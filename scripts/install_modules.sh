@@ -13,6 +13,8 @@ MODULE_SOURCE_DIR=~/modules/src
 MODULE_INSTALL_DIR=~/modules/opt
 MODULE_FILES_DIR=~/modulefiles
 
+NPROC=$(( $(nproc) < 8 ? $(nproc) : 8 ))
+
 mkdir -p ${MODULE_SOURCE_DIR}
 mkdir -p ${MODULE_INSTALL_DIR}
 mkdir -p ${MODULE_FILES_DIR}
@@ -38,8 +40,8 @@ wget https://cmake.org/files/v${major}.${minor}/cmake-${version}.tar.gz
 tar -xzf cmake-${version}.tar.gz
 
 cd cmake-${version}
-./bootstrap --prefix=${install_dir} --parallel=$(nproc) && \
-make -j $(nproc) && \
+./bootstrap --prefix=${install_dir} --parallel=${NPROC} && \
+make -j ${NPROC} && \
 make install
 
 cd  ${MODULE_FILES_DIR}/cmake
@@ -81,7 +83,7 @@ cmake -DCMAKE_INSTALL_PREFIX:PATH=${install_dir} \
         -DBUILD_SHARED_LIBS=ON \
         -DCMAKE_BUILD_TYPE=Release \
         -DEXAMPLES_ENABLE=OFF .. && \
-make -j $(nproc) && \
+make -j ${NPROC} && \
 make install
 
 cd  ${MODULE_FILES_DIR}/sundials
@@ -133,14 +135,14 @@ tar -xjf boost_${ver_si_on}.tar.bz2
 cd boost_${ver_si_on}
 if [[ (${major} -lt 1) || ((${major} -eq 1) && (${minor} -le 39)) ]]; then
     ./configure --prefix=${install_dir} && \
-    make -j $(nproc) && \
+    make -j ${NPROC} && \
     make install
 elif [ ${major} -eq 1 ] && [ ${minor} -le 49 ]; then
     ./bootstrap.sh --prefix=${install_dir} && \
-    ./bjam -j $(nproc) install
+    ./bjam -j ${NPROC} install
 else
     ./bootstrap.sh --prefix=${install_dir} && \
-    ./b2 -j $(nproc) install
+    ./b2 -j ${NPROC} install
 fi
 
 cd  ${MODULE_FILES_DIR}/boost
@@ -188,14 +190,14 @@ if [ ${major} -le 2 ]; then
     export XERCESCROOT=$(pwd)
     cd src/xercesc
     ./runConfigure -plinux -cgcc -xg++ -P${install_dir} && \
-    make -j $(nproc) && \
+    make -j ${NPROC} && \
     make install
 else
     wget https://archive.apache.org/dist/xerces/c/${major}/sources/xerces-c-${version}.tar.gz
     tar -xzf xerces-c-${version}.tar.gz
     cd xerces-c-${version}
     ./configure --enable-netaccessor-socket --prefix=${install_dir} && \
-    make -j $(nproc) && \
+    make -j ${NPROC} && \
     make install
 fi
 
