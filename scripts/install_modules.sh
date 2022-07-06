@@ -2,7 +2,7 @@
 # set -o errexit
 # set -o nounset
 
-MODULE_CMAKE_VERSIONS='2.8.12.2 3.9.1'
+MODULE_CMAKE_VERSIONS='2.4.8 2.8.12.2 3.9.1'
 
 MODULE_SUNDIALS_VERSIONS='2.7.0 4.1.0'
 MODULE_BOOST_VERSIONS='1.58.0 1.69.0'
@@ -38,7 +38,7 @@ wget https://cmake.org/files/v${major}.${minor}/cmake-${version}.tar.gz
 tar -xzf cmake-${version}.tar.gz
 
 cd cmake-${version}
-cmake -DCMAKE_INSTALL_PREFIX=${install_dir} . && \
+./bootstrap --prefix=${install_dir} --parallel=$(nproc) && \
 make -j $(nproc) && \
 make install
 
