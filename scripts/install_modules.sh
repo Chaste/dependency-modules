@@ -76,8 +76,11 @@ tar -xzf sundials-${version}.tar.gz
 cd sundials-${version}
 mkdir build
 cd build
+module switch cmake/3.9.1
 cmake -DCMAKE_INSTALL_PREFIX:PATH=${install_dir} \
-        -DEXAMPLES_INSTALL_PATH=${install_dir} .. && \
+        -DBUILD_SHARED_LIBS=ON \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DEXAMPLES_ENABLE=OFF .. && \
 make -j $(nproc) && \
 make install
 
