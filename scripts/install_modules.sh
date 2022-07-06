@@ -8,6 +8,7 @@ MODULE_SUNDIALS_VERSIONS='2.7.0 4.1.0'
 MODULE_BOOST_VERSIONS='1.58.0 1.69.0'
 MODULE_XERCES_VERSIONS='3.1.1 3.2.1'
 MODULE_XSD_VERSIONS='3.3.0 4.0.0'
+MODULE_VTK_VERSIONS='8.1.0' # TODO: 5.10.1
 
 MODULE_SOURCE_DIR=~/modules/src
 MODULE_INSTALL_DIR=~/modules/opt
@@ -271,5 +272,64 @@ prepend-path    LIBRARY_PATH         ${install_dir}/libxsd
 prepend-path    LD_LIBRARY_PATH      ${install_dir}/libxsd
 
 conflict xsd
+EOF
+done
+
+#==================== VTK ====================
+mkdir ${MODULE_SOURCE_DIR}/vtk
+mkdir ${MODULE_INSTALL_DIR}/vtk
+mkdir ${MODULE_FILES_DIR}/vtk
+
+for version in ${MODULE_VTK_VERSIONS}; do
+install_dir=${MODULE_INSTALL_DIR}/vtk/${version}
+mkdir ${install_dir}
+
+version_arr=(${version//\./ })
+major=${version_arr[0]}
+minor=${version_arr[1]}
+
+cd  ${MODULE_SOURCE_DIR}/vtk
+src_dir=VTK-${version}
+mkdir ${src_dir}
+if [[ (${major} -lt 6) || ((${major} -eq 6) && (${minor} -le 0)) ]]; then
+    wget http://www.vtk.org/files/release/${major}.${minor}/vtk-${version}.tar.gz
+    tar -xzf vtk-${version}.tar.gz -C ${src_dir} --strip-components=1
+else
+    wget https://github.com/Kitware/VTK/archive/v${version}.tar.gz
+    tar -xzf v${version}.tar.gz -C ${src_dir} --strip-components=1
+fi
+
+build_dir=build-${src_dir}
+mkdir ${build_dir}
+cd ${build_dir}
+module switch cmake/2.6.3
+cmake -DBUILD_SHARED_LIBS=ON \
+        -DCMAKE_INSTALL_PREFIX=${install_dir} \
+        -DCMAKE_INSTALL_RPATH=${install_dir}/lib/vtk-${major}.${minor} ../${src_dir} && \
+make -j $(nproc) && \
+make install
+
+cd  ${MODULE_FILES_DIR}/vtk
+cat <<EOF > ${version}
+#%Module1.0#####################################################################
+###
+## vtk ${version} modulefile
+##
+proc ModulesHelp { } {
+    puts stderr "\tThis adds the environment variables for vtk ${version}\n"
+}
+
+module-whatis "This adds the environment variables for vtk ${version}"
+
+setenv          VTK_ROOT             ${install_dir}
+prepend-path    CMAKE_PREFIX_PATH    ${install_dir}
+prepend-path    PATH                 ${install_dir}/bin
+prepend-path    LIBRARY_PATH         ${install_dir}/lib
+prepend-path    LD_LIBRARY_PATH      ${install_dir}/lib
+prepend-path    INCLUDE              ${install_dir}/include
+prepend-path    C_INCLUDE_PATH       ${install_dir}/include
+prepend-path    CPLUS_INCLUDE_PATH   ${install_dir}/include
+
+conflict vtk
 EOF
 done
