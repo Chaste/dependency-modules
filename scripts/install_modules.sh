@@ -63,6 +63,8 @@ conflict cmake
 EOF
 done
 
+module switch cmake/3.9.1
+
 #==================== SUNDIALS ====================
 mkdir ${MODULE_SOURCE_DIR}/sundials
 mkdir ${MODULE_INSTALL_DIR}/sundials
@@ -79,7 +81,6 @@ tar -xzf sundials-${version}.tar.gz
 cd sundials-${version}
 mkdir build
 cd build
-module switch cmake/3.9.1
 cmake -DCMAKE_INSTALL_PREFIX:PATH=${install_dir} \
         -DBUILD_SHARED_LIBS=ON \
         -DCMAKE_BUILD_TYPE=Release \
