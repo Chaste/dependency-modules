@@ -8,7 +8,7 @@ MODULE_SUNDIALS_VERSIONS='2.7.0 4.1.0'
 MODULE_BOOST_VERSIONS='1.58.0 1.69.0'
 MODULE_XERCES_VERSIONS='3.1.1 3.2.1'
 MODULE_XSD_VERSIONS='3.3.0 4.0.0'
-MODULE_VTK_VERSIONS='8.1.0' # TODO: 5.10.1
+MODULE_VTK_VERSIONS='6.3.0 8.1.0'
 
 MODULE_SOURCE_DIR=~/modules/src
 MODULE_INSTALL_DIR=~/modules/opt
@@ -303,10 +303,20 @@ else
     tar -xzf v${version}.tar.gz -C ${src_dir} --strip-components=1
 fi
 
-build_dir=build-${src_dir}
+if [ ${version} = 6.3.0 ]; then
+    #Fix for gcc 6-9: https://public.kitware.com/pipermail/vtkusers/2017-April/098448.html
+    cp ./${src_dir}/CMake/vtkCompilerExtras.cmake ./${src_dir}/CMake/vtkCompilerExtras.cmake.bak
+    sed -i '35s/^/#/' ./${src_dir}/CMake/vtkCompilerExtras.cmake
+    sed -i '36i\string (REGEX MATCH "[3-9]\\\\.[0-9]\\\\.[0-9]*"' ./${src_dir}/CMake/vtkCompilerExtras.cmake
+
+    cp ./${src_dir}/CMake/GenerateExportHeader.cmake ./${src_dir}/CMake/GenerateExportHeader.cmake.bak
+    sed -i '169s/^/#/' ./${src_dir}/CMake/GenerateExportHeader.cmake
+    sed -i '170i\   string (REGEX MATCH "[3-9]\\\\.[0-9]\\\\.[0-9]*"' ./${src_dir}/CMake/GenerateExportHeader.cmake
+fi
+
+build_dir=${src_dir}-build
 mkdir ${build_dir}
 cd ${build_dir}
-module switch cmake/2.6.3
 cmake -DBUILD_SHARED_LIBS=ON \
         -DCMAKE_INSTALL_PREFIX=${install_dir} \
         -DCMAKE_INSTALL_RPATH=${install_dir}/lib/vtk-${major}.${minor} ../${src_dir} && \
@@ -330,9 +340,9 @@ prepend-path    CMAKE_PREFIX_PATH    ${install_dir}
 prepend-path    PATH                 ${install_dir}/bin
 prepend-path    LIBRARY_PATH         ${install_dir}/lib
 prepend-path    LD_LIBRARY_PATH      ${install_dir}/lib
-prepend-path    INCLUDE              ${install_dir}/include
-prepend-path    C_INCLUDE_PATH       ${install_dir}/include
-prepend-path    CPLUS_INCLUDE_PATH   ${install_dir}/include
+prepend-path    INCLUDE              ${install_dir}/include/vtk-${major}.${minor}
+prepend-path    C_INCLUDE_PATH       ${install_dir}/include/vtk-${major}.${minor}
+prepend-path    CPLUS_INCLUDE_PATH   ${install_dir}/include/vtk-${major}.${minor}
 
 conflict vtk
 EOF
