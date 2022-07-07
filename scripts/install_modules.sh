@@ -2,6 +2,7 @@
 # set -o errexit
 # set -o nounset
 
+MODULE_GCC_VERSIONS='5.5.0'
 MODULE_CMAKE_VERSIONS='2.4.8 2.8.12.2 3.9.1'
 
 MODULE_SUNDIALS_VERSIONS='2.7.0 4.1.0'
@@ -22,6 +23,98 @@ mkdir -p ${MODULE_FILES_DIR}
 
 echo "module use ${MODULE_FILES_DIR}" >> ~/.bashrc
 source ~/.bashrc
+
+#==================== GCC ====================
+mkdir ${MODULE_SOURCE_DIR}/gcc
+mkdir ${MODULE_INSTALL_DIR}/gcc
+mkdir ${MODULE_FILES_DIR}/gcc
+
+for version in ${MODULE_GCC_VERSIONS}; do
+install_dir=${MODULE_INSTALL_DIR}/gcc/${version}
+mkdir ${install_dir}
+
+version_arr=(${version//\./ })
+major=${version_arr[0]}
+minor=${version_arr[1]}
+
+gmp_ver=6.2.1
+mpfr_ver=4.1.0
+mpc_ver=1.2.1
+isl_ver=0.24
+if [ ${major} -le 5 ]; then
+    gmp_ver=6.1.2
+    mpfr_ver=3.1.5
+    mpc_ver=1.0.3
+    isl_ver=0.18
+fi
+
+cd  ${MODULE_SOURCE_DIR}/gcc
+wget https://ftp.gnu.org/gnu/gcc/gcc-${version}/gcc-${version}.tar.xz
+wget https://ftp.gnu.org/gnu/gmp/gmp-${gmp_ver}.tar.xz
+wget https://ftp.gnu.org/gnu/mpfr/mpfr-${mpfr_ver}.tar.xz
+wget https://ftp.gnu.org/gnu/mpc/mpc-${mpc_ver}.tar.gz
+wget https://gcc.gnu.org/pub/gcc/infrastructure/isl-${isl_ver}.tar.bz2
+
+tar -xf gcc-${version}.tar.xz
+tar -xf gmp-${gmp_ver}.tar.xz
+tar -xf mpfr-${mpfr_ver}.tar.xz
+tar -xzf mpc-${mpc_ver}.tar.gz
+tar -xjf isl-${isl_ver}.tar.bz2
+
+cd gcc-${version}/
+ln -s ../gmp-${gmp_ver} gmp
+ln -s ../mpfr-${mpfr_ver} mpfr
+ln -s ../mpc-${mpc_ver} mpc
+ln -s ../isl-${isl_ver} isl
+
+mkdir build
+cd build
+../configure -v --prefix=${install_dir} \
+                --libdir=${install_dir}/lib \
+                --libexecdir=${install_dir}/lib \
+                --build=x86_64-linux-gnu \
+                --host=x86_64-linux-gnu \
+                --target=x86_64-linux-gnu \
+                --enable-checking=release \
+                --enable-languages=c,c++ \
+                --disable-multilib \
+                --disable-multiarch \
+                --program-suffix= \
+                --program-prefix= \
+                --enable-shared \
+                --disable-vtable-verify && \
+make -j ${NPROC} && \
+make install
+
+cd  ${MODULE_FILES_DIR}/gcc
+cat <<EOF > ${version}
+#%Module1.0#####################################################################
+###
+## gcc ${version} modulefile
+##
+proc ModulesHelp { } {
+    puts stderr "\tThis adds the environment variables for gcc ${version}\n"
+}
+
+module-whatis "This adds the environment variables for gcc ${version}"
+
+setenv          CC                 ${install_dir}/bin/gcc
+setenv          CXX                ${install_dir}/bin/g++
+
+prepend-path    PATH               ${install_dir}/bin
+
+prepend-path    LD_LIBRARY_PATH    ${install_dir}/lib
+prepend-path    LIBRARY_PATH       ${install_dir}/lib
+
+prepend-path    LD_LIBRARY_PATH    ${install_dir}/lib/../lib64
+prepend-path    LIBRARY_PATH       ${install_dir}/lib/../lib64
+
+prepend-path    LD_LIBRARY_PATH    ${install_dir}/lib/plugin
+prepend-path    LIBRARY_PATH       ${install_dir}/lib/plugin
+
+conflict gcc
+EOF
+done
 
 #==================== CMAKE ====================
 mkdir ${MODULE_SOURCE_DIR}/cmake
