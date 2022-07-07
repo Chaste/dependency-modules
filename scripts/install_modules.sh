@@ -147,6 +147,11 @@ else
     ./b2 -j ${NPROC} install
 fi
 
+if [ ${version} = 1.64.0 ]; then
+    # Fix: https://github.com/boostorg/serialization/commit/1d86261581230e2dc5d617a9b16287d326f3e229
+    sed -i.bak '25i\#include <boost/serialization/array_wrapper.hpp>' ${install_dir}/include/boost/serialization/array.hpp
+fi
+
 cd  ${MODULE_FILES_DIR}/boost
 cat <<EOF > ${version}
 #%Module1.0#####################################################################
