@@ -305,7 +305,7 @@ module switch cmake/2.6.3
 cmake -DBUILD_SHARED_LIBS=ON \
         -DCMAKE_INSTALL_PREFIX=${install_dir} \
         -DCMAKE_INSTALL_RPATH=${install_dir}/lib/vtk-${major}.${minor} ../${src_dir} && \
-make -j $(nproc) && \
+make -j ${NPROC} && \
 make install
 
 cd  ${MODULE_FILES_DIR}/vtk
