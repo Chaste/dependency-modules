@@ -245,9 +245,7 @@ minor=${version_arr[1]}
 
 cd  ${MODULE_SOURCE_DIR}/xsd
 wget https://www.codesynthesis.com/download/xsd/${major}.${minor}/linux-gnu/x86_64/xsd-${version}-x86_64-linux-gnu.tar.bz2
-tar -xjf xsd-${version}-x86_64-linux-gnu.tar.bz2
-
-rsync -a --delete xsd-${version}-x86_64-linux-gnu/ ${install_dir}/
+tar -xjf xsd-${version}-x86_64-linux-gnu.tar.bz2 -C ${install_dir} --strip-components=1
 
 if [ ${major} -eq 3 ]; then
     cd ${install_dir}
