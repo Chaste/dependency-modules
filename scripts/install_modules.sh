@@ -370,64 +370,64 @@ for version in ${MODULE_PETSC_VERSIONS}; do
     tar -xzf petsc-lite-${version}.tar.gz -C ${install_dir} --strip-components=1
 
     for arch in ${MODULE_PETSC_ARCHS}; do
-    cd ${install_dir}
-    export PETSC_DIR=$(pwd)
+        cd ${install_dir}
+        export PETSC_DIR=$(pwd)
 
-    case ${arch} in
+        case ${arch} in
 
-        linux-gnu)
-            export PETSC_ARCH=linux-gnu
-            ./configure --with-make-np=${NPROC} \
-                        --download-f2cblaslapack=1 \
-                        --download-mpich=1 \
-                        --download-hdf5=1 \
-                        --download-parmetis=1 \
-                        --download-metis=1 \
-                        --download-hypre=1 \
-                        --with-x=false \
-                        --with-shared-libraries && \
-            make all
-            ;;
+            linux-gnu)
+                export PETSC_ARCH=linux-gnu
+                ./configure --with-make-np=${NPROC} \
+                            --download-f2cblaslapack=1 \
+                            --download-mpich=1 \
+                            --download-hdf5=1 \
+                            --download-parmetis=1 \
+                            --download-metis=1 \
+                            --download-hypre=1 \
+                            --with-x=false \
+                            --with-shared-libraries && \
+                make all
+                ;;
 
-        linux-gnu-opt)
-            export PETSC_ARCH=linux-gnu-opt
-            ./configure --with-make-np=${NPROC} \
-                        --download-f2cblaslapack=1 \
-                        --download-mpich=1 \
-                        --download-hdf5=1 \
-                        --download-parmetis=1 \
-                        --download-metis=1 \
-                        --download-hypre=1 \
-                        --with-x=false \
-                        --with-shared-libraries \
-                        --with-debugging=0 && \
-            make all
-            ;;
+            linux-gnu-opt)
+                export PETSC_ARCH=linux-gnu-opt
+                ./configure --with-make-np=${NPROC} \
+                            --download-f2cblaslapack=1 \
+                            --download-mpich=1 \
+                            --download-hdf5=1 \
+                            --download-parmetis=1 \
+                            --download-metis=1 \
+                            --download-hypre=1 \
+                            --with-x=false \
+                            --with-shared-libraries \
+                            --with-debugging=0 && \
+                make all
+                ;;
 
-        linux-gnu-profile)
-            export PETSC_ARCH=linux-gnu-profile
-            ./configure --with-make-np=${NPROC} \
-                        --download-f2cblaslapack=1 \
-                        --download-mpich=1 \
-                        --download-hdf5=1 \
-                        --download-parmetis=1 \
-                        --download-metis=1 \
-                        --download-hypre=1 \
-                        --with-x=false \
-                        --with-shared-libraries \
-                        --CFLAGS="-fno-omit-frame-pointer -pg" \
-                        --CXX_CXXFLAGS="-fno-omit-frame-pointer -pg" \
-                        --LDFLAGS=-pg && \
-            make all
-            ;;
+            linux-gnu-profile)
+                export PETSC_ARCH=linux-gnu-profile
+                ./configure --with-make-np=${NPROC} \
+                            --download-f2cblaslapack=1 \
+                            --download-mpich=1 \
+                            --download-hdf5=1 \
+                            --download-parmetis=1 \
+                            --download-metis=1 \
+                            --download-hypre=1 \
+                            --with-x=false \
+                            --with-shared-libraries \
+                            --CFLAGS="-fno-omit-frame-pointer -pg" \
+                            --CXX_CXXFLAGS="-fno-omit-frame-pointer -pg" \
+                            --LDFLAGS=-pg && \
+                make all
+                ;;
 
-        *)
-            #TODO Catch unknown arch error
-            ;;
-    esac
+            *)
+                #TODO Catch unknown arch error
+                ;;
+        esac
 
-    cd ${MODULE_FILES_DIR}/petsc/${version}
-    cat <<EOF > ${arch}
+        cd ${MODULE_FILES_DIR}/petsc/${version}
+        cat <<EOF > ${arch}
 #%Module1.0#####################################################################
 ###
 ## petsc ${version}/${arch} modulefile
@@ -450,4 +450,6 @@ prepend-path    CPLUS_INCLUDE_PATH   ${install_dir}/${arch}/include
 
 conflict petsc
 EOF
+
+    done
 done
