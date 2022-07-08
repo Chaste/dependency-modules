@@ -69,50 +69,54 @@ done
 module switch cmake/3.9.1
 
 #==================== SUNDIALS ====================
+read -r -d '' MODULE_SUNDIALS_TEMPLATE <<'EOF'
+#%Module1.0#####################################################################
+###
+## sundials __VERSION__ modulefile
+##
+proc ModulesHelp { } {
+    puts stderr "\tThis adds the environment variables for sundials __VERSION__\n"
+}
+
+module-whatis "This adds the environment variables for sundials __VERSION__"
+
+setenv          SUNDIALS_ROOT        __INSTALL_DIR__
+prepend-path    CMAKE_PREFIX_PATH    __INSTALL_DIR__
+prepend-path    LIBRARY_PATH         __INSTALL_DIR__/lib
+prepend-path    LD_LIBRARY_PATH      __INSTALL_DIR__/lib
+prepend-path    INCLUDE              __INSTALL_DIR__/include
+prepend-path    C_INCLUDE_PATH       __INSTALL_DIR__/include
+prepend-path    CPLUS_INCLUDE_PATH   __INSTALL_DIR__/include
+
+conflict sundials
+EOF
+
 mkdir ${MODULE_SOURCE_DIR}/sundials
 mkdir ${MODULE_INSTALL_DIR}/sundials
 mkdir ${MODULE_FILES_DIR}/sundials
 
 for version in ${MODULE_SUNDIALS_VERSIONS}; do
-install_dir=${MODULE_INSTALL_DIR}/sundials/${version}
-mkdir ${install_dir}
+    install_dir=${MODULE_INSTALL_DIR}/sundials/${version}
+    mkdir ${install_dir}
 
-cd  ${MODULE_SOURCE_DIR}/sundials
-wget https://github.com/LLNL/sundials/releases/download/v${version}/sundials-${version}.tar.gz
-tar -xzf sundials-${version}.tar.gz
+    cd  ${MODULE_SOURCE_DIR}/sundials
+    wget https://github.com/LLNL/sundials/releases/download/v${version}/sundials-${version}.tar.gz
+    tar -xzf sundials-${version}.tar.gz
 
-cd sundials-${version}
-mkdir build
-cd build
-cmake -DCMAKE_INSTALL_PREFIX:PATH=${install_dir} \
-        -DBUILD_SHARED_LIBS=ON \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DEXAMPLES_ENABLE=OFF .. && \
-make -j ${NPROC} && \
-make install
+    cd sundials-${version}
+    mkdir build
+    cd build
+    cmake -DCMAKE_INSTALL_PREFIX=${install_dir} \
+            -DBUILD_SHARED_LIBS=ON \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DEXAMPLES_ENABLE=OFF .. && \
+    make -j ${NPROC} && \
+    make install
 
-cd  ${MODULE_FILES_DIR}/sundials
-cat <<EOF > ${version}
-#%Module1.0#####################################################################
-###
-## sundials ${version} modulefile
-##
-proc ModulesHelp { } {
-    puts stderr "\tThis adds the environment variables for sundials ${version}\n"
-}
-
-module-whatis "This adds the environment variables for sundials ${version}"
-
-setenv          SUNDIALS_ROOT        ${install_dir}
-prepend-path    CMAKE_PREFIX_PATH    ${install_dir}
-prepend-path    LIBRARY_PATH         ${install_dir}/lib
-prepend-path    LD_LIBRARY_PATH      ${install_dir}/lib
-prepend-path    INCLUDE              ${install_dir}/include
-prepend-path    C_INCLUDE_PATH       ${install_dir}/include
-prepend-path    CPLUS_INCLUDE_PATH   ${install_dir}/include
-
-conflict sundials
-EOF
+    cd  ${MODULE_FILES_DIR}/sundials
+    echo "${MODULE_SUNDIALS_TEMPLATE}" > ${version}
+    sed -i "s|__VERSION__|${version}|g" ${version}
+    sed -i "s|__INSTALL_DIR__|${install_dir}|g" ${version}
 done
 
 #==================== BOOST ====================
