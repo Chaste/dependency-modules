@@ -283,72 +283,78 @@ EOF
 done
 
 #==================== VTK ====================
+read -r -d '' MODULE_VTK_TEMPLATE <<'EOF'
+#%Module1.0#####################################################################
+###
+## vtk __VERSION__ modulefile
+##
+proc ModulesHelp { } {
+    puts stderr "\tThis adds the environment variables for vtk __VERSION__\n"
+}
+
+module-whatis "This adds the environment variables for vtk __VERSION__"
+
+setenv          VTK_ROOT             __INSTALL_DIR__
+prepend-path    CMAKE_PREFIX_PATH    __INSTALL_DIR__
+prepend-path    PATH                 __INSTALL_DIR__/bin
+prepend-path    LIBRARY_PATH         __INSTALL_DIR__/lib
+prepend-path    LD_LIBRARY_PATH      __INSTALL_DIR__/lib
+prepend-path    INCLUDE              __INSTALL_DIR__/include/vtk-__MAJOR__.__MINOR__
+prepend-path    C_INCLUDE_PATH       __INSTALL_DIR__/include/vtk-__MAJOR__.__MINOR__
+prepend-path    CPLUS_INCLUDE_PATH   __INSTALL_DIR__/include/vtk-__MAJOR__.__MINOR__
+
+conflict vtk
+EOF
+
 mkdir ${MODULE_SOURCE_DIR}/vtk
 mkdir ${MODULE_INSTALL_DIR}/vtk
 mkdir ${MODULE_FILES_DIR}/vtk
 
 for version in ${MODULE_VTK_VERSIONS}; do
-install_dir=${MODULE_INSTALL_DIR}/vtk/${version}
-mkdir ${install_dir}
+    install_dir=${MODULE_INSTALL_DIR}/vtk/${version}
+    mkdir ${install_dir}
 
-version_arr=(${version//\./ })
-major=${version_arr[0]}
-minor=${version_arr[1]}
+    version_arr=(${version//\./ })
+    major=${version_arr[0]}
+    minor=${version_arr[1]}
 
-cd  ${MODULE_SOURCE_DIR}/vtk
-src_dir=VTK-${version}
-mkdir ${src_dir}
-if [[ (${major} -lt 6) || ((${major} -eq 6) && (${minor} -le 0)) ]]; then
-    wget http://www.vtk.org/files/release/${major}.${minor}/vtk-${version}.tar.gz
-    tar -xzf vtk-${version}.tar.gz -C ${src_dir} --strip-components=1
-else
-    wget https://github.com/Kitware/VTK/archive/v${version}.tar.gz
-    tar -xzf v${version}.tar.gz -C ${src_dir} --strip-components=1
-fi
+    cd  ${MODULE_SOURCE_DIR}/vtk
+    src_dir=VTK-${version}
+    mkdir ${src_dir}
+    if [[ (${major} -lt 6) || ((${major} -eq 6) && (${minor} -le 0)) ]]; then
+        wget http://www.vtk.org/files/release/${major}.${minor}/vtk-${version}.tar.gz
+        tar -xzf vtk-${version}.tar.gz -C ${src_dir} --strip-components=1
+    else
+        wget https://github.com/Kitware/VTK/archive/v${version}.tar.gz
+        tar -xzf v${version}.tar.gz -C ${src_dir} --strip-components=1
+    fi
 
-if [ ${version} = 6.3.0 ]; then
-    #Fix for gcc 6-9: https://public.kitware.com/pipermail/vtkusers/2017-April/098448.html
-    cp ./${src_dir}/CMake/vtkCompilerExtras.cmake ./${src_dir}/CMake/vtkCompilerExtras.cmake.bak
-    sed -i '35s/^/#/' ./${src_dir}/CMake/vtkCompilerExtras.cmake
-    sed -i '36i\string (REGEX MATCH "[3-9]\\\\.[0-9]\\\\.[0-9]*"' ./${src_dir}/CMake/vtkCompilerExtras.cmake
+    if [ ${version} = 6.3.0 ]; then
+        #Fix for recognizing gcc 6-9: https://public.kitware.com/pipermail/vtkusers/2017-April/098448.html
+        cp ./${src_dir}/CMake/vtkCompilerExtras.cmake ./${src_dir}/CMake/vtkCompilerExtras.cmake.bak
+        sed -i '35s/^/#/' ./${src_dir}/CMake/vtkCompilerExtras.cmake
+        sed -i '36i\string (REGEX MATCH "[3-9]\\\\.[0-9]\\\\.[0-9]*"' ./${src_dir}/CMake/vtkCompilerExtras.cmake
 
-    cp ./${src_dir}/CMake/GenerateExportHeader.cmake ./${src_dir}/CMake/GenerateExportHeader.cmake.bak
-    sed -i '169s/^/#/' ./${src_dir}/CMake/GenerateExportHeader.cmake
-    sed -i '170i\   string (REGEX MATCH "[3-9]\\\\.[0-9]\\\\.[0-9]*"' ./${src_dir}/CMake/GenerateExportHeader.cmake
-fi
+        cp ./${src_dir}/CMake/GenerateExportHeader.cmake ./${src_dir}/CMake/GenerateExportHeader.cmake.bak
+        sed -i '169s/^/#/' ./${src_dir}/CMake/GenerateExportHeader.cmake
+        sed -i '170i\   string (REGEX MATCH "[3-9]\\\\.[0-9]\\\\.[0-9]*"' ./${src_dir}/CMake/GenerateExportHeader.cmake
+    fi
 
-build_dir=${src_dir}-build
-mkdir ${build_dir}
-cd ${build_dir}
-cmake -DBUILD_SHARED_LIBS=ON \
-        -DCMAKE_INSTALL_PREFIX=${install_dir} \
-        -DCMAKE_INSTALL_RPATH=${install_dir}/lib/vtk-${major}.${minor} ../${src_dir} && \
-make -j ${NPROC} && \
-make install
+    build_dir=${src_dir}-build
+    mkdir ${build_dir}
+    cd ${build_dir}
+    cmake -DBUILD_SHARED_LIBS=ON \
+            -DCMAKE_INSTALL_PREFIX=${install_dir} \
+            -DCMAKE_INSTALL_RPATH=${install_dir}/lib/vtk-${major}.${minor} ../${src_dir} && \
+    make -j ${NPROC} && \
+    make install
 
-cd  ${MODULE_FILES_DIR}/vtk
-cat <<EOF > ${version}
-#%Module1.0#####################################################################
-###
-## vtk ${version} modulefile
-##
-proc ModulesHelp { } {
-    puts stderr "\tThis adds the environment variables for vtk ${version}\n"
-}
-
-module-whatis "This adds the environment variables for vtk ${version}"
-
-setenv          VTK_ROOT             ${install_dir}
-prepend-path    CMAKE_PREFIX_PATH    ${install_dir}
-prepend-path    PATH                 ${install_dir}/bin
-prepend-path    LIBRARY_PATH         ${install_dir}/lib
-prepend-path    LD_LIBRARY_PATH      ${install_dir}/lib
-prepend-path    INCLUDE              ${install_dir}/include/vtk-${major}.${minor}
-prepend-path    C_INCLUDE_PATH       ${install_dir}/include/vtk-${major}.${minor}
-prepend-path    CPLUS_INCLUDE_PATH   ${install_dir}/include/vtk-${major}.${minor}
-
-conflict vtk
-EOF
+    cd  ${MODULE_FILES_DIR}/vtk
+    echo "${MODULE_VTK_TEMPLATE}" > ${version}
+    sed -i "s|__VERSION__|${version}|g" ${version}
+    sed -i "s|__INSTALL_DIR__|${install_dir}|g" ${version}
+    sed -i "s|__MAJOR__|${major}|g" ${version}
+    sed -i "s|__MINOR__|${minor}|g" ${version}
 done
 
 #==================== PETSC ====================
