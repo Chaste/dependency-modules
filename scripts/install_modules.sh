@@ -352,6 +352,30 @@ EOF
 done
 
 #==================== PETSC ====================
+read -r -d '' MODULE_PETSC_TEMPLATE <<'EOF'
+#%Module1.0#####################################################################
+###
+## petsc __VERSION__/__ARCH__ modulefile
+##
+proc ModulesHelp { } {
+    puts stderr "\tThis adds the environment variables for petsc __VERSION__/__ARCH__\n"
+}
+
+module-whatis "This adds the environment variables for petsc __VERSION__/__ARCH__"
+
+setenv          PETSC_ARCH           __ARCH__
+setenv          PETSC_DIR            __INSTALL_DIR__
+prepend-path    CMAKE_PREFIX_PATH    __INSTALL_DIR__/__ARCH__
+prepend-path    PATH                 __INSTALL_DIR__/__ARCH__/bin
+prepend-path    LIBRARY_PATH         __INSTALL_DIR__/__ARCH__/lib
+prepend-path    LD_LIBRARY_PATH      __INSTALL_DIR__/__ARCH__/lib
+prepend-path    INCLUDE              __INSTALL_DIR__/__ARCH__/include
+prepend-path    C_INCLUDE_PATH       __INSTALL_DIR__/__ARCH__/include
+prepend-path    CPLUS_INCLUDE_PATH   __INSTALL_DIR__/__ARCH__/include
+
+conflict petsc
+EOF
+
 mkdir ${MODULE_SOURCE_DIR}/petsc
 mkdir ${MODULE_INSTALL_DIR}/petsc
 mkdir ${MODULE_FILES_DIR}/petsc
@@ -427,29 +451,9 @@ for version in ${MODULE_PETSC_VERSIONS}; do
         esac
 
         cd ${MODULE_FILES_DIR}/petsc/${version}
-        cat <<EOF > ${arch}
-#%Module1.0#####################################################################
-###
-## petsc ${version}/${arch} modulefile
-##
-proc ModulesHelp { } {
-    puts stderr "\tThis adds the environment variables for petsc ${version}/${arch}\n"
-}
-
-module-whatis "This adds the environment variables for petsc ${version}/${arch}"
-
-setenv          PETSC_ARCH           ${arch}
-setenv          PETSC_DIR            ${install_dir}
-prepend-path    CMAKE_PREFIX_PATH    ${install_dir}/${arch}
-prepend-path    PATH                 ${install_dir}/${arch}/bin
-prepend-path    LIBRARY_PATH         ${install_dir}/${arch}/lib
-prepend-path    LD_LIBRARY_PATH      ${install_dir}/${arch}/lib
-prepend-path    INCLUDE              ${install_dir}/${arch}/include
-prepend-path    C_INCLUDE_PATH       ${install_dir}/${arch}/include
-prepend-path    CPLUS_INCLUDE_PATH   ${install_dir}/${arch}/include
-
-conflict petsc
-EOF
-
+        echo "${MODULE_PETSC_TEMPLATE}" > ${arch}
+        sed -i "s|__VERSION__|${version}|g" ${arch}
+        sed -i "s|__ARCH__|${arch}|g" ${arch}
+        sed -i "s|__INSTALL_DIR__|${install_dir}|g" ${arch}
     done
 done
