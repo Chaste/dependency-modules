@@ -464,6 +464,10 @@ for version in ${MODULE_PETSC_VERSIONS}; do
     wget https://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-lite-${version}.tar.gz
     tar -xzf petsc-lite-${version}.tar.gz -C ${install_dir} --strip-components=1
 
+    if [[ (${major} -lt 3) || ((${major} -eq 3) && (${minor} -le 9)) ]]; then
+        module switch python/2.7.18
+    fi
+
     for arch in ${MODULE_PETSC_ARCHS}; do
         cd ${install_dir}
         export PETSC_DIR=$(pwd)
@@ -527,4 +531,5 @@ for version in ${MODULE_PETSC_VERSIONS}; do
         sed -i "s|__ARCH__|${arch}|g" ${arch}
         sed -i "s|__INSTALL_DIR__|${install_dir}|g" ${arch}
     done
+    module unload python/2.7.18
 done
