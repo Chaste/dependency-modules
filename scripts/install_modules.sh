@@ -116,67 +116,71 @@ EOF
 done
 
 #==================== BOOST ====================
+read -r -d '' MODULE_BOOST_TEMPLATE <<'EOF'
+#%Module1.0#####################################################################
+###
+## boost __VERSION__ modulefile
+##
+proc ModulesHelp { } {
+    puts stderr "\tThis adds the environment variables for boost __VERSION__\n"
+}
+
+module-whatis "This adds the environment variables for boost __VERSION__"
+
+setenv          BOOST_ROOT           __INSTALL_DIR__
+prepend-path    CMAKE_PREFIX_PATH    __INSTALL_DIR__
+prepend-path    LIBRARY_PATH         __INSTALL_DIR__/lib
+prepend-path    LD_LIBRARY_PATH      __INSTALL_DIR__/lib
+prepend-path    INCLUDE              __INSTALL_DIR__/include
+prepend-path    C_INCLUDE_PATH       __INSTALL_DIR__/include
+prepend-path    CPLUS_INCLUDE_PATH   __INSTALL_DIR__/include
+
+conflict boost
+EOF
+
 mkdir ${MODULE_SOURCE_DIR}/boost
 mkdir ${MODULE_INSTALL_DIR}/boost
 mkdir ${MODULE_FILES_DIR}/boost
 
 for version in ${MODULE_BOOST_VERSIONS}; do
-install_dir=${MODULE_INSTALL_DIR}/boost/${version}
-mkdir ${install_dir}
+    install_dir=${MODULE_INSTALL_DIR}/boost/${version}
+    mkdir ${install_dir}
 
-ver_si_on=${version//\./_}
-version_arr=(${version//\./ })
-major=${version_arr[0]}
-minor=${version_arr[1]}
+    ver_si_on=${version//\./_}  # convert 1.69.0 to 1_69_0
+    version_arr=(${version//\./ })
+    major=${version_arr[0]}
+    minor=${version_arr[1]}
 
-cd  ${MODULE_SOURCE_DIR}/boost
-if [[ (${major} -lt 1) || ((${major} -eq 1) && (${minor} -le 70)) ]]; then
-    wget https://downloads.sourceforge.net/project/boost/boost/${version}/boost_${ver_si_on}.tar.bz2
-else
-    wget https://dl.bintray.com/boostorg/release/${version}/source/boost_${ver_si_on}.tar.bz2
-fi
-tar -xjf boost_${ver_si_on}.tar.bz2
+    cd  ${MODULE_SOURCE_DIR}/boost
+    if [[ (${major} -lt 1) || ((${major} -eq 1) && (${minor} -le 70)) ]]; then
+        wget https://downloads.sourceforge.net/project/boost/boost/${version}/boost_${ver_si_on}.tar.bz2
+    else
+        wget https://dl.bintray.com/boostorg/release/${version}/source/boost_${ver_si_on}.tar.bz2
+    fi
+    tar -xjf boost_${ver_si_on}.tar.bz2
 
-cd boost_${ver_si_on}
-if [[ (${major} -lt 1) || ((${major} -eq 1) && (${minor} -le 39)) ]]; then
-    ./configure --prefix=${install_dir} && \
-    make -j ${NPROC} && \
-    make install
-elif [ ${major} -eq 1 ] && [ ${minor} -le 49 ]; then
-    ./bootstrap.sh --prefix=${install_dir} && \
-    ./bjam -j ${NPROC} install
-else
-    ./bootstrap.sh --prefix=${install_dir} && \
-    ./b2 -j ${NPROC} install
-fi
+    cd boost_${ver_si_on}
+    if [[ (${major} -lt 1) || ((${major} -eq 1) && (${minor} -le 39)) ]]; then
+        ./configure --prefix=${install_dir} && \
+        make -j ${NPROC} && \
+        make install
+    elif [ ${major} -eq 1 ] && [ ${minor} -le 49 ]; then
+        ./bootstrap.sh --prefix=${install_dir} && \
+        ./bjam -j ${NPROC} install
+    else
+        ./bootstrap.sh --prefix=${install_dir} && \
+        ./b2 -j ${NPROC} install
+    fi
 
-if [ ${version} = 1.64.0 ]; then
-    # Fix: https://github.com/boostorg/serialization/commit/1d86261581230e2dc5d617a9b16287d326f3e229
-    sed -i.bak '25i\#include <boost/serialization/array_wrapper.hpp>' ${install_dir}/include/boost/serialization/array.hpp
-fi
+    if [ ${version} = 1.64.0 ]; then
+        # Fix: https://github.com/boostorg/serialization/commit/1d86261581230e2dc5d617a9b16287d326f3e229
+        sed -i.bak '25i\#include <boost/serialization/array_wrapper.hpp>' ${install_dir}/include/boost/serialization/array.hpp
+    fi
 
-cd  ${MODULE_FILES_DIR}/boost
-cat <<EOF > ${version}
-#%Module1.0#####################################################################
-###
-## boost ${version} modulefile
-##
-proc ModulesHelp { } {
-    puts stderr "\tThis adds the environment variables for boost ${version}\n"
-}
-
-module-whatis "This adds the environment variables for boost ${version}"
-
-setenv          BOOST_ROOT           ${install_dir}
-prepend-path    CMAKE_PREFIX_PATH    ${install_dir}
-prepend-path    LIBRARY_PATH         ${install_dir}/lib
-prepend-path    LD_LIBRARY_PATH      ${install_dir}/lib
-prepend-path    INCLUDE              ${install_dir}/include
-prepend-path    C_INCLUDE_PATH       ${install_dir}/include
-prepend-path    CPLUS_INCLUDE_PATH   ${install_dir}/include
-
-conflict boost
-EOF
+    cd  ${MODULE_FILES_DIR}/boost
+    echo "${MODULE_BOOST_TEMPLATE}" > ${version}
+    sed -i "s|__VERSION__|${version}|g" ${version}
+    sed -i "s|__INSTALL_DIR__|${install_dir}|g" ${version}
 done
 
 #==================== XERCES-C ====================
