@@ -180,59 +180,63 @@ EOF
 done
 
 #==================== XERCES-C ====================
+read -r -d '' MODULE_XERCES_TEMPLATE <<'EOF'
+#%Module1.0#####################################################################
+###
+## xercesc __VERSION__ modulefile
+##
+proc ModulesHelp { } {
+    puts stderr "\tThis adds the environment variables for xercesc __VERSION__\n"
+}
+
+module-whatis "This adds the environment variables for xercesc __VERSION__"
+
+prepend-path    CMAKE_PREFIX_PATH    __INSTALL_DIR__
+prepend-path    PATH                 __INSTALL_DIR__/bin
+prepend-path    LIBRARY_PATH         __INSTALL_DIR__/lib
+prepend-path    LD_LIBRARY_PATH      __INSTALL_DIR__/lib
+prepend-path    INCLUDE              __INSTALL_DIR__/include
+prepend-path    C_INCLUDE_PATH       __INSTALL_DIR__/include
+prepend-path    CPLUS_INCLUDE_PATH   __INSTALL_DIR__/include
+
+conflict xercesc
+EOF
+
 mkdir ${MODULE_SOURCE_DIR}/xercesc
 mkdir ${MODULE_INSTALL_DIR}/xercesc
 mkdir ${MODULE_FILES_DIR}/xercesc
 
 for version in ${MODULE_XERCES_VERSIONS}; do
-install_dir=${MODULE_INSTALL_DIR}/xercesc/${version}
-mkdir ${install_dir}
+    install_dir=${MODULE_INSTALL_DIR}/xercesc/${version}
+    mkdir ${install_dir}
 
-ver_si_on=${version//\./_}
-version_arr=(${version//\./ })
-major=${version_arr[0]}
+    ver_si_on=${version//\./_}  # convert 3.1.1 to 3_1_1
+    version_arr=(${version//\./ })
+    major=${version_arr[0]}
 
-cd  ${MODULE_SOURCE_DIR}/xercesc
-if [ ${major} -le 2 ]; then
-    wget https://archive.apache.org/dist/xerces/c/${major}/sources/xerces-c-src_${ver_si_on}.tar.gz
-    tar -xzf xerces-c-src_${ver_si_on}.tar.gz
-    cd xerces-c-src_${ver_si_on}
-    export XERCESCROOT=$(pwd)
-    cd src/xercesc
-    ./runConfigure -plinux -cgcc -xg++ -P${install_dir} && \
-    make -j ${NPROC} && \
-    make install
-else
-    wget https://archive.apache.org/dist/xerces/c/${major}/sources/xerces-c-${version}.tar.gz
-    tar -xzf xerces-c-${version}.tar.gz
-    cd xerces-c-${version}
-    ./configure --enable-netaccessor-socket --prefix=${install_dir} && \
-    make -j ${NPROC} && \
-    make install
-fi
+    cd  ${MODULE_SOURCE_DIR}/xercesc
+    if [ ${major} -le 2 ]; then
+        wget https://archive.apache.org/dist/xerces/c/${major}/sources/xerces-c-src_${ver_si_on}.tar.gz
+        tar -xzf xerces-c-src_${ver_si_on}.tar.gz
+        cd xerces-c-src_${ver_si_on}
+        export XERCESCROOT=$(pwd)
+        cd src/xercesc
+        ./runConfigure -plinux -cgcc -xg++ -P${install_dir} && \
+        make -j ${NPROC} && \
+        make install
+    else
+        wget https://archive.apache.org/dist/xerces/c/${major}/sources/xerces-c-${version}.tar.gz
+        tar -xzf xerces-c-${version}.tar.gz
+        cd xerces-c-${version}
+        ./configure --enable-netaccessor-socket --prefix=${install_dir} && \
+        make -j ${NPROC} && \
+        make install
+    fi
 
-cd  ${MODULE_FILES_DIR}/xercesc
-cat <<EOF > ${version}
-#%Module1.0#####################################################################
-###
-## xercesc ${version} modulefile
-##
-proc ModulesHelp { } {
-    puts stderr "\tThis adds the environment variables for xercesc ${version}\n"
-}
-
-module-whatis "This adds the environment variables for xercesc ${version}"
-
-prepend-path    CMAKE_PREFIX_PATH    ${install_dir}
-prepend-path    PATH                 ${install_dir}/bin
-prepend-path    LIBRARY_PATH         ${install_dir}/lib
-prepend-path    LD_LIBRARY_PATH      ${install_dir}/lib
-prepend-path    INCLUDE              ${install_dir}/include
-prepend-path    C_INCLUDE_PATH       ${install_dir}/include
-prepend-path    CPLUS_INCLUDE_PATH   ${install_dir}/include
-
-conflict xercesc
-EOF
+    cd  ${MODULE_FILES_DIR}/xercesc
+    echo "${MODULE_XERCES_TEMPLATE}" > ${version}
+    sed -i "s|__VERSION__|${version}|g" ${version}
+    sed -i "s|__INSTALL_DIR__|${install_dir}|g" ${version}
 done
 
 #==================== XSD ====================
