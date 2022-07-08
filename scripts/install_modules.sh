@@ -2,6 +2,7 @@
 # set -o errexit
 # set -o nounset
 
+MODULE_PYTHON_VERSIONS='2.7.18'
 MODULE_CMAKE_VERSIONS='3.9.1'
 
 MODULE_SUNDIALS_VERSIONS='2.7.0 4.1.0'
@@ -25,6 +26,50 @@ mkdir -p ${MODULE_FILES_DIR}
 
 echo "module use ${MODULE_FILES_DIR}" >> ~/.bashrc
 source ~/.bashrc
+
+#==================== PYTHON ====================
+read -r -d '' MODULE_PYTHON_TEMPLATE <<'EOF'
+#%Module1.0#####################################################################
+###
+## python __VERSION__ modulefile
+##
+proc ModulesHelp { } {
+    puts stderr "\tThis adds the environment variables for python __VERSION__\n"
+}
+
+module-whatis "This adds the environment variables for python __VERSION__"
+
+prepend-path    PATH    __INSTALL_DIR__/bin
+
+conflict python
+EOF
+
+mkdir ${MODULE_SOURCE_DIR}/python
+mkdir ${MODULE_INSTALL_DIR}/python
+mkdir ${MODULE_FILES_DIR}/python
+
+for version in ${MODULE_PYTHON_VERSIONS}; do
+    install_dir=${MODULE_INSTALL_DIR}/python/${version}
+    mkdir ${install_dir}
+
+    version_arr=(${version//\./ })
+    major=${version_arr[0]}
+    minor=${version_arr[1]}
+
+    cd  ${MODULE_SOURCE_DIR}/python
+    wget https://www.python.org/ftp/python/${version}/Python-${version}.tar.xz
+    tar -xf Python-${version}.tar.xz
+
+    cd Python-${version}
+    ./configure --prefix=${install_dir} && \
+    make -j ${NPROC} && \
+    make install
+
+    cd  ${MODULE_FILES_DIR}/python
+    echo "${MODULE_PYTHON_TEMPLATE}" > ${version}
+    sed -i "s|__VERSION__|${version}|g" ${version}
+    sed -i "s|__INSTALL_DIR__|${install_dir}|g" ${version}
+done
 
 #==================== CMAKE ====================
 read -r -d '' MODULE_CMAKE_TEMPLATE <<'EOF'
