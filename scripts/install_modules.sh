@@ -9,6 +9,7 @@ MODULE_BOOST_VERSIONS='1.58.0 1.69.0'
 MODULE_XERCES_VERSIONS='3.1.1 3.2.1'
 MODULE_XSD_VERSIONS='3.3.0 4.0.0'
 MODULE_VTK_VERSIONS='6.3.0 8.1.0'
+MODULE_PETSC_VERSIONS='3.9.2'
 
 MODULE_SOURCE_DIR=~/modules/src
 MODULE_INSTALL_DIR=~/modules/opt
@@ -345,5 +346,89 @@ prepend-path    C_INCLUDE_PATH       ${install_dir}/include/vtk-${major}.${minor
 prepend-path    CPLUS_INCLUDE_PATH   ${install_dir}/include/vtk-${major}.${minor}
 
 conflict vtk
+EOF
+done
+
+#==================== PETSC ====================
+mkdir ${MODULE_SOURCE_DIR}/petsc
+mkdir ${MODULE_INSTALL_DIR}/petsc
+mkdir ${MODULE_FILES_DIR}/petsc
+
+for version in ${MODULE_PETSC_VERSIONS}; do
+install_dir=${MODULE_INSTALL_DIR}/petsc/${version}
+mkdir ${install_dir}
+
+version_arr=(${version//\./ })
+major=${version_arr[0]}
+minor=${version_arr[1]}
+
+cd  ${MODULE_SOURCE_DIR}/petsc
+wget https://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-lite-${version}.tar.gz
+tar -xzf petsc-lite-${version}.tar.gz -C ${install_dir} --strip-components=1
+
+cd ${install_dir}
+export PETSC_DIR=$(pwd)
+export PETSC_ARCH=linux-gnu
+./configure --with-make-np=${NPROC} \
+            --download-f2cblaslapack=1 \
+            --download-mpich=1 \
+            --download-hdf5=1 \
+            --download-parmetis=1 \
+            --download-metis=1 \
+            --download-hypre=1 \
+            --with-x=false \
+            --with-shared-libraries && \
+make all
+
+export PETSC_ARCH=linux-gnu-opt
+./configure --with-make-np=${NPROC} \
+            --download-f2cblaslapack=1 \
+            --download-mpich=1 \
+            --download-hdf5=1 \
+            --download-parmetis=1 \
+            --download-metis=1 \
+            --download-hypre=1 \
+            --with-x=false \
+            --with-shared-libraries \
+            --with-debugging=0 && \
+make all
+
+export PETSC_ARCH=linux-gnu-profile
+./configure --with-make-np=${NPROC} \
+            --download-f2cblaslapack=1 \
+            --download-mpich=1 \
+            --download-hdf5=1 \
+            --download-parmetis=1 \
+            --download-metis=1 \
+            --download-hypre=1 \
+            --with-x=false \
+            --with-shared-libraries \
+            --CFLAGS="-fno-omit-frame-pointer -pg" \
+            --CXX_CXXFLAGS="-fno-omit-frame-pointer -pg" \
+            --LDFLAGS=-pg && \
+make all
+
+cd  ${MODULE_FILES_DIR}/petsc
+cat <<EOF > ${version}
+#%Module1.0#####################################################################
+###
+## petsc ${version} modulefile
+##
+proc ModulesHelp { } {
+    puts stderr "\tThis adds the environment variables for petsc ${version}\n"
+}
+
+module-whatis "This adds the environment variables for petsc ${version}"
+
+setenv          PETSC_ROOT             ${install_dir}
+prepend-path    CMAKE_PREFIX_PATH    ${install_dir}
+prepend-path    PATH                 ${install_dir}/bin
+prepend-path    LIBRARY_PATH         ${install_dir}/lib
+prepend-path    LD_LIBRARY_PATH      ${install_dir}/lib
+prepend-path    INCLUDE              ${install_dir}/include
+prepend-path    C_INCLUDE_PATH       ${install_dir}/include
+prepend-path    CPLUS_INCLUDE_PATH   ${install_dir}/include
+
+conflict petsc
 EOF
 done
