@@ -9,7 +9,8 @@ MODULE_BOOST_VERSIONS='1.58.0 1.69.0'
 MODULE_XERCES_VERSIONS='3.1.1 3.2.1'
 MODULE_XSD_VERSIONS='3.3.0 4.0.0'
 MODULE_VTK_VERSIONS='6.3.0 8.1.0'
-MODULE_PETSC_VERSIONS='3.9.2'
+MODULE_PETSC_VERSIONS='3.9.2 3.12.5'
+MODULE_PETSC_ARCHS='linux-gnu linux-gnu-opt linux-gnu-profile'
 
 MODULE_DIR=~/modules
 MODULE_SOURCE_DIR=${MODULE_DIR}/src
@@ -356,79 +357,96 @@ mkdir ${MODULE_INSTALL_DIR}/petsc
 mkdir ${MODULE_FILES_DIR}/petsc
 
 for version in ${MODULE_PETSC_VERSIONS}; do
-install_dir=${MODULE_INSTALL_DIR}/petsc/${version}
-mkdir ${install_dir}
+    install_dir=${MODULE_INSTALL_DIR}/petsc/${version}
+    mkdir ${install_dir}
+    mkdir  ${MODULE_FILES_DIR}/petsc/${version}
 
-version_arr=(${version//\./ })
-major=${version_arr[0]}
-minor=${version_arr[1]}
+    version_arr=(${version//\./ })
+    major=${version_arr[0]}
+    minor=${version_arr[1]}
 
-cd  ${MODULE_SOURCE_DIR}/petsc
-wget https://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-lite-${version}.tar.gz
-tar -xzf petsc-lite-${version}.tar.gz -C ${install_dir} --strip-components=1
+    cd  ${MODULE_SOURCE_DIR}/petsc
+    wget https://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-lite-${version}.tar.gz
+    tar -xzf petsc-lite-${version}.tar.gz -C ${install_dir} --strip-components=1
 
-cd ${install_dir}
-export PETSC_DIR=$(pwd)
-export PETSC_ARCH=linux-gnu
-./configure --with-make-np=${NPROC} \
-            --download-f2cblaslapack=1 \
-            --download-mpich=1 \
-            --download-hdf5=1 \
-            --download-parmetis=1 \
-            --download-metis=1 \
-            --download-hypre=1 \
-            --with-x=false \
-            --with-shared-libraries && \
-make all
+    for arch in ${MODULE_PETSC_ARCHS}; do
+    cd ${install_dir}
+    export PETSC_DIR=$(pwd)
 
-export PETSC_ARCH=linux-gnu-opt
-./configure --with-make-np=${NPROC} \
-            --download-f2cblaslapack=1 \
-            --download-mpich=1 \
-            --download-hdf5=1 \
-            --download-parmetis=1 \
-            --download-metis=1 \
-            --download-hypre=1 \
-            --with-x=false \
-            --with-shared-libraries \
-            --with-debugging=0 && \
-make all
+    case ${arch} in
 
-export PETSC_ARCH=linux-gnu-profile
-./configure --with-make-np=${NPROC} \
-            --download-f2cblaslapack=1 \
-            --download-mpich=1 \
-            --download-hdf5=1 \
-            --download-parmetis=1 \
-            --download-metis=1 \
-            --download-hypre=1 \
-            --with-x=false \
-            --with-shared-libraries \
-            --CFLAGS="-fno-omit-frame-pointer -pg" \
-            --CXX_CXXFLAGS="-fno-omit-frame-pointer -pg" \
-            --LDFLAGS=-pg && \
-make all
+        linux-gnu)
+            export PETSC_ARCH=linux-gnu
+            ./configure --with-make-np=${NPROC} \
+                        --download-f2cblaslapack=1 \
+                        --download-mpich=1 \
+                        --download-hdf5=1 \
+                        --download-parmetis=1 \
+                        --download-metis=1 \
+                        --download-hypre=1 \
+                        --with-x=false \
+                        --with-shared-libraries && \
+            make all
+            ;;
 
-cd  ${MODULE_FILES_DIR}/petsc
-cat <<EOF > ${version}
+        linux-gnu-opt)
+            export PETSC_ARCH=linux-gnu-opt
+            ./configure --with-make-np=${NPROC} \
+                        --download-f2cblaslapack=1 \
+                        --download-mpich=1 \
+                        --download-hdf5=1 \
+                        --download-parmetis=1 \
+                        --download-metis=1 \
+                        --download-hypre=1 \
+                        --with-x=false \
+                        --with-shared-libraries \
+                        --with-debugging=0 && \
+            make all
+            ;;
+
+        linux-gnu-profile)
+            export PETSC_ARCH=linux-gnu-profile
+            ./configure --with-make-np=${NPROC} \
+                        --download-f2cblaslapack=1 \
+                        --download-mpich=1 \
+                        --download-hdf5=1 \
+                        --download-parmetis=1 \
+                        --download-metis=1 \
+                        --download-hypre=1 \
+                        --with-x=false \
+                        --with-shared-libraries \
+                        --CFLAGS="-fno-omit-frame-pointer -pg" \
+                        --CXX_CXXFLAGS="-fno-omit-frame-pointer -pg" \
+                        --LDFLAGS=-pg && \
+            make all
+            ;;
+
+        *)
+            #TODO Catch unknown arch error
+            ;;
+    esac
+
+    cd ${MODULE_FILES_DIR}/petsc/${version}
+    cat <<EOF > ${arch}
 #%Module1.0#####################################################################
 ###
-## petsc ${version} modulefile
+## petsc ${version}/${arch} modulefile
 ##
 proc ModulesHelp { } {
-    puts stderr "\tThis adds the environment variables for petsc ${version}\n"
+    puts stderr "\tThis adds the environment variables for petsc ${version}/${arch}\n"
 }
 
-module-whatis "This adds the environment variables for petsc ${version}"
+module-whatis "This adds the environment variables for petsc ${version}/${arch}"
 
-setenv          PETSC_ROOT             ${install_dir}
-prepend-path    CMAKE_PREFIX_PATH    ${install_dir}
-prepend-path    PATH                 ${install_dir}/bin
-prepend-path    LIBRARY_PATH         ${install_dir}/lib
-prepend-path    LD_LIBRARY_PATH      ${install_dir}/lib
-prepend-path    INCLUDE              ${install_dir}/include
-prepend-path    C_INCLUDE_PATH       ${install_dir}/include
-prepend-path    CPLUS_INCLUDE_PATH   ${install_dir}/include
+setenv          PETSC_ARCH           ${arch}
+setenv          PETSC_DIR            ${install_dir}
+prepend-path    CMAKE_PREFIX_PATH    ${install_dir}/${arch}
+prepend-path    PATH                 ${install_dir}/${arch}/bin
+prepend-path    LIBRARY_PATH         ${install_dir}/${arch}/lib
+prepend-path    LD_LIBRARY_PATH      ${install_dir}/${arch}/lib
+prepend-path    INCLUDE              ${install_dir}/${arch}/include
+prepend-path    C_INCLUDE_PATH       ${install_dir}/${arch}/include
+prepend-path    CPLUS_INCLUDE_PATH   ${install_dir}/${arch}/include
 
 conflict petsc
 EOF
