@@ -27,43 +27,47 @@ echo "module use ${MODULE_FILES_DIR}" >> ~/.bashrc
 source ~/.bashrc
 
 #==================== CMAKE ====================
+read -r -d '' MODULE_CMAKE_TEMPLATE <<'EOF'
+#%Module1.0#####################################################################
+###
+## cmake __VERSION__ modulefile
+##
+proc ModulesHelp { } {
+    puts stderr "\tThis adds the environment variables for cmake __VERSION__\n"
+}
+
+module-whatis "This adds the environment variables for cmake __VERSION__"
+
+prepend-path    PATH    __INSTALL_DIR__/bin
+
+conflict cmake
+EOF
+
 mkdir ${MODULE_SOURCE_DIR}/cmake
 mkdir ${MODULE_INSTALL_DIR}/cmake
 mkdir ${MODULE_FILES_DIR}/cmake
 
 for version in ${MODULE_CMAKE_VERSIONS}; do
-install_dir=${MODULE_INSTALL_DIR}/cmake/${version}
-mkdir ${install_dir}
+    install_dir=${MODULE_INSTALL_DIR}/cmake/${version}
+    mkdir ${install_dir}
 
-version_arr=(${version//\./ })
-major=${version_arr[0]}
-minor=${version_arr[1]}
+    version_arr=(${version//\./ })
+    major=${version_arr[0]}
+    minor=${version_arr[1]}
 
-cd  ${MODULE_SOURCE_DIR}/cmake
-wget https://cmake.org/files/v${major}.${minor}/cmake-${version}.tar.gz
-tar -xzf cmake-${version}.tar.gz
+    cd  ${MODULE_SOURCE_DIR}/cmake
+    wget https://cmake.org/files/v${major}.${minor}/cmake-${version}.tar.gz
+    tar -xzf cmake-${version}.tar.gz
 
-cd cmake-${version}
-./bootstrap --prefix=${install_dir} --parallel=${NPROC} && \
-make -j ${NPROC} && \
-make install
+    cd cmake-${version}
+    ./bootstrap --prefix=${install_dir} --parallel=${NPROC} && \
+    make -j ${NPROC} && \
+    make install
 
-cd  ${MODULE_FILES_DIR}/cmake
-cat <<EOF > ${version}
-#%Module1.0#####################################################################
-###
-## cmake ${version} modulefile
-##
-proc ModulesHelp { } {
-    puts stderr "\tThis adds the environment variables for cmake ${version}\n"
-}
-
-module-whatis "This adds the environment variables for cmake ${version}"
-
-prepend-path    PATH    ${install_dir}/bin
-
-conflict cmake
-EOF
+    cd  ${MODULE_FILES_DIR}/cmake
+    echo "${MODULE_CMAKE_TEMPLATE}" > ${version}
+    sed -i "s|__VERSION__|${version}|g" ${version}
+    sed -i "s|__INSTALL_DIR__|${install_dir}|g" ${version}
 done
 
 module switch cmake/3.9.1
