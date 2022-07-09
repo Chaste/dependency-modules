@@ -2,7 +2,6 @@
 # set -o errexit
 # set -o nounset
 
-MODULE_SUNDIALS_VERSIONS='2.7.0 4.1.0'
 MODULE_BOOST_VERSIONS='1.58.0 1.69.0'
 MODULE_XERCES_VERSIONS='3.1.1 3.2.1'
 MODULE_XSD_VERSIONS='3.3.0 4.0.0'
@@ -24,64 +23,17 @@ mkdir -p ${MODULE_FILES_DIR}
 echo "module use ${MODULE_FILES_DIR}" >> ~/.bashrc
 source ~/.bashrc
 
-#==================== PYTHON ====================
 ./install_python.sh --version=2.7.18 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
 ./install_python.sh --version=3.8.12 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
 
-#==================== CMAKE ====================
 ./install_cmake.sh --version=3.9.1 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
 
-#==================== SUNDIALS ====================
 module switch cmake/3.9.1
-read -r -d '' MODULE_SUNDIALS_TEMPLATE <<'EOF'
-#%Module1.0#####################################################################
-###
-## sundials __VERSION__ modulefile
-##
-proc ModulesHelp { } {
-    puts stderr "\tThis adds the environment variables for sundials __VERSION__\n"
-}
 
-module-whatis "This adds the environment variables for sundials __VERSION__"
-
-setenv          SUNDIALS_ROOT        __INSTALL_DIR__
-prepend-path    CMAKE_PREFIX_PATH    __INSTALL_DIR__
-prepend-path    LIBRARY_PATH         __INSTALL_DIR__/lib
-prepend-path    LD_LIBRARY_PATH      __INSTALL_DIR__/lib
-prepend-path    INCLUDE              __INSTALL_DIR__/include
-prepend-path    C_INCLUDE_PATH       __INSTALL_DIR__/include
-prepend-path    CPLUS_INCLUDE_PATH   __INSTALL_DIR__/include
-
-conflict sundials
-EOF
-
-mkdir ${MODULE_SOURCE_DIR}/sundials
-mkdir ${MODULE_INSTALL_DIR}/sundials
-mkdir ${MODULE_FILES_DIR}/sundials
-
-for version in ${MODULE_SUNDIALS_VERSIONS}; do
-    install_dir=${MODULE_INSTALL_DIR}/sundials/${version}
-    mkdir ${install_dir}
-
-    cd  ${MODULE_SOURCE_DIR}/sundials
-    wget https://github.com/LLNL/sundials/releases/download/v${version}/sundials-${version}.tar.gz
-    tar -xzf sundials-${version}.tar.gz
-
-    cd sundials-${version}
-    mkdir build
-    cd build
-    cmake -DCMAKE_INSTALL_PREFIX=${install_dir} \
-            -DBUILD_SHARED_LIBS=ON \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DEXAMPLES_ENABLE=OFF .. && \
-    make -j ${NPROC} && \
-    make install
-
-    cd  ${MODULE_FILES_DIR}/sundials
-    echo "${MODULE_SUNDIALS_TEMPLATE}" > ${version}
-    sed -i "s|__VERSION__|${version}|g" ${version}
-    sed -i "s|__INSTALL_DIR__|${install_dir}|g" ${version}
-done
+./install_sundials.sh --version=2.7.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
+./install_sundials.sh --version=3.1.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
+./install_sundials.sh --version=4.1.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
+./install_sundials.sh --version=5.0.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
 
 #==================== BOOST ====================
 read -r -d '' MODULE_BOOST_TEMPLATE <<'EOF'
