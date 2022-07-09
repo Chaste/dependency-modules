@@ -2,9 +2,6 @@
 # set -o errexit
 # set -o nounset
 
-MODULE_PYTHON_VERSIONS='2.7.18 3.8.12'
-MODULE_CMAKE_VERSIONS='3.9.1'
-
 MODULE_SUNDIALS_VERSIONS='2.7.0 4.1.0'
 MODULE_BOOST_VERSIONS='1.58.0 1.69.0'
 MODULE_XERCES_VERSIONS='3.1.1 3.2.1'
@@ -32,52 +29,10 @@ source ~/.bashrc
 ./install_python.sh --version=3.8.12 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
 
 #==================== CMAKE ====================
-read -r -d '' MODULE_CMAKE_TEMPLATE <<'EOF'
-#%Module1.0#####################################################################
-###
-## cmake __VERSION__ modulefile
-##
-proc ModulesHelp { } {
-    puts stderr "\tThis adds the environment variables for cmake __VERSION__\n"
-}
-
-module-whatis "This adds the environment variables for cmake __VERSION__"
-
-prepend-path    PATH    __INSTALL_DIR__/bin
-
-conflict cmake
-EOF
-
-mkdir ${MODULE_SOURCE_DIR}/cmake
-mkdir ${MODULE_INSTALL_DIR}/cmake
-mkdir ${MODULE_FILES_DIR}/cmake
-
-for version in ${MODULE_CMAKE_VERSIONS}; do
-    install_dir=${MODULE_INSTALL_DIR}/cmake/${version}
-    mkdir ${install_dir}
-
-    version_arr=(${version//\./ })
-    major=${version_arr[0]}
-    minor=${version_arr[1]}
-
-    cd  ${MODULE_SOURCE_DIR}/cmake
-    wget https://cmake.org/files/v${major}.${minor}/cmake-${version}.tar.gz
-    tar -xzf cmake-${version}.tar.gz
-
-    cd cmake-${version}
-    ./bootstrap --prefix=${install_dir} --parallel=${NPROC} && \
-    make -j ${NPROC} && \
-    make install
-
-    cd  ${MODULE_FILES_DIR}/cmake
-    echo "${MODULE_CMAKE_TEMPLATE}" > ${version}
-    sed -i "s|__VERSION__|${version}|g" ${version}
-    sed -i "s|__INSTALL_DIR__|${install_dir}|g" ${version}
-done
-
-module switch cmake/3.9.1
+./install_cmake.sh --version=3.9.1 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
 
 #==================== SUNDIALS ====================
+module switch cmake/3.9.1
 read -r -d '' MODULE_SUNDIALS_TEMPLATE <<'EOF'
 #%Module1.0#####################################################################
 ###

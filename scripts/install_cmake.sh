@@ -37,46 +37,37 @@ done
 
 version_arr=(${version//\./ })
 major=${version_arr[0]}
+minor=${version_arr[1]}
 
-mkdir -p ${base_dir}/src/python
-cd ${base_dir}/src/python
-wget -nc https://www.python.org/ftp/python/${version}/Python-${version}.tar.xz
-tar -xf Python-${version}.tar.xz
+mkdir -p ${base_dir}/src/cmake
+cd ${base_dir}/src/cmake
+wget -nc https://cmake.org/files/v${major}.${minor}/cmake-${version}.tar.gz
+tar -xzf cmake-${version}.tar.gz
 
-install_dir=${base_dir}/opt/python/${version}
+install_dir=${base_dir}/opt/cmake/${version}
 mkdir -p ${install_dir}
 
-cd Python-${version}
-./configure \
-    --enable-optimizations \
-    --prefix=${install_dir} && \
+cd cmake-${version}
+./bootstrap \
+    --prefix=${install_dir} \
+    --parallel=${parallel} && \
 make -j ${parallel} && \
 make install
 
-if [ ${major} -eq 3 ]; then
-    cd ${install_dir}/bin
-    if [ ! -f python]; then
-        ln -s python3 python
-    fi
-    if [ ! -f pip]; then
-        ln -s pip3 pip
-    fi
-fi
-
-mkdir -p ${base_dir}/modulefiles/python
-cd  ${base_dir}/modulefiles/python
+mkdir -p ${base_dir}/modulefiles/cmake
+cd  ${base_dir}/modulefiles/cmake
 cat <<EOF > ${version}
 #%Module1.0#####################################################################
 ###
-## python ${version} modulefile
+## cmake ${version} modulefile
 ##
 proc ModulesHelp { } {
-    puts stderr "\tThis adds the environment variables for python ${version}\n"
+    puts stderr "\tThis adds the environment variables for cmake ${version}\n"
 }
 
-module-whatis "This adds the environment variables for python ${version}"
+module-whatis "This adds the environment variables for cmake ${version}"
 
 prepend-path    PATH    ${install_dir}/bin
 
-conflict python
+conflict cmake
 EOF
