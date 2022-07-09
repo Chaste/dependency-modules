@@ -10,7 +10,7 @@ MODULE_BOOST_VERSIONS='1.58.0 1.69.0'
 MODULE_XERCES_VERSIONS='3.1.1 3.2.1'
 MODULE_XSD_VERSIONS='3.3.0 4.0.0'
 MODULE_VTK_VERSIONS='6.3.0 8.1.0'
-MODULE_PETSC_VERSIONS='3.6.4 3.7.7 3.8.4 3.9.4 3.12.5'
+MODULE_PETSC_VERSIONS='3.6.4 3.7.7 3.8.4 3.9.4 3.10.5 3.12.5'
 MODULE_PETSC_ARCHS='linux-gnu linux-gnu-opt'
 
 MODULE_DIR=~/modules
@@ -422,7 +422,7 @@ for version in ${MODULE_VTK_VERSIONS}; do
     sed -i "s|__MINOR__|${minor}|g" ${version}
 done
 
-#==================== PETSC ====================
+#==================== PETSC + HDF5 ====================
 read -r -d '' MODULE_PETSC_TEMPLATE <<'EOF'
 #%Module1.0#####################################################################
 ###
@@ -447,10 +447,6 @@ prepend-path    CPLUS_INCLUDE_PATH   __INSTALL_DIR__/__ARCH__/include
 conflict petsc
 EOF
 
-# Preferred MPICH versions to bundle with PETSc
-URL_MPICH_3_3=https://www.mpich.org/static/downloads/3.3/mpich-3.3.tar.gz
-URL_MPICH_3_4=https://www.mpich.org/static/downloads/3.4a3/mpich-3.4a3.tar.gz
-
 # Preferred HDF5 versions to bundle with PETSc
 URL_HDF5_8_16=https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.16/src/hdf5-1.8.16.tar.gz
 URL_HDF5_8_21=https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.21/src/hdf5-1.8.21.tar.gz
@@ -460,6 +456,10 @@ URL_HDF5_10_2=https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10
 URL_HDF5_10_3=https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.3/src/hdf5-1.10.3.tar.gz
 URL_HDF5_10_4=https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.4/src/hdf5-1.10.4.tar.gz
 URL_HDF5_10_5=https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.5/src/hdf5-1.10.5.tar.gz
+
+# Preferred MPICH versions
+URL_MPICH_3_3=https://www.mpich.org/static/downloads/3.3/mpich-3.3.tar.gz
+URL_MPICH_3_4=https://www.mpich.org/static/downloads/3.4a3/mpich-3.4a3.tar.gz
 
 # Fixes for broken Hypre urls in some PETSc versions
 URL_HYPRE_2_11=https://github.com/hypre-space/hypre/archive/refs/tags/v2.11.1.tar.gz
@@ -529,6 +529,17 @@ for version in ${MODULE_PETSC_VERSIONS}; do
         hypre=$(pwd)/v2.14.0.tar.gz
 
         module switch python/2.7.18  # configure needs Python 2 in this version
+
+    elif [[ (${major} -eq 3) && (${minor} -eq 10) ]]; then  # PETSc 3.10.x
+        wget -nc ${URL_MPICH_3_3}
+        wget -nc ${URL_HDF5_10_4}
+        wget -nc ${URL_HYPRE_2_14}  # Fixes broken hypre url in this version
+
+        mpich=$(pwd)/mpich-3.3.tar.gz
+        hdf5=$(pwd)/hdf5-1.10.4.tar.gz
+        hypre=$(pwd)/v2.14.0.tar.gz
+
+        module switch python/2.7.18  # configure needs Python 2 in this version
     fi
 
     for arch in ${MODULE_PETSC_ARCHS}; do
@@ -546,7 +557,6 @@ for version in ${MODULE_PETSC_VERSIONS}; do
                     --with-fc=0 \
                     --COPTFLAGS=-Og \
                     --CXXOPTFLAGS=-Og \
-                    --FOPTFLAGS=-Og \
                     --with-x=false \
                     --with-ssl=false \
                     --download-f2cblaslapack=1 \
@@ -565,10 +575,9 @@ for version in ${MODULE_PETSC_VERSIONS}; do
                     --with-make-np=${NPROC} \
                     --with-cc=gcc \
                     --with-cxx=g++ \
-                    --with-fc=gfortran \
+                    --with-fc=0 \
                     --COPTFLAGS=-Og \
                     --CXXOPTFLAGS=-Og \
-                    --FOPTFLAGS=-Og \
                     --with-x=false \
                     --with-ssl=false \
                     --download-f2cblaslapack=1 \
