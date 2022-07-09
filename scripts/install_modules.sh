@@ -2,7 +2,6 @@
 # set -o errexit
 # set -o nounset
 
-MODULE_BOOST_VERSIONS='1.58.0 1.69.0'
 MODULE_XERCES_VERSIONS='3.1.1 3.2.1'
 MODULE_XSD_VERSIONS='3.3.0 4.0.0'
 MODULE_VTK_VERSIONS='6.3.0 8.1.0'
@@ -35,73 +34,13 @@ module switch cmake/3.9.1
 ./install_sundials.sh --version=4.1.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
 ./install_sundials.sh --version=5.0.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
 
-#==================== BOOST ====================
-read -r -d '' MODULE_BOOST_TEMPLATE <<'EOF'
-#%Module1.0#####################################################################
-###
-## boost __VERSION__ modulefile
-##
-proc ModulesHelp { } {
-    puts stderr "\tThis adds the environment variables for boost __VERSION__\n"
-}
-
-module-whatis "This adds the environment variables for boost __VERSION__"
-
-setenv          BOOST_ROOT           __INSTALL_DIR__
-prepend-path    CMAKE_PREFIX_PATH    __INSTALL_DIR__
-prepend-path    LIBRARY_PATH         __INSTALL_DIR__/lib
-prepend-path    LD_LIBRARY_PATH      __INSTALL_DIR__/lib
-prepend-path    INCLUDE              __INSTALL_DIR__/include
-prepend-path    C_INCLUDE_PATH       __INSTALL_DIR__/include
-prepend-path    CPLUS_INCLUDE_PATH   __INSTALL_DIR__/include
-
-conflict boost
-EOF
-
-mkdir ${MODULE_SOURCE_DIR}/boost
-mkdir ${MODULE_INSTALL_DIR}/boost
-mkdir ${MODULE_FILES_DIR}/boost
-
-for version in ${MODULE_BOOST_VERSIONS}; do
-    install_dir=${MODULE_INSTALL_DIR}/boost/${version}
-    mkdir ${install_dir}
-
-    ver_si_on=${version//\./_}  # convert 1.69.0 to 1_69_0
-    version_arr=(${version//\./ })
-    major=${version_arr[0]}
-    minor=${version_arr[1]}
-
-    cd  ${MODULE_SOURCE_DIR}/boost
-    if [[ (${major} -lt 1) || ((${major} -eq 1) && (${minor} -le 70)) ]]; then
-        wget https://downloads.sourceforge.net/project/boost/boost/${version}/boost_${ver_si_on}.tar.bz2
-    else
-        wget https://dl.bintray.com/boostorg/release/${version}/source/boost_${ver_si_on}.tar.bz2
-    fi
-    tar -xjf boost_${ver_si_on}.tar.bz2
-
-    cd boost_${ver_si_on}
-    if [[ (${major} -lt 1) || ((${major} -eq 1) && (${minor} -le 39)) ]]; then
-        ./configure --prefix=${install_dir} && \
-        make -j ${NPROC} && \
-        make install
-    elif [ ${major} -eq 1 ] && [ ${minor} -le 49 ]; then
-        ./bootstrap.sh --prefix=${install_dir} && \
-        ./bjam -j ${NPROC} install
-    else
-        ./bootstrap.sh --prefix=${install_dir} && \
-        ./b2 -j ${NPROC} install
-    fi
-
-    if [ ${version} = 1.64.0 ]; then
-        # Fix: https://github.com/boostorg/serialization/commit/1d86261581230e2dc5d617a9b16287d326f3e229
-        sed -i.bak '25i\#include <boost/serialization/array_wrapper.hpp>' ${install_dir}/include/boost/serialization/array.hpp
-    fi
-
-    cd  ${MODULE_FILES_DIR}/boost
-    echo "${MODULE_BOOST_TEMPLATE}" > ${version}
-    sed -i "s|__VERSION__|${version}|g" ${version}
-    sed -i "s|__INSTALL_DIR__|${install_dir}|g" ${version}
-done
+./install_boost.sh --version=1.58.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
+./install_boost.sh --version=1.60.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
+./install_boost.sh --version=1.61.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
+./install_boost.sh --version=1.62.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
+./install_boost.sh --version=1.66.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
+./install_boost.sh --version=1.67.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
+./install_boost.sh --version=1.69.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
 
 #==================== XERCES-C ====================
 read -r -d '' MODULE_XERCES_TEMPLATE <<'EOF'
