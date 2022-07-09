@@ -10,8 +10,8 @@ MODULE_BOOST_VERSIONS='1.58.0 1.69.0'
 MODULE_XERCES_VERSIONS='3.1.1 3.2.1'
 MODULE_XSD_VERSIONS='3.3.0 4.0.0'
 MODULE_VTK_VERSIONS='6.3.0 8.1.0'
-MODULE_PETSC_VERSIONS='3.9.4 3.12.5'
-MODULE_PETSC_ARCHS='linux-gnu linux-gnu-opt linux-gnu-profile'
+MODULE_PETSC_VERSIONS='3.6.4 3.9.4 3.12.5'
+MODULE_PETSC_ARCHS='linux-gnu linux-gnu-opt'
 
 MODULE_DIR=~/modules
 MODULE_SOURCE_DIR=${MODULE_DIR}/src
@@ -447,6 +447,20 @@ prepend-path    CPLUS_INCLUDE_PATH   __INSTALL_DIR__/__ARCH__/include
 conflict petsc
 EOF
 
+URL_MPICH_3_3=https://www.mpich.org/static/downloads/3.3/mpich-3.3.tar.gz
+URL_MPICH_3_4=https://www.mpich.org/static/downloads/3.4a3/mpich-3.4a3.tar.gz
+
+URL_HDF5_8_16=https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.16/src/hdf5-1.8.16.tar.gz
+URL_HDF5_8_21=https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.21/src/hdf5-1.8.21.tar.gz
+URL_HDF5_10_0=https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.0-patch1/src/hdf5-1.10.0-patch1.tar.gz
+URL_HDF5_10_1=https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.1/src/hdf5-1.10.1.tar.gz
+URL_HDF5_10_2=https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.2/src/hdf5-1.10.2.tar.gz
+URL_HDF5_10_3=https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.3/src/hdf5-1.10.3.tar.gz
+URL_HDF5_10_4=https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.4/src/hdf5-1.10.4.tar.gz
+URL_HDF5_10_5=https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.5/src/hdf5-1.10.5.tar.gz
+
+URL_HYPRE_2_14=https://github.com/hypre-space/hypre/archive/refs/tags/v2.14.0.tar.gz
+
 mkdir ${MODULE_SOURCE_DIR}/petsc
 mkdir ${MODULE_INSTALL_DIR}/petsc
 mkdir ${MODULE_FILES_DIR}/petsc
@@ -464,36 +478,31 @@ for version in ${MODULE_PETSC_VERSIONS}; do
     wget -nc https://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-lite-${version}.tar.gz
     tar -xzf petsc-lite-${version}.tar.gz -C ${install_dir} --strip-components=1
 
-    f2cblaslapack=1
     mpich=1
     hdf5=1
-    parmetis=1
-    metis=1
     hypre=1
 
-    if [[ ((${major} -eq 3) && (${minor} -eq 9)) ]]; then
-        wget -nc https://ftp.mcs.anl.gov/pub/petsc/externalpackages/f2cblaslapack-3.4.2.q3.tar.gz
-        f2cblaslapack=$(pwd)/f2cblaslapack-3.4.2.q3.tar.gz
+    if [[ (${major} -eq 3) && (${minor} -eq 6) ]]; then  # version 3.6.x
+        # Retrieving packages to fix "url is not a tarball" errors
+        wget -nc ${URL_MPICH_3_3}
+        wget -nc ${URL_HDF5_8_16}
 
-        # default version is: https://www.mpich.org/static/downloads/3.3b1/mpich-3.3b1.tar.gz
-        wget -nc https://www.mpich.org/static/downloads/3.3/mpich-3.3.tar.gz
         mpich=$(pwd)/mpich-3.3.tar.gz
+        hdf5=$(pwd)/hdf5-1.8.16.tar.gz
 
-        # default version is: https://support.hdfgroup.org/ftp/HDF5/current18/src/hdf5-1.8.18.tar.gz
-        wget -nc https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.3/src/hdf5-1.10.3.tar.gz
+        module switch python/2.7.18  # configure needs Python 2 in this version
+
+    elif [[ (${major} -eq 3) && (${minor} -eq 9) ]]; then  # version 3.9.x
+        # Retrieving packages to fix "url is not a tarball" errors
+        wget -nc ${URL_MPICH_3_3}
+        wget -nc ${URL_HDF5_10_3}
+        wget -nc ${URL_HYPRE_2_14}  # Fixes broken hypre url in this version
+
+        mpich=$(pwd)/mpich-3.3.tar.gz
         hdf5=$(pwd)/hdf5-1.10.3.tar.gz
-
-        wget -nc https://bitbucket.org/petsc/pkg-parmetis/get/v4.0.3-p4.tar.gz
-        parmetis=$(pwd)/v4.0.3-p4.tar.gz
-
-        wget -nc https://bitbucket.org/petsc/pkg-metis/get/v5.1.0-p5.tar.gz
-        metis=$(pwd)/v5.1.0-p5.tar.gz
-
-        # default url broken: https://github.com/LLNL/hypre/archive/v2.14.0.tar.gz
-        wget -nc https://github.com/hypre-space/hypre/archive/refs/tags/v2.14.0.tar.gz
         hypre=$(pwd)/v2.14.0.tar.gz
 
-        module switch python/2.7.18
+        module switch python/2.7.18  # configure needs Python 2 in this version
     fi
 
     for arch in ${MODULE_PETSC_ARCHS}; do
@@ -506,51 +515,44 @@ for version in ${MODULE_PETSC_VERSIONS}; do
                 export PETSC_ARCH=linux-gnu
                 ./configure \
                     --with-make-np=${NPROC} \
-                    --download-f2cblaslapack=${f2cblaslapack} \
+                    --with-cc=gcc \
+                    --with-cxx=g++ \
+                    --with-fc=0 \
+                    --COPTFLAGS=-Og \
+                    --CXXOPTFLAGS=-Og \
+                    --with-x=false \
+                    --with-ssl=false \
+                    --download-f2cblaslapack=1 \
                     --download-mpich=${mpich} \
                     --download-hdf5=${hdf5} \
-                    --download-parmetis=${parmetis} \
-                    --download-metis=${metis} \
+                    --download-parmetis=1 \
+                    --download-metis=1 \
                     --download-hypre=${hypre} \
-                    --with-x=false \
                     --with-shared-libraries && \
-                make all
+                make all test
                 ;;
 
             linux-gnu-opt)
                 export PETSC_ARCH=linux-gnu-opt
                 ./configure \
                     --with-make-np=${NPROC} \
-                    --download-f2cblaslapack=${f2cblaslapack} \
+                    --with-cc=gcc \
+                    --with-cxx=g++ \
+                    --with-fc=gfortran \
+                    --COPTFLAGS=-Og \
+                    --CXXOPTFLAGS=-Og \
+                    --with-x=false \
+                    --with-ssl=false \
+                    --download-f2cblaslapack=1 \
                     --download-mpich=${mpich} \
                     --download-hdf5=${hdf5} \
-                    --download-parmetis=${parmetis} \
-                    --download-metis=${metis} \
+                    --download-parmetis=1 \
+                    --download-metis=1 \
                     --download-hypre=${hypre} \
-                    --with-x=false \
                     --with-shared-libraries \
                     --with-debugging=0 && \
-                make all
+                make all test
                 ;;
-
-            linux-gnu-profile)
-                export PETSC_ARCH=linux-gnu-profile
-                ./configure \
-                    --with-make-np=${NPROC} \
-                    --download-f2cblaslapack=${f2cblaslapack} \
-                    --download-mpich=${mpich} \
-                    --download-hdf5=${hdf5} \
-                    --download-parmetis=${parmetis} \
-                    --download-metis=${metis} \
-                    --download-hypre=${hypre} \
-                    --with-x=false \
-                    --with-shared-libraries \
-                    --CFLAGS="-fno-omit-frame-pointer -pg" \
-                    --CXX_CXXFLAGS="-fno-omit-frame-pointer -pg" \
-                    --LDFLAGS=-pg && \
-                make all
-                ;;
-
             *)
                 #TODO Catch unknown arch error
                 ;;
