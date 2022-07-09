@@ -13,10 +13,10 @@ MODULE_VTK_VERSIONS='6.3.0 8.1.0'
 MODULE_PETSC_VERSIONS='3.6.4 3.7.7 3.8.4 3.9.4 3.10.5 3.11.3 3.12.4'
 MODULE_PETSC_ARCHS='linux-gnu linux-gnu-opt'
 
-MODULE_DIR=~/modules
-MODULE_SOURCE_DIR=${MODULE_DIR}/src
-MODULE_INSTALL_DIR=${MODULE_DIR}/opt
-MODULE_FILES_DIR=${MODULE_DIR}/modulefiles
+MODULES_DIR=~/modules
+MODULE_SOURCE_DIR=${MODULES_DIR}/src
+MODULE_INSTALL_DIR=${MODULES_DIR}/opt
+MODULE_FILES_DIR=${MODULES_DIR}/modulefiles
 
 NPROC=$(( $(nproc) < 8 ? $(nproc) : 8 ))
 
@@ -28,54 +28,8 @@ echo "module use ${MODULE_FILES_DIR}" >> ~/.bashrc
 source ~/.bashrc
 
 #==================== PYTHON ====================
-read -r -d '' MODULE_PYTHON_TEMPLATE <<'EOF'
-#%Module1.0#####################################################################
-###
-## python __VERSION__ modulefile
-##
-proc ModulesHelp { } {
-    puts stderr "\tThis adds the environment variables for python __VERSION__\n"
-}
-
-module-whatis "This adds the environment variables for python __VERSION__"
-
-prepend-path    PATH    __INSTALL_DIR__/bin
-
-conflict python
-EOF
-
-mkdir ${MODULE_SOURCE_DIR}/python
-mkdir ${MODULE_INSTALL_DIR}/python
-mkdir ${MODULE_FILES_DIR}/python
-
-for version in ${MODULE_PYTHON_VERSIONS}; do
-    install_dir=${MODULE_INSTALL_DIR}/python/${version}
-    mkdir ${install_dir}
-
-    version_arr=(${version//\./ })
-    major=${version_arr[0]}
-    minor=${version_arr[1]}
-
-    cd  ${MODULE_SOURCE_DIR}/python
-    wget https://www.python.org/ftp/python/${version}/Python-${version}.tar.xz
-    tar -xf Python-${version}.tar.xz
-
-    cd Python-${version}
-    ./configure --prefix=${install_dir} && \
-    make -j ${NPROC} && \
-    make install
-
-    if [ ${major} -eq 3 ]; then
-        cd ${install_dir}/bin
-        ln -s python3 python
-        ln -s pip3 pip
-    fi
-
-    cd  ${MODULE_FILES_DIR}/python
-    echo "${MODULE_PYTHON_TEMPLATE}" > ${version}
-    sed -i "s|__VERSION__|${version}|g" ${version}
-    sed -i "s|__INSTALL_DIR__|${install_dir}|g" ${version}
-done
+./install_python.sh --version=2.7.18 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
+./install_python.sh --version=3.8.12 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
 
 #==================== CMAKE ====================
 read -r -d '' MODULE_CMAKE_TEMPLATE <<'EOF'
