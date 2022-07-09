@@ -10,7 +10,7 @@ MODULE_BOOST_VERSIONS='1.58.0 1.69.0'
 MODULE_XERCES_VERSIONS='3.1.1 3.2.1'
 MODULE_XSD_VERSIONS='3.3.0 4.0.0'
 MODULE_VTK_VERSIONS='6.3.0 8.1.0'
-MODULE_PETSC_VERSIONS='3.9.2 3.12.5'
+MODULE_PETSC_VERSIONS='3.9.4 3.12.5'
 MODULE_PETSC_ARCHS='linux-gnu linux-gnu-opt linux-gnu-profile'
 
 MODULE_DIR=~/modules
@@ -461,10 +461,38 @@ for version in ${MODULE_PETSC_VERSIONS}; do
     minor=${version_arr[1]}
 
     cd  ${MODULE_SOURCE_DIR}/petsc
-    wget https://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-lite-${version}.tar.gz
+    wget -nc https://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-lite-${version}.tar.gz
     tar -xzf petsc-lite-${version}.tar.gz -C ${install_dir} --strip-components=1
 
-    if [[ (${major} -lt 3) || ((${major} -eq 3) && (${minor} -le 9)) ]]; then
+    f2cblaslapack=1
+    mpich=1
+    hdf5=1
+    parmetis=1
+    metis=1
+    hypre=1
+
+    if [[ ((${major} -eq 3) && (${minor} -eq 9)) ]]; then
+        wget -nc https://ftp.mcs.anl.gov/pub/petsc/externalpackages/f2cblaslapack-3.4.2.q3.tar.gz
+        f2cblaslapack=$(pwd)/f2cblaslapack-3.4.2.q3.tar.gz
+
+        # default version is: https://www.mpich.org/static/downloads/3.3b1/mpich-3.3b1.tar.gz
+        wget -nc https://www.mpich.org/static/downloads/3.3/mpich-3.3.tar.gz
+        mpich=$(pwd)/mpich-3.3.tar.gz
+
+        # default version is: https://support.hdfgroup.org/ftp/HDF5/current18/src/hdf5-1.8.18.tar.gz
+        wget -nc https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.3/src/hdf5-1.10.3.tar.gz
+        hdf5=$(pwd)/hdf5-1.10.3.tar.gz
+
+        wget -nc https://bitbucket.org/petsc/pkg-parmetis/get/v4.0.3-p4.tar.gz
+        parmetis=$(pwd)/v4.0.3-p4.tar.gz
+
+        wget -nc https://bitbucket.org/petsc/pkg-metis/get/v5.1.0-p5.tar.gz
+        metis=$(pwd)/v5.1.0-p5.tar.gz
+
+        # default url broken: https://github.com/LLNL/hypre/archive/v2.14.0.tar.gz
+        wget -nc https://github.com/hypre-space/hypre/archive/refs/tags/v2.14.0.tar.gz
+        hypre=$(pwd)/v2.14.0.tar.gz
+
         module switch python/2.7.18
     fi
 
@@ -476,47 +504,50 @@ for version in ${MODULE_PETSC_VERSIONS}; do
 
             linux-gnu)
                 export PETSC_ARCH=linux-gnu
-                ./configure --with-make-np=${NPROC} \
-                            --download-f2cblaslapack=1 \
-                            --download-mpich=1 \
-                            --download-hdf5=1 \
-                            --download-parmetis=1 \
-                            --download-metis=1 \
-                            --download-hypre=1 \
-                            --with-x=false \
-                            --with-shared-libraries && \
+                ./configure \
+                    --with-make-np=${NPROC} \
+                    --download-f2cblaslapack=${f2cblaslapack} \
+                    --download-mpich=${mpich} \
+                    --download-hdf5=${hdf5} \
+                    --download-parmetis=${parmetis} \
+                    --download-metis=${metis} \
+                    --download-hypre=${hypre} \
+                    --with-x=false \
+                    --with-shared-libraries && \
                 make all
                 ;;
 
             linux-gnu-opt)
                 export PETSC_ARCH=linux-gnu-opt
-                ./configure --with-make-np=${NPROC} \
-                            --download-f2cblaslapack=1 \
-                            --download-mpich=1 \
-                            --download-hdf5=1 \
-                            --download-parmetis=1 \
-                            --download-metis=1 \
-                            --download-hypre=1 \
-                            --with-x=false \
-                            --with-shared-libraries \
-                            --with-debugging=0 && \
+                ./configure \
+                    --with-make-np=${NPROC} \
+                    --download-f2cblaslapack=${f2cblaslapack} \
+                    --download-mpich=${mpich} \
+                    --download-hdf5=${hdf5} \
+                    --download-parmetis=${parmetis} \
+                    --download-metis=${metis} \
+                    --download-hypre=${hypre} \
+                    --with-x=false \
+                    --with-shared-libraries \
+                    --with-debugging=0 && \
                 make all
                 ;;
 
             linux-gnu-profile)
                 export PETSC_ARCH=linux-gnu-profile
-                ./configure --with-make-np=${NPROC} \
-                            --download-f2cblaslapack=1 \
-                            --download-mpich=1 \
-                            --download-hdf5=1 \
-                            --download-parmetis=1 \
-                            --download-metis=1 \
-                            --download-hypre=1 \
-                            --with-x=false \
-                            --with-shared-libraries \
-                            --CFLAGS="-fno-omit-frame-pointer -pg" \
-                            --CXX_CXXFLAGS="-fno-omit-frame-pointer -pg" \
-                            --LDFLAGS=-pg && \
+                ./configure \
+                    --with-make-np=${NPROC} \
+                    --download-f2cblaslapack=${f2cblaslapack} \
+                    --download-mpich=${mpich} \
+                    --download-hdf5=${hdf5} \
+                    --download-parmetis=${parmetis} \
+                    --download-metis=${metis} \
+                    --download-hypre=${hypre} \
+                    --with-x=false \
+                    --with-shared-libraries \
+                    --CFLAGS="-fno-omit-frame-pointer -pg" \
+                    --CXX_CXXFLAGS="-fno-omit-frame-pointer -pg" \
+                    --LDFLAGS=-pg && \
                 make all
                 ;;
 
