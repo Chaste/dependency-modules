@@ -2,7 +2,7 @@
 # set -o errexit
 # set -o nounset
 
-MODULE_PYTHON_VERSIONS='2.7.18'
+MODULE_PYTHON_VERSIONS='2.7.18 3.8.12'
 MODULE_CMAKE_VERSIONS='3.9.1'
 
 MODULE_SUNDIALS_VERSIONS='2.7.0 4.1.0'
@@ -64,6 +64,12 @@ for version in ${MODULE_PYTHON_VERSIONS}; do
     ./configure --prefix=${install_dir} && \
     make -j ${NPROC} && \
     make install
+
+    if [ ${major} -eq 3 ]; then
+        cd ${install_dir}/bin
+        ln -s python3 python
+        ln -s pip3 pip
+    fi
 
     cd  ${MODULE_FILES_DIR}/python
     echo "${MODULE_PYTHON_TEMPLATE}" > ${version}
