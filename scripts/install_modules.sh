@@ -10,7 +10,7 @@ MODULE_BOOST_VERSIONS='1.58.0 1.69.0'
 MODULE_XERCES_VERSIONS='3.1.1 3.2.1'
 MODULE_XSD_VERSIONS='3.3.0 4.0.0'
 MODULE_VTK_VERSIONS='6.3.0 8.1.0'
-MODULE_PETSC_VERSIONS='3.6.4 3.7.7 3.9.4 3.12.5'
+MODULE_PETSC_VERSIONS='3.6.4 3.7.7 3.8.4 3.9.4 3.12.5'
 MODULE_PETSC_ARCHS='linux-gnu linux-gnu-opt'
 
 MODULE_DIR=~/modules
@@ -463,6 +463,7 @@ URL_HDF5_10_5=https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10
 
 # Fixes for broken Hypre urls in some PETSc versions
 URL_HYPRE_2_11=https://github.com/hypre-space/hypre/archive/refs/tags/v2.11.1.tar.gz
+URL_HYPRE_2_12=https://github.com/hypre-space/hypre/archive/refs/tags/v2.12.0.tar.gz
 URL_HYPRE_2_14=https://github.com/hypre-space/hypre/archive/refs/tags/v2.14.0.tar.gz
 
 mkdir ${MODULE_SOURCE_DIR}/petsc
@@ -507,6 +508,17 @@ for version in ${MODULE_PETSC_VERSIONS}; do
 
         module switch python/2.7.18  # configure needs Python 2 in this version
 
+    elif [[ (${major} -eq 3) && (${minor} -eq 8) ]]; then  # PETSc 3.8.x
+        wget -nc ${URL_MPICH_3_3}
+        wget -nc ${URL_HDF5_8_21}
+        wget -nc ${URL_HYPRE_2_12}  # Fixes broken hypre url in this version
+
+        mpich=$(pwd)/mpich-3.3.tar.gz
+        hdf5=$(pwd)/hdf5-1.10.0-patch1.tar.gz
+        hypre=$(pwd)/v2.12.0.tar.gz
+
+        module switch python/2.7.18  # configure needs Python 2 in this version
+
     elif [[ (${major} -eq 3) && (${minor} -eq 9) ]]; then  # PETSc 3.9.x
         wget -nc ${URL_MPICH_3_3}
         wget -nc ${URL_HDF5_10_3}
@@ -534,6 +546,7 @@ for version in ${MODULE_PETSC_VERSIONS}; do
                     --with-fc=0 \
                     --COPTFLAGS=-Og \
                     --CXXOPTFLAGS=-Og \
+                    --FOPTFLAGS=-Og \
                     --with-x=false \
                     --with-ssl=false \
                     --download-f2cblaslapack=1 \
@@ -555,6 +568,7 @@ for version in ${MODULE_PETSC_VERSIONS}; do
                     --with-fc=gfortran \
                     --COPTFLAGS=-Og \
                     --CXXOPTFLAGS=-Og \
+                    --FOPTFLAGS=-Og \
                     --with-x=false \
                     --with-ssl=false \
                     --download-f2cblaslapack=1 \
