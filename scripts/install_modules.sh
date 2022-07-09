@@ -10,7 +10,7 @@ MODULE_BOOST_VERSIONS='1.58.0 1.69.0'
 MODULE_XERCES_VERSIONS='3.1.1 3.2.1'
 MODULE_XSD_VERSIONS='3.3.0 4.0.0'
 MODULE_VTK_VERSIONS='6.3.0 8.1.0'
-MODULE_PETSC_VERSIONS='3.6.4 3.7.7 3.8.4 3.9.4 3.10.5 3.12.5'
+MODULE_PETSC_VERSIONS='3.6.4 3.7.7 3.8.4 3.9.4 3.10.5 3.11.3 3.12.5'
 MODULE_PETSC_ARCHS='linux-gnu linux-gnu-opt'
 
 MODULE_DIR=~/modules
@@ -395,7 +395,7 @@ for version in ${MODULE_VTK_VERSIONS}; do
     fi
 
     if [ ${version} = 6.3.0 ]; then
-        #Fix for recognizing gcc 6-9: https://public.kitware.com/pipermail/vtkusers/2017-April/098448.html
+        # Fix for recognizing gcc 6-9: https://public.kitware.com/pipermail/vtkusers/2017-April/098448.html
         cp ./${src_dir}/CMake/vtkCompilerExtras.cmake ./${src_dir}/CMake/vtkCompilerExtras.cmake.bak
         sed -i '35s/^/#/' ./${src_dir}/CMake/vtkCompilerExtras.cmake
         sed -i '36i\string (REGEX MATCH "[3-9]\\\\.[0-9]\\\\.[0-9]*"' ./${src_dir}/CMake/vtkCompilerExtras.cmake
@@ -465,6 +465,7 @@ URL_MPICH_3_4=https://www.mpich.org/static/downloads/3.4a3/mpich-3.4a3.tar.gz
 URL_HYPRE_2_11=https://github.com/hypre-space/hypre/archive/refs/tags/v2.11.1.tar.gz
 URL_HYPRE_2_12=https://github.com/hypre-space/hypre/archive/refs/tags/v2.12.0.tar.gz
 URL_HYPRE_2_14=https://github.com/hypre-space/hypre/archive/refs/tags/v2.14.0.tar.gz
+URL_HYPRE_2_15=https://github.com/hypre-space/hypre/archive/refs/tags/v2.15.1.tar.gz
 
 mkdir ${MODULE_SOURCE_DIR}/petsc
 mkdir ${MODULE_INSTALL_DIR}/petsc
@@ -492,8 +493,8 @@ for version in ${MODULE_PETSC_VERSIONS}; do
         wget -nc ${URL_MPICH_3_3}
         wget -nc ${URL_HDF5_8_16}
 
-        mpich=$(pwd)/mpich-3.3.tar.gz
-        hdf5=$(pwd)/hdf5-1.8.16.tar.gz
+        mpich=$(pwd)/$(basename ${URL_MPICH_3_3})
+        hdf5=$(pwd)/$(basename ${URL_HDF5_8_16})
 
         module switch python/2.7.18  # configure needs Python 2 in this version
 
@@ -502,9 +503,9 @@ for version in ${MODULE_PETSC_VERSIONS}; do
         wget -nc ${URL_HDF5_10_0}
         wget -nc ${URL_HYPRE_2_11}  # Fixes broken hypre url in this version
 
-        mpich=$(pwd)/mpich-3.3.tar.gz
-        hdf5=$(pwd)/hdf5-1.10.0-patch1.tar.gz
-        hypre=$(pwd)/v2.11.1.tar.gz
+        mpich=$(pwd)/$(basename ${URL_MPICH_3_3})
+        hdf5=$(pwd)/$(basename ${URL_HDF5_10_0})
+        hypre=$(pwd)/$(basename ${URL_HYPRE_2_11})
 
         module switch python/2.7.18  # configure needs Python 2 in this version
 
@@ -513,9 +514,9 @@ for version in ${MODULE_PETSC_VERSIONS}; do
         wget -nc ${URL_HDF5_8_21}
         wget -nc ${URL_HYPRE_2_12}  # Fixes broken hypre url in this version
 
-        mpich=$(pwd)/mpich-3.3.tar.gz
-        hdf5=$(pwd)/hdf5-1.10.0-patch1.tar.gz
-        hypre=$(pwd)/v2.12.0.tar.gz
+        mpich=$(pwd)/$(basename ${URL_MPICH_3_3})
+        hdf5=$(pwd)/$(basename ${URL_HDF5_8_21})
+        hypre=$(pwd)/$(basename ${URL_HYPRE_2_12})
 
         module switch python/2.7.18  # configure needs Python 2 in this version
 
@@ -524,9 +525,9 @@ for version in ${MODULE_PETSC_VERSIONS}; do
         wget -nc ${URL_HDF5_10_3}
         wget -nc ${URL_HYPRE_2_14}  # Fixes broken hypre url in this version
 
-        mpich=$(pwd)/mpich-3.3.tar.gz
-        hdf5=$(pwd)/hdf5-1.10.3.tar.gz
-        hypre=$(pwd)/v2.14.0.tar.gz
+        mpich=$(pwd)/$(basename ${URL_MPICH_3_3})
+        hdf5=$(pwd)/$(basename ${URL_HDF5_10_3})
+        hypre=$(pwd)/$(basename ${URL_HYPRE_2_14})
 
         module switch python/2.7.18  # configure needs Python 2 in this version
 
@@ -535,11 +536,20 @@ for version in ${MODULE_PETSC_VERSIONS}; do
         wget -nc ${URL_HDF5_10_4}
         wget -nc ${URL_HYPRE_2_14}  # Fixes broken hypre url in this version
 
-        mpich=$(pwd)/mpich-3.3.tar.gz
-        hdf5=$(pwd)/hdf5-1.10.4.tar.gz
-        hypre=$(pwd)/v2.14.0.tar.gz
+        mpich=$(pwd)/$(basename ${URL_MPICH_3_3})
+        hdf5=$(pwd)/$(basename ${URL_HDF5_10_4})
+        hypre=$(pwd)/$(basename ${URL_HYPRE_2_14})
 
         module switch python/2.7.18  # configure needs Python 2 in this version
+
+    elif [[ (${major} -eq 3) && (${minor} -eq 11) ]]; then  # PETSc 3.11.x
+        wget -nc ${URL_MPICH_3_3}
+        wget -nc ${URL_HDF5_10_5}
+        wget -nc ${URL_HYPRE_2_15}  # Fixes broken hypre url in this version
+
+        mpich=$(pwd)/$(basename ${URL_MPICH_3_3})
+        hdf5=$(pwd)/$(basename ${URL_HDF5_10_5})
+        hypre=$(pwd)/$(basename ${URL_HYPRE_2_15})
     fi
 
     for arch in ${MODULE_PETSC_ARCHS}; do
