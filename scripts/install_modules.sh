@@ -2,7 +2,6 @@
 # set -o errexit
 # set -o nounset
 
-MODULE_XERCES_VERSIONS='3.1.1 3.2.1'
 MODULE_XSD_VERSIONS='3.3.0 4.0.0'
 MODULE_VTK_VERSIONS='6.3.0 8.1.0'
 MODULE_PETSC_VERSIONS='3.6.4 3.7.7 3.8.4 3.9.4 3.10.5 3.11.3 3.12.4'
@@ -25,9 +24,18 @@ source ~/.bashrc
 ./install_python.sh --version=2.7.18 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
 ./install_python.sh --version=3.8.12 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
 
+module switch python/3.8.12
+
 ./install_cmake.sh --version=3.9.1 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
 
 module switch cmake/3.9.1
+
+./install_xercesc.sh --version=3.1.1 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
+./install_xercesc.sh --version=3.1.2 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
+./install_xercesc.sh --version=3.1.3 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
+./install_xercesc.sh --version=3.1.4 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
+./install_xercesc.sh --version=3.2.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
+./install_xercesc.sh --version=3.2.1 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
 
 ./install_sundials.sh --version=2.7.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
 ./install_sundials.sh --version=3.1.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
@@ -41,66 +49,6 @@ module switch cmake/3.9.1
 ./install_boost.sh --version=1.66.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
 ./install_boost.sh --version=1.67.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
 ./install_boost.sh --version=1.69.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
-
-#==================== XERCES-C ====================
-read -r -d '' MODULE_XERCES_TEMPLATE <<'EOF'
-#%Module1.0#####################################################################
-###
-## xercesc __VERSION__ modulefile
-##
-proc ModulesHelp { } {
-    puts stderr "\tThis adds the environment variables for xercesc __VERSION__\n"
-}
-
-module-whatis "This adds the environment variables for xercesc __VERSION__"
-
-prepend-path    CMAKE_PREFIX_PATH    __INSTALL_DIR__
-prepend-path    PATH                 __INSTALL_DIR__/bin
-prepend-path    LIBRARY_PATH         __INSTALL_DIR__/lib
-prepend-path    LD_LIBRARY_PATH      __INSTALL_DIR__/lib
-prepend-path    INCLUDE              __INSTALL_DIR__/include
-prepend-path    C_INCLUDE_PATH       __INSTALL_DIR__/include
-prepend-path    CPLUS_INCLUDE_PATH   __INSTALL_DIR__/include
-
-conflict xercesc
-EOF
-
-mkdir ${MODULE_SOURCE_DIR}/xercesc
-mkdir ${MODULE_INSTALL_DIR}/xercesc
-mkdir ${MODULE_FILES_DIR}/xercesc
-
-for version in ${MODULE_XERCES_VERSIONS}; do
-    install_dir=${MODULE_INSTALL_DIR}/xercesc/${version}
-    mkdir ${install_dir}
-
-    ver_si_on=${version//\./_}  # convert 3.1.1 to 3_1_1
-    version_arr=(${version//\./ })
-    major=${version_arr[0]}
-
-    cd  ${MODULE_SOURCE_DIR}/xercesc
-    if [ ${major} -le 2 ]; then
-        wget https://archive.apache.org/dist/xerces/c/${major}/sources/xerces-c-src_${ver_si_on}.tar.gz
-        tar -xzf xerces-c-src_${ver_si_on}.tar.gz
-        cd xerces-c-src_${ver_si_on}
-        export XERCESCROOT=$(pwd)
-        cd src/xercesc
-        ./runConfigure -plinux -cgcc -xg++ -P${install_dir} && \
-        make -j ${NPROC} && \
-        make install
-    else
-        wget https://archive.apache.org/dist/xerces/c/${major}/sources/xerces-c-${version}.tar.gz
-        tar -xzf xerces-c-${version}.tar.gz
-        cd xerces-c-${version}
-        ./configure --enable-netaccessor-socket --prefix=${install_dir} && \
-        make -j ${NPROC} && \
-        make install
-    fi
-
-    cd  ${MODULE_FILES_DIR}/xercesc
-    echo "${MODULE_XERCES_TEMPLATE}" > ${version}
-    sed -i "s|__VERSION__|${version}|g" ${version}
-    sed -i "s|__INSTALL_DIR__|${install_dir}|g" ${version}
-done
 
 #==================== XSD ====================
 read -r -d '' MODULE_XSD_TEMPLATE <<'EOF'
