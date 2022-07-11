@@ -30,6 +30,9 @@ module switch python/3.8.12
 
 module switch cmake/3.9.1
 
+./install_xsd.sh --version=3.3.0 --modules-dir=${MODULES_DIR}
+./install_xsd.sh --version=4.0.0 --modules-dir=${MODULES_DIR}
+
 ./install_xercesc.sh --version=3.1.1 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
 ./install_xercesc.sh --version=3.1.2 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
 ./install_xercesc.sh --version=3.1.3 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
@@ -49,57 +52,6 @@ module switch cmake/3.9.1
 ./install_boost.sh --version=1.66.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
 ./install_boost.sh --version=1.67.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
 ./install_boost.sh --version=1.69.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
-
-#==================== XSD ====================
-read -r -d '' MODULE_XSD_TEMPLATE <<'EOF'
-#%Module1.0#####################################################################
-###
-## xsd __VERSION__ modulefile
-##
-proc ModulesHelp { } {
-    puts stderr "\tThis adds the environment variables for xsd __VERSION__\n"
-}
-
-module-whatis "This adds the environment variables for xsd __VERSION__"
-
-setenv          XSD_ROOT             __INSTALL_DIR__
-prepend-path    CMAKE_PREFIX_PATH    __INSTALL_DIR__
-prepend-path    PATH                 __INSTALL_DIR__/bin
-prepend-path    LIBRARY_PATH         __INSTALL_DIR__/libxsd
-prepend-path    LD_LIBRARY_PATH      __INSTALL_DIR__/libxsd
-
-conflict xsd
-EOF
-
-mkdir ${MODULE_SOURCE_DIR}/xsd
-mkdir ${MODULE_INSTALL_DIR}/xsd
-mkdir ${MODULE_FILES_DIR}/xsd
-
-cd  ${MODULE_SOURCE_DIR}/xsd
-wget https://chaste.cs.ox.ac.uk/public/deps/xsd-setg.patch
-
-for version in ${MODULE_XSD_VERSIONS}; do
-    install_dir=${MODULE_INSTALL_DIR}/xsd/${version}
-    mkdir ${install_dir}
-
-    version_arr=(${version//\./ })
-    major=${version_arr[0]}
-    minor=${version_arr[1]}
-
-    cd  ${MODULE_SOURCE_DIR}/xsd
-    wget https://www.codesynthesis.com/download/xsd/${major}.${minor}/linux-gnu/x86_64/xsd-${version}-x86_64-linux-gnu.tar.bz2
-    tar -xjf xsd-${version}-x86_64-linux-gnu.tar.bz2 -C ${install_dir} --strip-components=1
-
-    if [ ${major} -eq 3 ]; then
-        cd ${install_dir}
-        patch -p0 <${MODULE_SOURCE_DIR}/xsd/xsd-setg.patch
-    fi
-
-    cd  ${MODULE_FILES_DIR}/xsd
-    echo "${MODULE_XSD_TEMPLATE}" > ${version}
-    sed -i "s|__VERSION__|${version}|g" ${version}
-    sed -i "s|__INSTALL_DIR__|${install_dir}|g" ${version}
-done
 
 #==================== VTK ====================
 read -r -d '' MODULE_VTK_TEMPLATE <<'EOF'
