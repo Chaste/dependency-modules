@@ -3,7 +3,8 @@
 # set -o nounset
 
 MODULES_DIR=~/modules
-echo "module use ${MODULES_DIR}/modulefiles" >> ~/.bashrc
+grep -qxF "module use ${MODULES_DIR}/modulefiles" ~/.bashrc \
+    || echo "module use ${MODULES_DIR}/modulefiles" >> ~/.bashrc
 source ~/.bashrc
 
 NPROC=$(( $(nproc) < 8 ? $(nproc) : 8 ))
