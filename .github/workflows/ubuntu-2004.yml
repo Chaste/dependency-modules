@@ -24,14 +24,15 @@ jobs:
         run: sudo ./setup_ubuntu2004.sh
 
       - name: Setup modules directory
+        shell: bash
         run: |
           mkdir -p ${MODULES_DIR}
-          echo "module use ${MODULES_DIR}" >> ~/.bashrc
-          source ~/.bashrc
+          echo "module use ${MODULES_DIR}" >> ${HOME}/.bashrc
+          source ${HOME}/.bashrc
           
       - name: Install dependencies as modules
         shell: bash
-        working-directory:  dependency-modules/scripts
+        working-directory: dependency-modules/scripts
         run: |
           ./install_xsd.sh --version=4.0.0 --modules-dir=${MODULES_DIR}
           ./install_xercesc.sh --version=3.2.1 --modules-dir=${MODULES_DIR}
