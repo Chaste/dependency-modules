@@ -31,9 +31,10 @@ for option; do
     esac
 done
 
-[ -z "${version}" ] && usage
-[ -z "${base_dir}" ] && usage
-[ -z "x${parallel}" ] && parallel=$(nproc)
+if [ -z "${version}" ]; then usage; fi
+if [ -z "${base_dir}" ]; then usage; fi
+
+parallel="${parallel:-$(nproc)}"
 
 mkdir -p ${base_dir}/src/sundials
 cd ${base_dir}/src/sundials

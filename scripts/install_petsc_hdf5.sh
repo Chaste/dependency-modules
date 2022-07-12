@@ -43,10 +43,11 @@ for option; do
     esac
 done
 
-[ -z "${petsc_version}" ] && usage
-[ -z "${hdf5_version}" ] && usage
-[ -z "${base_dir}" ] && usage
-[ -z "x${parallel}" ] && parallel=$(nproc)
+if [ -z "${petsc_version}" ]; then usage; fi
+if [ -z "${hdf5_version}" ]; then usage; fi
+if [ -z "${base_dir}" ]; then usage; fi
+
+parallel="${parallel:-$(nproc)}"
 
 if [[ ! (${petsc_arch} = 'linux-gnu' || ${petsc_arch} = 'linux-gnu-opt') ]]; then
     usage

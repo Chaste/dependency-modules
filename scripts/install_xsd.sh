@@ -27,8 +27,8 @@ for option; do
     esac
 done
 
-[ -z "${version}" ] && usage
-[ -z "${base_dir}" ] && usage
+if [ -z "${version}" ]; then usage; fi
+if [ -z "${base_dir}" ]; then usage; fi
 
 version_arr=(${version//\./ })
 major=${version_arr[0]}
