@@ -45,11 +45,6 @@ jobs:
         working-directory: dependency-modules/scripts
         run: ./install_sundials.sh --version=2.7.0 --modules-dir=${MODULES_DIR}
         
-      - name: Build and install boost/1.67.0 module
-        shell: bash
-        working-directory: dependency-modules/scripts
-        run: ./install_boost.sh --version=1.67.0 --modules-dir=${MODULES_DIR}
-        
       - name: Build and install vtk/8.1.1 module
         shell: bash
         working-directory: dependency-modules/scripts
@@ -59,4 +54,9 @@ jobs:
         shell: bash
         working-directory: dependency-modules/scripts
         run: ./install_petsc_hdf5.sh --petsc-version=3.9.4 --hdf5-version=1.10.3 --petsc-arch=linux-gnu --modules-dir=${MODULES_DIR}
+                
+      - name: Build and install boost/1.67.0 module
+        shell: bash
+        working-directory: dependency-modules/scripts
+        run: ./install_boost.sh --version=1.67.0 --modules-dir=${MODULES_DIR}
 
