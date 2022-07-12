@@ -21,7 +21,7 @@ jobs:
       - name: Install required packages
         shell: bash
         working-directory: dependency-modules/scripts
-        run: sudo setup_ubuntu2004.sh
+        run: sudo ./setup_ubuntu2004.sh
 
       - name: Setup modules directory
         run: |
@@ -33,10 +33,10 @@ jobs:
         shell: bash
         working-directory:  dependency-modules/scripts
         run: |
-          install_xsd.sh --version=4.0.0 --modules-dir=${MODULES_DIR}
-          install_xercesc.sh --version=3.2.1 --modules-dir=${MODULES_DIR}
-          install_boost.sh --version=1.67.0 --modules-dir=${MODULES_DIR}
-          install_sundials.sh --version=2.7.0 --modules-dir=${MODULES_DIR}
-          install_vtk.sh --version=8.1.1 --modules-dir=${MODULES_DIR}
-          install_petsc_hdf5.sh --petsc-version=3.9.4 --hdf5-version=1.10.3 --petsc-arch=linux-gnu --modules-dir=${MODULES_DIR}
+          ./install_xsd.sh --version=4.0.0 --modules-dir=${MODULES_DIR}
+          ./install_xercesc.sh --version=3.2.1 --modules-dir=${MODULES_DIR}
+          ./install_boost.sh --version=1.67.0 --modules-dir=${MODULES_DIR}
+          ./install_sundials.sh --version=2.7.0 --modules-dir=${MODULES_DIR}
+          ./install_vtk.sh --version=8.1.1 --modules-dir=${MODULES_DIR}
+          ./install_petsc_hdf5.sh --petsc-version=3.9.4 --hdf5-version=1.10.3 --petsc-arch=linux-gnu --modules-dir=${MODULES_DIR}
 
