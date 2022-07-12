@@ -1,0 +1,42 @@
+name: Ubuntu 20.04 Chaste Dependency Modules test suite
+
+on:
+  workflow_dispatch:
+
+jobs:
+  
+  setup:
+    name: Setup for Ubuntu 20.04
+    runs-on: ubuntu-20.04
+    env:
+      MODULES_DIR: ${HOME}/modules/modulefiles
+
+    steps:
+      - name: Checkout Chaste/dependency-modules repository
+        uses: actions/checkout@v3
+        with:
+          repository: Chaste/dependency-modules
+          path: dependency-modules
+          
+      - name: Install required packages
+        shell: bash
+        working-directory: dependency-modules/scripts
+        run: setup_ubuntu-2004.sh
+
+      - name: Setup modules directory
+        run: |
+          mkdir -p ${MODULES_DIR}
+          echo "module use ${MODULES_DIR}" >> ~/.bashrc
+          source ~/.bashrc
+          
+      - name: Install dependencies as modules
+        shell: bash
+        working-directory:  dependency-modules/scripts
+        run: |
+          install_xsd.sh --version=4.0.0 --modules-dir=${MODULES_DIR}
+          install_xercesc.sh --version=3.2.1 --modules-dir=${MODULES_DIR}
+          install_boost.sh --version=1.67.0 --modules-dir=${MODULES_DIR}
+          install_sundials.sh --version=2.7.0 --modules-dir=${MODULES_DIR}
+          install_vtk.sh --version=8.1.1 --modules-dir=${MODULES_DIR}
+          install_petsc_hdf5.sh --petsc-version=3.9.4 --hdf5-version=1.10.3 --petsc-arch=linux-gnu --modules-dir=${MODULES_DIR}
+
