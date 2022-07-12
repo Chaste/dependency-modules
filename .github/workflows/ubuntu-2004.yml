@@ -21,7 +21,7 @@ jobs:
       - name: Install required packages
         shell: bash
         working-directory: dependency-modules/scripts
-        run: setup_ubuntu-2004.sh
+        run: sudo setup_ubuntu2004.sh
 
       - name: Setup modules directory
         run: |
