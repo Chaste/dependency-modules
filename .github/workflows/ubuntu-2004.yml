@@ -54,14 +54,14 @@ jobs:
           test -d ${XERCESCROOT}/include || exit 3
           test -d ${XERCESCROOT}/lib || exit 4
         
-#       - name: Build and install sundials/2.7.0 module
-#         working-directory: dependency-modules/scripts
-#         run: |
-#           ./install_sundials.sh --version=2.7.0 --modules-dir=${MODULES_DIR}
-#           module load sundials/2.7.0
-#           test ${SUNDIALS_ROOT} = ${MODULES_DIR}/opt/sundials/2.7.0 || exit 1
-#           test -d ${SUNDIALS_ROOT}/include || exit 2
-#           test -d ${SUNDIALS_ROOT}/lib || exit 3
+      - name: Build and install sundials/4.1.0 module
+        working-directory: dependency-modules/scripts
+        run: |
+          ./install_sundials.sh --version=4.1.0 --modules-dir=${MODULES_DIR}
+          module load sundials/4.1.0
+          test ${SUNDIALS_ROOT} = ${MODULES_DIR}/opt/sundials/4.1.0 || exit 1
+          test -d ${SUNDIALS_ROOT}/include || exit 2
+          test -d ${SUNDIALS_ROOT}/lib || exit 3
           
 #       - name: Build and install vtk/8.1.1 module
 #         working-directory: dependency-modules/scripts
@@ -113,7 +113,12 @@ jobs:
       
       - name: Configure Chaste
         working-directory: Chaste/build
-        run: cmake -DCMAKE_BUILD_TYPE=Release ..
+        run: |
+          module purge
+          module load xsd/4.0.0
+          module load xercesc/3.2.1
+          module load sundials/4.1.0
+          cmake -DCMAKE_BUILD_TYPE=Release ..
       
       - name: Compile build info
         working-directory: Chaste/build
@@ -126,14 +131,11 @@ jobs:
       - name: Check build info
         working-directory: Chaste/build
         run: |
-          module purge
-          module load xsd/4.0.0
-          module load xercesc/3.2.1
           grep "<PETSc>3.12.4</PETSc>" buildinfo || exit 1
           grep "<Boost>1.71.0</Boost>" buildinfo || exit 2
           grep "<HDF5>1.10.4</HDF5>" buildinfo || exit 3
           grep "<Parmetis>4.0.3</Parmetis>" buildinfo || exit 4
           grep "<XSD>4.0.0</XSD>" buildinfo || exit 5
           grep "<SUNDIALS>3.1.2</SUNDIALS>" buildinfo || exit 6
-          grep "<VTK>7.1</Boost>" buildinfo || exit 7
+          grep "<VTK>7.1</VTK>" buildinfo || exit 7
           grep "<Xerces>3.2.1</Xerces>" buildinfo || exit 8
