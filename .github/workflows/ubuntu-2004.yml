@@ -46,7 +46,10 @@ jobs:
         working-directory: dependency-modules/scripts
         run: |
           ./install_sundials.sh --version=2.7.0 --modules-dir=${MODULES_DIR}
+          module show sundials/2.7.0
           module load sundials/2.7.0
+          echo ${SUNDIALS_ROOT}
+          ls ${SUNDIALS_ROOT}
           test ${SUNDIALS_ROOT} = ${MODULES_DIR}/opt/sundials/2.7.0 || exit 1
           test -d ${SUNDIALS_ROOT}/lib || exit 2
           test -d ${SUNDIALS_ROOT}/include || exit 3
