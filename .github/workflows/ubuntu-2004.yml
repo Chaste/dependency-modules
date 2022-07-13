@@ -43,9 +43,15 @@ jobs:
           test -d ${XSD_ROOT}/bin || exit 2
           test -d ${XSD_ROOT}/libxsd || exit 3
           
-#       - name: Build and install xercesc/3.2.1 module
-#         working-directory: dependency-modules/scripts
-#         run: ./install_xercesc.sh --version=3.2.1 --modules-dir=${MODULES_DIR}
+      - name: Build and install xercesc/3.2.1 module
+        working-directory: dependency-modules/scripts
+        run: |
+          ./install_xercesc.sh --version=3.2.1 --modules-dir=${MODULES_DIR}
+          module load xercesc/3.2.1
+          test ${XERCESCROOT} = ${MODULES_DIR}/opt/xercesc/3.2.1 || exit 1
+          test -d ${XERCESCROOT}/bin || exit 2
+          test -d ${XERCESCROOT}/include || exit 3
+          test -d ${XERCESCROOT}/lib || exit 4
         
       - name: Build and install sundials/2.7.0 module
         working-directory: dependency-modules/scripts
@@ -53,8 +59,8 @@ jobs:
           ./install_sundials.sh --version=2.7.0 --modules-dir=${MODULES_DIR}
           module load sundials/2.7.0
           test ${SUNDIALS_ROOT} = ${MODULES_DIR}/opt/sundials/2.7.0 || exit 1
-          test -d ${SUNDIALS_ROOT}/lib || exit 2
-          test -d ${SUNDIALS_ROOT}/include || exit 3
+          test -d ${SUNDIALS_ROOT}/include || exit 2
+          test -d ${SUNDIALS_ROOT}/lib || exit 3
           
 #       - name: Build and install vtk/8.1.1 module
 #         working-directory: dependency-modules/scripts
