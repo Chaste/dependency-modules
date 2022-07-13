@@ -9,8 +9,8 @@ jobs:
     name: Setup for Ubuntu 20.04
     runs-on: ubuntu-20.04
     env:
-      MODULES_DIR: ${HOME}/modules/modulefiles
-
+      MODULES_DIR: ${{ github.workspace }}/modules
+      
     steps:
       - name: Checkout Chaste/dependency-modules repository
         uses: actions/checkout@v3
@@ -26,8 +26,8 @@ jobs:
       - name: Setup modules directory
         shell: bash
         run: |
-          mkdir -p ${MODULES_DIR}
-          echo "module use ${MODULES_DIR}" >> ${HOME}/.bashrc
+          mkdir -p ${MODULES_DIR}/modulefiles
+          echo "module use ${MODULES_DIR}/modulefiles" >> ${HOME}/.bashrc
           source ${HOME}/.bashrc
           
       - name: Build and install xsd/4.0.0 module
