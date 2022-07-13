@@ -62,9 +62,15 @@ jobs:
           test -d ${SUNDIALS_ROOT}/include || exit 2
           test -d ${SUNDIALS_ROOT}/lib || exit 3
           
-#       - name: Build and install vtk/8.1.1 module
-#         working-directory: dependency-modules/scripts
-#         run: ./install_vtk.sh --version=8.1.1 --modules-dir=${MODULES_DIR}
+      - name: Build and install vtk/8.1.1 module
+        working-directory: dependency-modules/scripts
+        run: |
+          ./install_vtk.sh --version=8.1.1 --modules-dir=${MODULES_DIR}
+          module load vtk/8.1.1
+          test ${VTK_ROOT} = ${MODULES_DIR}/opt/vtk/8.1.1 || exit 1
+          test -d ${VTK_ROOT}/bin || exit 2
+          test -d ${VTK_ROOT}/include || exit 3
+          test -d ${VTK_ROOT}/lib || exit 4
         
 #       - name: Build and install petsc_hdf5/3.9.4_1.10.3/linux-gnu module
 #         working-directory: dependency-modules/scripts
