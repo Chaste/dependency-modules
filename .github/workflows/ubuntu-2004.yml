@@ -34,43 +34,43 @@ jobs:
           source /etc/profile.d/modules.sh 
           module avail
           
-      - name: Build and install xsd/4.0.0 module
-        working-directory: dependency-modules/scripts
-        run: |
-          ./install_xsd.sh --version=4.0.0 --modules-dir=${MODULES_DIR}
-          module load xsd/4.0.0
-          test ${XSD_ROOT} = ${MODULES_DIR}/opt/xsd/4.0.0 || exit 1
-          test -d ${XSD_ROOT}/bin || exit 2
-          test -d ${XSD_ROOT}/libxsd || exit 3
+#       - name: Build and install xsd/4.0.0 module
+#         working-directory: dependency-modules/scripts
+#         run: |
+#           ./install_xsd.sh --version=4.0.0 --modules-dir=${MODULES_DIR}
+#           module load xsd/4.0.0
+#           test ${XSD_ROOT} = ${MODULES_DIR}/opt/xsd/4.0.0 || exit 1
+#           test -d ${XSD_ROOT}/bin || exit 2
+#           test -d ${XSD_ROOT}/libxsd || exit 3
           
-      - name: Build and install xercesc/3.2.1 module
-        working-directory: dependency-modules/scripts
-        run: |
-          ./install_xercesc.sh --version=3.2.1 --modules-dir=${MODULES_DIR}
-          module load xercesc/3.2.1
-          test ${XERCESCROOT} = ${MODULES_DIR}/opt/xercesc/3.2.1 || exit 1
-          test -d ${XERCESCROOT}/bin || exit 2
-          test -d ${XERCESCROOT}/include || exit 3
-          test -d ${XERCESCROOT}/lib || exit 4
+#       - name: Build and install xercesc/3.2.1 module
+#         working-directory: dependency-modules/scripts
+#         run: |
+#           ./install_xercesc.sh --version=3.2.1 --modules-dir=${MODULES_DIR}
+#           module load xercesc/3.2.1
+#           test ${XERCESCROOT} = ${MODULES_DIR}/opt/xercesc/3.2.1 || exit 1
+#           test -d ${XERCESCROOT}/bin || exit 2
+#           test -d ${XERCESCROOT}/include || exit 3
+#           test -d ${XERCESCROOT}/lib || exit 4
         
-      - name: Build and install sundials/2.7.0 module
-        working-directory: dependency-modules/scripts
-        run: |
-          ./install_sundials.sh --version=2.7.0 --modules-dir=${MODULES_DIR}
-          module load sundials/2.7.0
-          test ${SUNDIALS_ROOT} = ${MODULES_DIR}/opt/sundials/2.7.0 || exit 1
-          test -d ${SUNDIALS_ROOT}/include || exit 2
-          test -d ${SUNDIALS_ROOT}/lib || exit 3
+#       - name: Build and install sundials/2.7.0 module
+#         working-directory: dependency-modules/scripts
+#         run: |
+#           ./install_sundials.sh --version=2.7.0 --modules-dir=${MODULES_DIR}
+#           module load sundials/2.7.0
+#           test ${SUNDIALS_ROOT} = ${MODULES_DIR}/opt/sundials/2.7.0 || exit 1
+#           test -d ${SUNDIALS_ROOT}/include || exit 2
+#           test -d ${SUNDIALS_ROOT}/lib || exit 3
           
-      - name: Build and install vtk/8.1.1 module
-        working-directory: dependency-modules/scripts
-        run: |
-          ./install_vtk.sh --version=8.1.1 --modules-dir=${MODULES_DIR}
-          module load vtk/8.1.1
-          test ${VTK_ROOT} = ${MODULES_DIR}/opt/vtk/8.1.1 || exit 1
-          test -d ${VTK_ROOT}/bin || exit 2
-          test -d ${VTK_ROOT}/include || exit 3
-          test -d ${VTK_ROOT}/lib || exit 4
+#       - name: Build and install vtk/8.1.1 module
+#         working-directory: dependency-modules/scripts
+#         run: |
+#           ./install_vtk.sh --version=8.1.1 --modules-dir=${MODULES_DIR}
+#           module load vtk/8.1.1
+#           test ${VTK_ROOT} = ${MODULES_DIR}/opt/vtk/8.1.1 || exit 1
+#           test -d ${VTK_ROOT}/bin || exit 2
+#           test -d ${VTK_ROOT}/include || exit 3
+#           test -d ${VTK_ROOT}/lib || exit 4
         
       - name: Build and install petsc_hdf5/3.9.4_1.10.3/linux-gnu module
         working-directory: dependency-modules/scripts
