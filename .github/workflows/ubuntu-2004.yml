@@ -72,10 +72,23 @@ jobs:
           test -d ${VTK_ROOT}/include || exit 3
           test -d ${VTK_ROOT}/lib || exit 4
         
-#       - name: Build and install petsc_hdf5/3.9.4_1.10.3/linux-gnu module
-#         working-directory: dependency-modules/scripts
-#         run: ./install_petsc_hdf5.sh --petsc-version=3.9.4 --hdf5-version=1.10.3 --petsc-arch=linux-gnu --modules-dir=${MODULES_DIR}
-                
+      - name: Build and install petsc_hdf5/3.9.4_1.10.3/linux-gnu module
+        working-directory: dependency-modules/scripts
+        run: |
+          ./install_petsc_hdf5.sh --petsc-version=3.9.4 --hdf5-version=1.10.3 --petsc-arch=linux-gnu --modules-dir=${MODULES_DIR}
+          module load petsc_hdf5/3.9.4_1.10.3/linux-gnu
+          test ${PETSC_DIR} = ${MODULES_DIR}/opt/petsc_hdf5/3.9.4_1.10.3 || exit 1
+          test ${PETSC_ARCH} = linux-gnu || exit 2
+          test -d ${PETSC_DIR}/${PETSC_ARCH}/bin || exit 3
+          test -d ${PETSC_DIR}/${PETSC_ARCH}/include || exit 4
+          test -d ${PETSC_DIR}/${PETSC_ARCH}/lib || exit 5
+          test -f ${PETSC_DIR}/${PETSC_ARCH}/lib/libhdf5.so || exit 6
+          test -f ${PETSC_DIR}/${PETSC_ARCH}/lib/libmpi.so || exit 7
+          test -f ${PETSC_DIR}/${PETSC_ARCH}/lib/libparmetis.so || exit 8
+          test -f ${PETSC_DIR}/${PETSC_ARCH}/lib/libpetsc.so || exit 9
+          test $(which h5pcc) = ${PETSC_DIR}/${PETSC_ARCH}/bin/h5pcc || exit 10
+          test $(which mpicc) = ${PETSC_DIR}/${PETSC_ARCH}/bin/mpicc || exit 11
+          
 #       - name: Build and install boost/1.67.0 module
 #         working-directory: dependency-modules/scripts
 #         run: ./install_boost.sh --version=1.67.0 --modules-dir=${MODULES_DIR}
