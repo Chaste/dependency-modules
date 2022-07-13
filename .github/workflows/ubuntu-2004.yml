@@ -30,33 +30,33 @@ jobs:
           echo "module use ${MODULES_DIR}/modulefiles" >> ${HOME}/.bashrc
           source ${HOME}/.bashrc
           
-      - name: Build and install xsd/4.0.0 module
-        shell: bash
-        working-directory: dependency-modules/scripts
-        run: ./install_xsd.sh --version=4.0.0 --modules-dir=${MODULES_DIR}
+#       - name: Build and install xsd/4.0.0 module
+#         shell: bash
+#         working-directory: dependency-modules/scripts
+#         run: ./install_xsd.sh --version=4.0.0 --modules-dir=${MODULES_DIR}
         
-      - name: Build and install xercesc/3.2.1 module
-        shell: bash
-        working-directory: dependency-modules/scripts
-        run: ./install_xercesc.sh --version=3.2.1 --modules-dir=${MODULES_DIR}
+#       - name: Build and install xercesc/3.2.1 module
+#         shell: bash
+#         working-directory: dependency-modules/scripts
+#         run: ./install_xercesc.sh --version=3.2.1 --modules-dir=${MODULES_DIR}
         
       - name: Build and install sundials/2.7.0 module
         shell: bash
         working-directory: dependency-modules/scripts
         run: ./install_sundials.sh --version=2.7.0 --modules-dir=${MODULES_DIR}
         
-      - name: Build and install vtk/8.1.1 module
-        shell: bash
-        working-directory: dependency-modules/scripts
-        run: ./install_vtk.sh --version=8.1.1 --modules-dir=${MODULES_DIR}
+#       - name: Build and install vtk/8.1.1 module
+#         shell: bash
+#         working-directory: dependency-modules/scripts
+#         run: ./install_vtk.sh --version=8.1.1 --modules-dir=${MODULES_DIR}
         
-      - name: Build and install petsc_hdf5/3.9.4_1.10.3/linux-gnu module
-        shell: bash
-        working-directory: dependency-modules/scripts
-        run: ./install_petsc_hdf5.sh --petsc-version=3.9.4 --hdf5-version=1.10.3 --petsc-arch=linux-gnu --modules-dir=${MODULES_DIR}
+#       - name: Build and install petsc_hdf5/3.9.4_1.10.3/linux-gnu module
+#         shell: bash
+#         working-directory: dependency-modules/scripts
+#         run: ./install_petsc_hdf5.sh --petsc-version=3.9.4 --hdf5-version=1.10.3 --petsc-arch=linux-gnu --modules-dir=${MODULES_DIR}
                 
-      - name: Build and install boost/1.67.0 module
-        shell: bash
-        working-directory: dependency-modules/scripts
-        run: ./install_boost.sh --version=1.67.0 --modules-dir=${MODULES_DIR}
+#       - name: Build and install boost/1.67.0 module
+#         shell: bash
+#         working-directory: dependency-modules/scripts
+#         run: ./install_boost.sh --version=1.67.0 --modules-dir=${MODULES_DIR}
 
