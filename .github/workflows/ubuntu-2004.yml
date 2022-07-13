@@ -43,8 +43,15 @@ jobs:
       - name: Build and install sundials/2.7.0 module
         shell: bash
         working-directory: dependency-modules/scripts
-        run: ./install_sundials.sh --version=2.7.0 --modules-dir=${MODULES_DIR}
-        
+        run: |
+          ./install_sundials.sh --version=2.7.0 --modules-dir=${MODULES_DIR}
+          module load sundials/2.7.0
+          test ${SUNDIALS_ROOT} = ${MODULES_DIR}/modulefiles/sundials/2.7.0 || exit 1
+          test -d ${MODULES_DIR}/opt/sundials/2.7.0/lib || exit 1
+          test -d ${MODULES_DIR}/opt/sundials/2.7.0/include || exit 1
+          test -d ${MODULES_DIR}/opt/sundials/2.7.0/cvode || exit 1
+          test -d ${MODULES_DIR}/opt/sundials/2.7.0/nvector || exit 1
+          
 #       - name: Build and install vtk/8.1.1 module
 #         shell: bash
 #         working-directory: dependency-modules/scripts
