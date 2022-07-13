@@ -4,7 +4,7 @@ set -o nounset
 
 usage()
 {
-    echo 'Usage: '"$0"' --petsc-version=version --hdf5-version=version --petsc-arch=label [--mpich-version=version] --modules-dir=path [--parallel=value]'
+    echo 'Usage: '"$(basename $0)"' --petsc-version=version --hdf5-version=version --petsc-arch=label [--mpich-version=version] --modules-dir=path [--parallel=value]'
     exit 1
 }
 
@@ -227,6 +227,9 @@ prepend-path    LD_LIBRARY_PATH      ${install_dir}/${petsc_arch}/lib
 prepend-path    INCLUDE              ${install_dir}/${petsc_arch}/include
 prepend-path    C_INCLUDE_PATH       ${install_dir}/${petsc_arch}/include
 prepend-path    CPLUS_INCLUDE_PATH   ${install_dir}/${petsc_arch}/include
+
+setenv          HDF5_ROOT            ${install_dir}/${petsc_arch}
+setenv          PARMETIS_ROOT        ${install_dir}/${petsc_arch}
 
 conflict petsc
 conflict hdf5

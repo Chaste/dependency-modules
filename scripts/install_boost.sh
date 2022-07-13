@@ -44,11 +44,11 @@ ver_si_on=${version//\./_}  # Converts 1.69.0 to 1_69_0
 mkdir -p ${base_dir}/src/boost
 cd ${base_dir}/src/boost
 
-if [[ (${major} -lt 1) || ((${major} -eq 1) && (${minor} -le 70)) ]]; then  # Boost <= 1.70.x
+if [[ (${major} -lt 1) || ((${major} -eq 1) && (${minor} -le 62)) ]]; then  # Boost <= 1.62.x
     wget -nc https://downloads.sourceforge.net/project/boost/boost/${version}/boost_${ver_si_on}.tar.bz2
 
-else  # Boost > 1.70.x
-    wget -nc https://dl.bintray.com/boostorg/release/${version}/source/boost_${ver_si_on}.tar.bz2
+else  # Boost > 1.62.x
+    wget -nc https://boostorg.jfrog.io/artifactory/main/release/${version}/source/boost_${ver_si_on}.tar.bz2
 fi
 tar -xjf boost_${ver_si_on}.tar.bz2
 
