@@ -15,6 +15,7 @@ jobs:
         
     env:
       MODULES_DIR: ${{ github.workspace }}/modules
+      CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
       
     steps:
       - name: Checkout Chaste/dependency-modules repository
@@ -22,7 +23,7 @@ jobs:
         with:
           repository: Chaste/dependency-modules
           path: dependency-modules
-          
+        
       - name: Install required packages
         working-directory: dependency-modules/scripts
         run: sudo ./setup_ubuntu2004.sh
@@ -72,14 +73,14 @@ jobs:
 #           test -d ${VTK_ROOT}/include || exit 3
 #           test -d ${VTK_ROOT}/lib || exit 4
           
-      - name: Build and install boost/1.67.0 module
-        working-directory: dependency-modules/scripts
-        run: |
-          ./install_boost.sh --version=1.67.0 --modules-dir=${MODULES_DIR}
-          module load boost/1.67.0
-          test ${BOOST_ROOT} = ${MODULES_DIR}/opt/boost/1.67.0 || exit 1
-          test -d ${BOOST_ROOT}/include || exit 2
-          test -d ${BOOST_ROOT}/lib || exit 3
+#       - name: Build and install boost/1.67.0 module
+#         working-directory: dependency-modules/scripts
+#         run: |
+#           ./install_boost.sh --version=1.67.0 --modules-dir=${MODULES_DIR}
+#           module load boost/1.67.0
+#           test ${BOOST_ROOT} = ${MODULES_DIR}/opt/boost/1.67.0 || exit 1
+#           test -d ${BOOST_ROOT}/include || exit 2
+#           test -d ${BOOST_ROOT}/lib || exit 3
         
 #       - name: Build and install petsc_hdf5/3.9.4_1.10.3/linux-gnu module
 #         working-directory: dependency-modules/scripts
@@ -97,3 +98,27 @@ jobs:
 #           test -f ${PETSC_DIR}/${PETSC_ARCH}/lib/libpetsc.so || exit 9
 #           test $(which h5pcc) = ${PETSC_DIR}/${PETSC_ARCH}/bin/h5pcc || exit 10
 #           test $(which mpicc) = ${PETSC_DIR}/${PETSC_ARCH}/bin/mpicc || exit 11
+
+      - name: Checkout Chaste repository
+        uses: actions/checkout@v3
+        with:
+          repository: Chaste/Chaste
+          path: Chaste
+          submodules: recursive
+          
+      - name: Make build and test directories
+        run: |
+          mkdir -p Chaste/build
+          mkdir -p ${CHASTE_TEST_OUTPUT}
+      
+      - name: Configure Chaste
+        run: cmake -DCMAKE_BUILD_TYPE=Release ..
+        working-directory: Chaste/build
+      
+      - name: Get Build Info
+        run: cmake --build . --parallel $(nproc) --target TestChasteBuildInfo
+        working-directory: Chaste/build
+
+      - name: Check Build Info
+        run: ctest -j ${nproc} -V -R TestChasteBuildInfo --output-on-failure
+        working-directory: Chaste/build
