@@ -33,7 +33,7 @@ jobs:
       - name: Setup modules directory
         run: |
           mkdir -p ${MODULES_DIR}/modulefiles
-          echo "module use ${MODULES_DIR}/modulefiles" >> ${HOME}/.bashrc
+          echo "module use ${MODULES_DIR}/modulefiles" >> /etc/profile
           
 #       - name: Build and install xsd/4.0.0 module
 #         working-directory: dependency-modules/scripts
