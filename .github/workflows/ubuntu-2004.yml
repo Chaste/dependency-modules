@@ -27,13 +27,12 @@ jobs:
         working-directory: dependency-modules/scripts
         run: sudo ./setup_ubuntu2004.sh
 
-      - name: Test module command
-        run: module avail
-          
       - name: Setup modules directory
         run: |
           mkdir -p ${MODULES_DIR}/modulefiles
           echo "module use ${MODULES_DIR}/modulefiles" | sudo tee -a /etc/profile.d/modules.sh
+          source /etc/profile.d/modules.sh 
+          module avail
           
 #       - name: Build and install xsd/4.0.0 module
 #         working-directory: dependency-modules/scripts
