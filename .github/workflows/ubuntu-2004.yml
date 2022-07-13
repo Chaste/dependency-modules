@@ -11,7 +11,7 @@ jobs:
     
     defaults:
       run:
-        shell: bash -ieo pipefail {0}
+        shell: bash --login -i -e -o pipefail {0}
         
     env:
       MODULES_DIR: ${{ github.workspace }}/modules
@@ -27,6 +27,9 @@ jobs:
         working-directory: dependency-modules/scripts
         run: sudo ./setup_ubuntu2004.sh
 
+      - name: Test module command
+        run: module avail
+          
       - name: Setup modules directory
         run: |
           mkdir -p ${MODULES_DIR}/modulefiles
