@@ -34,10 +34,15 @@ jobs:
           source /etc/profile.d/modules.sh 
           module avail
           
-#       - name: Build and install xsd/4.0.0 module
-#         working-directory: dependency-modules/scripts
-#         run: ./install_xsd.sh --version=4.0.0 --modules-dir=${MODULES_DIR}
-        
+      - name: Build and install xsd/4.0.0 module
+        working-directory: dependency-modules/scripts
+        run: |
+          ./install_xsd.sh --version=4.0.0 --modules-dir=${MODULES_DIR}
+          module load xsd/4.0.0
+          test ${XSD_ROOT} = ${MODULES_DIR}/opt/xsd/4.0.0 || exit 1
+          test -d ${XSD_ROOT}/bin || exit 2
+          test -d ${XSD_ROOT}/libxsd || exit 3
+          
 #       - name: Build and install xercesc/3.2.1 module
 #         working-directory: dependency-modules/scripts
 #         run: ./install_xercesc.sh --version=3.2.1 --modules-dir=${MODULES_DIR}
