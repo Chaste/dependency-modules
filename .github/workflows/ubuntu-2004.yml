@@ -46,6 +46,7 @@ jobs:
           source /etc/profile.d/modules.sh 
           module avail
           
+      #==== XSD
       - name: Install xsd module
         working-directory: dependency-modules/scripts
         run: |
@@ -58,6 +59,7 @@ jobs:
           test -d ${XSD_ROOT}/bin || exit 2
           test -d ${XSD_ROOT}/libxsd || exit 3
           
+      #===== XERCESC
       - name: Cache xercesc module
         id: cache-xercesc
         uses: actions/cache@v3
@@ -68,7 +70,7 @@ jobs:
           key: ${{ env.OS_VERSION }}-xercesc-${{ env.XERCESC_VER }}-${{ hashFiles('dependency-modules/scripts/install_xercesc.sh') }}
       
       - name: Build and install xercesc module
-        if: steps.cache-xercesc.outputs.cache-hit != 'true'
+        if: steps.cache-xercesc.outputs.cache-hit == 'false'
         working-directory: dependency-modules/scripts
         run: |
           ./install_xercesc.sh --version=${XERCESC_VER} --modules-dir=${MODULES_DIR}
@@ -80,15 +82,30 @@ jobs:
           test -d ${XERCESCROOT}/bin || exit 2
           test -d ${XERCESCROOT}/include || exit 3
           test -d ${XERCESCROOT}/lib || exit 4
-        
-#       - name: Build and install sundials module
-#         working-directory: dependency-modules/scripts
-#         run: |
-#           ./install_sundials.sh --version=${SUNDIALS_VER} --modules-dir=${MODULES_DIR}
-#           module load sundials/${SUNDIALS_VER}
-#           test ${SUNDIALS_ROOT} = ${MODULES_DIR}/opt/sundials/${SUNDIALS_VER} || exit 1
-#           test -d ${SUNDIALS_ROOT}/include || exit 2
-#           test -d ${SUNDIALS_ROOT}/lib || exit 3
+          
+      #===== SUNDIALS
+      - name: Cache sundials module
+        id: cache-sundials
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${MODULES_DIR}/opt/sundials/${SUNDIALS_VER}
+            ${MODULES_DIR}/modulefiles/sundials/${SUNDIALS_VER}
+          key: ${{ env.OS_VERSION }}-sundials-${{ env.SUNDIALS_VER }}-${{ hashFiles('dependency-modules/scripts/install_sundials.sh') }}
+      
+      - name: Build and install sundials module
+        if: steps.cache-sundials.outputs.cache-hit == 'false'
+        working-directory: dependency-modules/scripts
+        run: |
+          ./install_sundials.sh --version=${SUNDIALS_VER} --modules-dir=${MODULES_DIR}
+          
+      - name: Check sundials module
+        working-directory: dependency-modules/scripts
+        run: |
+          module load sundials/${SUNDIALS_VER}
+          test ${SUNDIALS_ROOT} = ${MODULES_DIR}/opt/sundials/${SUNDIALS_VER} || exit 1
+          test -d ${SUNDIALS_ROOT}/include || exit 2
+          test -d ${SUNDIALS_ROOT}/lib || exit 3
           
 #       - name: Build and install boost module
 #         working-directory: dependency-modules/scripts
