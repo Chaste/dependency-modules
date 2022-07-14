@@ -43,7 +43,7 @@ ver_si_on=${version//\./_}  # Converts 1.69.0 to 1_69_0
 
 # Unsupported versions: https://chaste.cs.ox.ac.uk/trac/wiki/InstallGuides/DependencyVersions
 if [[ (${major} -lt 1) || ((${major} -eq 1) && (${minor} -lt 62)) ]]; then  # Boost < 1.62.x
-    echo "$(basename $0): Boost version < 1.62 not supported"
+    echo "$(basename $0): Boost versions < 1.62 not supported"
     exit 1
 fi
 

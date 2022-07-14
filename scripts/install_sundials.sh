@@ -4,7 +4,7 @@ set -o nounset
 
 usage()
 {
-    echo 'Usage: '"$0"' --version=version --modules-dir=path [--parallel=value]'
+    echo 'Usage: '"$(basename $0)"' --version=version --modules-dir=path [--parallel=value]'
     exit 1
 }
 
@@ -35,6 +35,16 @@ if [ -z "${version}" ]; then usage; fi
 if [ -z "${base_dir}" ]; then usage; fi
 
 parallel="${parallel:-$(nproc)}"
+
+version_arr=(${version//\./ })
+major=${version_arr[0]}
+minor=${version_arr[1]}
+
+# Unsupported versions: https://chaste.cs.ox.ac.uk/trac/wiki/InstallGuides/DependencyVersions
+if [[ (${major} -lt 2) || ((${major} -eq 2) && (${minor} -lt 7)) ]]; then  # Sundials < 2.7.x
+    echo "$(basename $0): Sundials versions < 2.7 not supported"
+    exit 1
+fi
 
 mkdir -p ${base_dir}/src/sundials
 cd ${base_dir}/src/sundials

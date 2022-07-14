@@ -42,7 +42,7 @@ minor=${version_arr[1]}
 
 # Unsupported versions: https://chaste.cs.ox.ac.uk/trac/wiki/InstallGuides/DependencyVersions
 if [[ (${major} -lt 3) || ((${major} -eq 3) && (${minor} -lt 5)) ]]; then  # CMake < 3.5.x
-    echo "$(basename $0): CMake version < 3.5 not supported"
+    echo "$(basename $0): CMake versions < 3.5 not supported"
     exit 1
 fi
 
