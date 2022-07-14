@@ -45,23 +45,6 @@ module load cmake/3.9.1
 
 module switch python/2.7.18  # For PETSc versions < 3.11.x configuration needs Python 2
 
-# PETSc 3.6.4 + HDF5 1.8.16 + MPICH 3.3
-./install_petsc_hdf5.sh \
-    --petsc-version=3.6.4 \
-    --hdf5-version=1.8.16 \
-    --petsc-arch=linux-gnu \
-    --mpich-version=3.3 \
-    --modules-dir=${MODULES_DIR} \
-    --parallel=${NPROC}
-
-./install_petsc_hdf5.sh \
-    --petsc-version=3.6.4 \
-    --hdf5-version=1.8.16 \
-    --petsc-arch=linux-gnu-opt \
-    --mpich-version=3.3 \
-    --modules-dir=${MODULES_DIR} \
-    --parallel=${NPROC}
-
 # PETSc 3.7.7 + HDF5 1.10.0-patch1 + MPICH 3.3
 ./install_petsc_hdf5.sh \
     --petsc-version=3.7.7 \
@@ -74,23 +57,6 @@ module switch python/2.7.18  # For PETSc versions < 3.11.x configuration needs P
 ./install_petsc_hdf5.sh \
     --petsc-version=3.7.7 \
     --hdf5-version=1.10.0-patch1 \
-    --petsc-arch=linux-gnu-opt \
-    --mpich-version=3.3 \
-    --modules-dir=${MODULES_DIR} \
-    --parallel=${NPROC}
-
-# PETSc 3.8.4 + HDF5 1.8.21 + MPICH 3.3
-./install_petsc_hdf5.sh \
-    --petsc-version=3.8.4 \
-    --hdf5-version=1.8.21 \
-    --petsc-arch=linux-gnu \
-    --mpich-version=3.3 \
-    --modules-dir=${MODULES_DIR} \
-    --parallel=${NPROC}
-
-./install_petsc_hdf5.sh \
-    --petsc-version=3.8.4 \
-    --hdf5-version=1.8.21 \
     --petsc-arch=linux-gnu-opt \
     --mpich-version=3.3 \
     --modules-dir=${MODULES_DIR} \
