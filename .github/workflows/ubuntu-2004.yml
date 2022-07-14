@@ -126,7 +126,7 @@ jobs:
 
       - name: Get build info
         working-directory: Chaste/build
-        run: ctest -j $(nproc) -V -R TestChasteBuildInfo --output-on-failure > buildinfo
+        run: ctest -j $(nproc) -V -R TestChasteBuildInfo --output-on-failure | tee buildinfo
 
       - name: Check build info
         working-directory: Chaste/build
@@ -136,6 +136,6 @@ jobs:
           grep "<HDF5>1.10.4</HDF5>" buildinfo || exit 3
           grep "<Parmetis>4.0.3</Parmetis>" buildinfo || exit 4
           grep "<XSD>4.0.0</XSD>" buildinfo || exit 5
-          grep "<SUNDIALS>3.1.2</SUNDIALS>" buildinfo || exit 6
+          grep "<SUNDIALS>4.1.0</SUNDIALS>" buildinfo || exit 6
           grep "<VTK>7.1</VTK>" buildinfo || exit 7
           grep "<Xerces>3.2.1</Xerces>" buildinfo || exit 8
