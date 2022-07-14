@@ -21,10 +21,6 @@ module load cmake/3.9.1
 ./install_xsd.sh --version=3.3.0 --modules-dir=${MODULES_DIR}
 ./install_xsd.sh --version=4.0.0 --modules-dir=${MODULES_DIR}
 
-./install_xercesc.sh --version=3.1.1 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
-./install_xercesc.sh --version=3.1.2 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
-./install_xercesc.sh --version=3.1.3 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
-./install_xercesc.sh --version=3.1.4 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
 ./install_xercesc.sh --version=3.2.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
 ./install_xercesc.sh --version=3.2.1 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
 
