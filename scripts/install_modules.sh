@@ -33,9 +33,6 @@ module load cmake/3.9.1
 ./install_sundials.sh --version=4.1.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
 ./install_sundials.sh --version=5.0.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
 
-./install_boost.sh --version=1.58.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
-./install_boost.sh --version=1.60.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
-./install_boost.sh --version=1.61.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
 ./install_boost.sh --version=1.62.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
 ./install_boost.sh --version=1.66.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
 ./install_boost.sh --version=1.67.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}

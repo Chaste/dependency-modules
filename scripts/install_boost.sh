@@ -4,7 +4,7 @@ set -o nounset
 
 usage()
 {
-    echo 'Usage: '"$0"' --version=version --modules-dir=path [--parallel=value]'
+    echo 'Usage: '"$(basename $0)"' --version=version --modules-dir=path [--parallel=value]'
     exit 1
 }
 
@@ -41,10 +41,16 @@ major=${version_arr[0]}
 minor=${version_arr[1]}
 ver_si_on=${version//\./_}  # Converts 1.69.0 to 1_69_0
 
+# Unsupported versions: https://chaste.cs.ox.ac.uk/trac/wiki/InstallGuides/DependencyVersions
+if [[ (${major} -lt 1) || ((${major} -eq 1) && (${minor} -lt 62)) ]]; then  # Boost < 1.62.x
+    echo "$(basename $0): Boost version < 1.62 not supported"
+    exit 1
+fi
+
 mkdir -p ${base_dir}/src/boost
 cd ${base_dir}/src/boost
 
-if [[ (${major} -lt 1) || ((${major} -eq 1) && (${minor} -le 62)) ]]; then  # Boost <= 1.62.x
+if [[ (${major} -eq 1) && (${minor} -eq 62) ]]; then  # Boost == 1.62.x
     wget -nc https://downloads.sourceforge.net/project/boost/boost/${version}/boost_${ver_si_on}.tar.bz2
 
 else  # Boost > 1.62.x
@@ -56,19 +62,8 @@ install_dir=${base_dir}/opt/boost/${version}
 mkdir -p ${install_dir}
 
 cd boost_${ver_si_on}
-if [[ (${major} -lt 1) || ((${major} -eq 1) && (${minor} -le 39)) ]]; then  # Boost <= 1.39.x
-    ./configure --prefix=${install_dir} && \
-    make -j ${parallel} && \
-    make install
-
-elif [ ${major} -eq 1 ] && [ ${minor} -le 49 ]; then  # 1.39.x < Boost <= 1.49.x
-    ./bootstrap.sh --prefix=${install_dir} && \
-    ./bjam -j ${parallel} install
-
-else  # Boost > 1.49.x
-    ./bootstrap.sh --prefix=${install_dir} && \
-    ./b2 -j ${parallel} install
-fi
+./bootstrap.sh --prefix=${install_dir} && \
+./b2 -j ${parallel} install
 
 if [ ${version} = 1.64.0 ]; then
     # Fix: https://github.com/boostorg/serialization/commit/1d86261581230e2dc5d617a9b16287d326f3e229
