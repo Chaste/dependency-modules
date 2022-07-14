@@ -18,7 +18,6 @@ module load python/3.8.12
 
 module load cmake/3.9.1
 
-./install_xsd.sh --version=3.3.0 --modules-dir=${MODULES_DIR}
 ./install_xsd.sh --version=4.0.0 --modules-dir=${MODULES_DIR}
 
 ./install_xercesc.sh --version=3.2.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}

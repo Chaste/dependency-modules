@@ -4,7 +4,7 @@ set -o nounset
 
 usage()
 {
-    echo 'Usage: '"$0"' --version=version --modules-dir=path'
+    echo 'Usage: '"$(basename $0)"' --version=version --modules-dir=path'
     exit 1
 }
 
@@ -34,20 +34,20 @@ version_arr=(${version//\./ })
 major=${version_arr[0]}
 minor=${version_arr[1]}
 
+# Unsupported versions: https://chaste.cs.ox.ac.uk/trac/wiki/InstallGuides/DependencyVersions
+if [ ${major} -lt 4 ]; then  # XSD < 4.0.x
+    echo "$(basename $0): XSD versions < 4.0 not supported"
+    exit 1
+fi
+
 mkdir -p ${base_dir}/src/xsd
 cd ${base_dir}/src/xsd
-wget -nc https://chaste.cs.ox.ac.uk/public/deps/xsd-setg.patch
 wget -nc https://www.codesynthesis.com/download/xsd/${major}.${minor}/linux-gnu/x86_64/xsd-${version}-x86_64-linux-gnu.tar.bz2
 
 install_dir=${base_dir}/opt/xsd/${version}
 mkdir -p ${install_dir}
 
 tar -xjf xsd-${version}-x86_64-linux-gnu.tar.bz2 -C ${install_dir} --strip-components=1
-
-if [ ${major} -eq 3 ]; then
-    cd ${install_dir}
-    patch -p0 <${base_dir}/src/xsd/xsd-setg.patch
-fi
 
 mkdir -p ${base_dir}/modulefiles/xsd
 cd  ${base_dir}/modulefiles/xsd
