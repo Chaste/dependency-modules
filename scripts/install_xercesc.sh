@@ -78,6 +78,7 @@ proc ModulesHelp { } {
 module-whatis "This adds the environment variables for xercesc ${version}"
 
 setenv          XERCESCROOT          ${install_dir}
+setenv          XERCESC_ROOT         ${install_dir}
 prepend-path    CMAKE_PREFIX_PATH    ${install_dir}
 prepend-path    PATH                 ${install_dir}/bin
 prepend-path    LIBRARY_PATH         ${install_dir}/lib
