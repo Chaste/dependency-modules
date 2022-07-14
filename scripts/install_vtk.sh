@@ -4,7 +4,7 @@ set -o nounset
 
 usage()
 {
-    echo 'Usage: '"$0"' --version=version --modules-dir=path [--parallel=value]'
+    echo 'Usage: '"$(basename $0)"' --version=version --modules-dir=path [--parallel=value]'
     exit 1
 }
 
@@ -39,6 +39,12 @@ parallel="${parallel:-$(nproc)}"
 version_arr=(${version//\./ })
 major=${version_arr[0]}
 minor=${version_arr[1]}
+
+# Unsupported versions: https://chaste.cs.ox.ac.uk/trac/wiki/InstallGuides/DependencyVersions
+if [[ (${major} -lt 6) || ((${major} -eq 6) && (${minor} -lt 3)) ]]; then  # VTK < 6.3.x
+    echo "$(basename $0): VTK versions < 6.3 not supported"
+    exit 1
+fi
 
 mkdir -p ${base_dir}/src/vtk
 cd ${base_dir}/src/vtk

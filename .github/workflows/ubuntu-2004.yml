@@ -16,6 +16,14 @@ jobs:
     env:
       MODULES_DIR: ${{ github.workspace }}/modules
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
+      XSD_VER: 4.0.0
+      XERCESC_VER: 3.2.1
+      SUNDIALS_VER: 4.1.0
+      BOOST_VER: 1.69.0
+      VTK_VER: 8.1.1
+      PETSC_VER: 3.9.4
+      PETSC_LBL: linux-gnu
+      HDF5_VER: 1.10.3
       
     steps:
       - name: Checkout Chaste/dependency-modules repository
@@ -35,69 +43,69 @@ jobs:
           source /etc/profile.d/modules.sh 
           module avail
           
-      - name: Build and install xsd/4.0.0 module
+      - name: Build and install xsd module
         working-directory: dependency-modules/scripts
         run: |
-          ./install_xsd.sh --version=4.0.0 --modules-dir=${MODULES_DIR}
-          module load xsd/4.0.0
-          test ${XSD_ROOT} = ${MODULES_DIR}/opt/xsd/4.0.0 || exit 1
+          ./install_xsd.sh --version=${XSD_VER} --modules-dir=${MODULES_DIR}
+          module load xsd/${XSD_VER}
+          test ${XSD_ROOT} = ${MODULES_DIR}/opt/xsd/${XSD_VER} || exit 1
           test -d ${XSD_ROOT}/bin || exit 2
           test -d ${XSD_ROOT}/libxsd || exit 3
           
-      - name: Build and install xercesc/3.2.1 module
+      - name: Build and install xercesc module
         working-directory: dependency-modules/scripts
         run: |
-          ./install_xercesc.sh --version=3.2.1 --modules-dir=${MODULES_DIR}
-          module load xercesc/3.2.1
-          test ${XERCESCROOT} = ${MODULES_DIR}/opt/xercesc/3.2.1 || exit 1
+          ./install_xercesc.sh --version=${XERCESC_VER} --modules-dir=${MODULES_DIR}
+          module load xercesc/${XERCESC_VER}
+          test ${XERCESCROOT} = ${MODULES_DIR}/opt/xercesc/${XERCESC_VER} || exit 1
           test -d ${XERCESCROOT}/bin || exit 2
           test -d ${XERCESCROOT}/include || exit 3
           test -d ${XERCESCROOT}/lib || exit 4
         
-#       - name: Build and install sundials/2.7.0 module
-#         working-directory: dependency-modules/scripts
-#         run: |
-#           ./install_sundials.sh --version=2.7.0 --modules-dir=${MODULES_DIR}
-#           module load sundials/2.7.0
-#           test ${SUNDIALS_ROOT} = ${MODULES_DIR}/opt/sundials/2.7.0 || exit 1
-#           test -d ${SUNDIALS_ROOT}/include || exit 2
-#           test -d ${SUNDIALS_ROOT}/lib || exit 3
+      - name: Build and install sundials module
+        working-directory: dependency-modules/scripts
+        run: |
+          ./install_sundials.sh --version=${SUNDIALS_VER} --modules-dir=${MODULES_DIR}
+          module load sundials/${SUNDIALS_VER}
+          test ${SUNDIALS_ROOT} = ${MODULES_DIR}/opt/sundials/${SUNDIALS_VER} || exit 1
+          test -d ${SUNDIALS_ROOT}/include || exit 2
+          test -d ${SUNDIALS_ROOT}/lib || exit 3
           
-#       - name: Build and install vtk/8.1.1 module
-#         working-directory: dependency-modules/scripts
-#         run: |
-#           ./install_vtk.sh --version=8.1.1 --modules-dir=${MODULES_DIR}
-#           module load vtk/8.1.1
-#           test ${VTK_ROOT} = ${MODULES_DIR}/opt/vtk/8.1.1 || exit 1
-#           test -d ${VTK_ROOT}/bin || exit 2
-#           test -d ${VTK_ROOT}/include || exit 3
-#           test -d ${VTK_ROOT}/lib || exit 4
+      - name: Build and install boost module
+        working-directory: dependency-modules/scripts
+        run: |
+          ./install_boost.sh --version=${BOOST_VER} --modules-dir=${MODULES_DIR}
+          module load boost/${BOOST_VER}
+          test ${BOOST_ROOT} = ${MODULES_DIR}/opt/boost/${BOOST_VER} || exit 1
+          test -d ${BOOST_ROOT}/include || exit 2
+          test -d ${BOOST_ROOT}/lib || exit 3
           
-#       - name: Build and install boost/1.69.0 module
-#         working-directory: dependency-modules/scripts
-#         run: |
-#           ./install_boost.sh --version=1.69.0 --modules-dir=${MODULES_DIR}
-#           module load boost/1.69.0
-#           test ${BOOST_ROOT} = ${MODULES_DIR}/opt/boost/1.69.0 || exit 1
-#           test -d ${BOOST_ROOT}/include || exit 2
-#           test -d ${BOOST_ROOT}/lib || exit 3
+      - name: Build and install vtk module
+        working-directory: dependency-modules/scripts
+        run: |
+          ./install_vtk.sh --version=${VTK_VER} --modules-dir=${MODULES_DIR}
+          module load vtk/${VTK_VER}
+          test ${VTK_ROOT} = ${MODULES_DIR}/opt/vtk/${VTK_VER} || exit 1
+          test -d ${VTK_ROOT}/bin || exit 2
+          test -d ${VTK_ROOT}/include || exit 3
+          test -d ${VTK_ROOT}/lib || exit 4
         
-#       - name: Build and install petsc_hdf5/3.9.4_1.10.3/linux-gnu module
-#         working-directory: dependency-modules/scripts
-#         run: |
-#           ./install_petsc_hdf5.sh --petsc-version=3.9.4 --hdf5-version=1.10.3 --petsc-arch=linux-gnu --modules-dir=${MODULES_DIR}
-#           module load petsc_hdf5/3.9.4_1.10.3/linux-gnu
-#           test ${PETSC_DIR} = ${MODULES_DIR}/opt/petsc_hdf5/3.9.4_1.10.3 || exit 1
-#           test ${PETSC_ARCH} = linux-gnu || exit 2
-#           test -d ${PETSC_DIR}/${PETSC_ARCH}/bin || exit 3
-#           test -d ${PETSC_DIR}/${PETSC_ARCH}/include || exit 4
-#           test -d ${PETSC_DIR}/${PETSC_ARCH}/lib || exit 5
-#           test -f ${PETSC_DIR}/${PETSC_ARCH}/lib/libhdf5.so || exit 6
-#           test -f ${PETSC_DIR}/${PETSC_ARCH}/lib/libmpi.so || exit 7
-#           test -f ${PETSC_DIR}/${PETSC_ARCH}/lib/libparmetis.so || exit 8
-#           test -f ${PETSC_DIR}/${PETSC_ARCH}/lib/libpetsc.so || exit 9
-#           test $(which h5pcc) = ${PETSC_DIR}/${PETSC_ARCH}/bin/h5pcc || exit 10
-#           test $(which mpicc) = ${PETSC_DIR}/${PETSC_ARCH}/bin/mpicc || exit 11
+      - name: Build and install petsc_hdf5 module
+        working-directory: dependency-modules/scripts
+        run: |
+          ./install_petsc_hdf5.sh --petsc-version=${PETSC_VER} --hdf5-version=${HDF5_VER} --petsc-arch=${PETSC_LBL} --modules-dir=${MODULES_DIR}
+          module load petsc_hdf5/${PETSC_VER}_${HDF5_VER}/${PETSC_LBL}
+          test ${PETSC_DIR} = ${MODULES_DIR}/opt/petsc_hdf5/${PETSC_VER}_${HDF5_VER} || exit 1
+          test ${PETSC_ARCH} = ${PETSC_LBL} || exit 2
+          test -d ${PETSC_DIR}/${PETSC_ARCH}/bin || exit 3
+          test -d ${PETSC_DIR}/${PETSC_ARCH}/include || exit 4
+          test -d ${PETSC_DIR}/${PETSC_ARCH}/lib || exit 5
+          test -f ${PETSC_DIR}/${PETSC_ARCH}/lib/libhdf5.so || exit 6
+          test -f ${PETSC_DIR}/${PETSC_ARCH}/lib/libmpi.so || exit 7
+          test -f ${PETSC_DIR}/${PETSC_ARCH}/lib/libparmetis.so || exit 8
+          test -f ${PETSC_DIR}/${PETSC_ARCH}/lib/libpetsc.so || exit 9
+          test $(which h5pcc) = ${PETSC_DIR}/${PETSC_ARCH}/bin/h5pcc || exit 10
+          test $(which mpicc) = ${PETSC_DIR}/${PETSC_ARCH}/bin/mpicc || exit 11
 
       - name: Checkout Chaste repository
         uses: actions/checkout@v3
@@ -113,7 +121,15 @@ jobs:
       
       - name: Configure Chaste
         working-directory: Chaste/build
-        run: cmake -DCMAKE_BUILD_TYPE=Release ..
+        run: |
+          module purge
+          module load xsd/${XSD_VER}
+          module load xercesc/${XERCESC_VER}
+          module load sundials/${SUNDIALS_VER}
+          module load boost/${BOOST_VER}
+          module load vtk/${VTK_VER}
+          module load petsc_hdf5/${PETSC_VER}_${HDF5_VER}/${PETSC_LBL}
+          cmake -DCMAKE_BUILD_TYPE=Release ..
       
       - name: Compile build info
         working-directory: Chaste/build
@@ -121,19 +137,20 @@ jobs:
 
       - name: Get build info
         working-directory: Chaste/build
-        run: ctest -j $(nproc) -V -R TestChasteBuildInfo --output-on-failure > buildinfo
+        run: |
+          ctest -j $(nproc) -V -R TestChasteBuildInfo --output-on-failure | tee buildinfo
+          sed -i.bak 's/"//g' buildinfo  # removes quotes from some sundials versions
 
       - name: Check build info
         working-directory: Chaste/build
         run: |
-          module purge
-          module load xsd/4.0.0
-          module load xercesc/3.2.1
-          grep "<PETSc>3.12.4</PETSc>" buildinfo || exit 1
-          grep "<Boost>1.71.0</Boost>" buildinfo || exit 2
-          grep "<HDF5>1.10.4</HDF5>" buildinfo || exit 3
-          grep "<Parmetis>4.0.3</Parmetis>" buildinfo || exit 4
-          grep "<XSD>4.0.0</XSD>" buildinfo || exit 5
-          grep "<SUNDIALS>3.1.2</SUNDIALS>" buildinfo || exit 6
-          grep "<VTK>7.1</Boost>" buildinfo || exit 7
-          grep "<Xerces>3.2.1</Xerces>" buildinfo || exit 8
+          vtk_arr=(${VTK_VER//\./ })
+          vtk_major=${vtk_arr[0]}
+          vtk_minor=${vtk_arr[1]}
+          grep "<PETSc>${PETSC_VER}</PETSc>" buildinfo || exit 1
+          grep "<Boost>${BOOST_VER}</Boost>" buildinfo || exit 2
+          grep "<HDF5>${HDF5_VER}</HDF5>" buildinfo || exit 3
+          grep "<XSD>${XSD_VER}</XSD>" buildinfo || exit 4
+          grep "<SUNDIALS>${SUNDIALS_VER}</SUNDIALS>" buildinfo || exit 5
+          grep "<VTK>${vtk_major}.${vtk_minor}</VTK>" buildinfo || exit 6
+          grep "<Xerces>${XERCESC_VER}</Xerces>" buildinfo || exit 7

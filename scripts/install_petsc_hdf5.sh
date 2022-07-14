@@ -4,7 +4,8 @@ set -o nounset
 
 usage()
 {
-    echo 'Usage: '"$(basename $0)"' --petsc-version=version --hdf5-version=version --petsc-arch=label [--mpich-version=version] --modules-dir=path [--parallel=value]'
+    echo 'Usage: '"$(basename $0)"' --petsc-version=version --hdf5-version=version [--mpich-version=version]'
+    echo '        --petsc-arch={linux-gnu|linux-gnu-opt} --modules-dir=path [--parallel=value]'
     exit 1
 }
 
@@ -49,7 +50,8 @@ if [ -z "${base_dir}" ]; then usage; fi
 
 parallel="${parallel:-$(nproc)}"
 
-if [[ ! (${petsc_arch} = 'linux-gnu' || ${petsc_arch} = 'linux-gnu-opt') ]]; then
+if [[ ! (${petsc_arch} = 'linux-gnu' 
+      || ${petsc_arch} = 'linux-gnu-opt') ]]; then
     usage
 fi
 
@@ -60,6 +62,17 @@ petsc_minor=${petsc_version_arr[1]}
 hdf5_version_arr=(${hdf5_version//\./ })
 hdf5_major=${hdf5_version_arr[0]}
 hdf5_minor=${hdf5_version_arr[1]}
+
+# Unsupported versions: https://chaste.cs.ox.ac.uk/trac/wiki/InstallGuides/DependencyVersions
+if [[ (${petsc_major} -lt 3) || ((${petsc_major} -eq 3) && (${petsc_minor} -lt 7)) ]]; then  # PETSc < 3.7.x
+    echo "$(basename $0): PETSc versions < 3.7 not supported"
+    exit 1
+fi
+
+if [[ (${hdf5_major} -lt 1) || ((${hdf5_major} -eq 1) && (${hdf5_minor} -lt 10)) ]]; then  # HDF5 < 1.10.x
+    echo "$(basename $0): HDF5 versions < 1.10 not supported"
+    exit 1
+fi
 
 # Preferred MPICH versions
 URL_MPICH_3_3=https://www.mpich.org/static/downloads/3.3/mpich-3.3.tar.gz
@@ -88,13 +101,7 @@ if [ -n "${mpich_version}" ]; then
 fi
 
 download_hypre=1
-if [[ (${petsc_major} -eq 3) && (${petsc_minor} -eq 6) ]]; then  # PETSc 3.6.x
-    if [ -z "${mpich_version}" ]; then
-        wget -nc ${URL_MPICH_3_3}
-        download_mpich=$(pwd)/$(basename ${URL_MPICH_3_3})
-    fi
-
-elif [[ (${petsc_major} -eq 3) && (${petsc_minor} -eq 7) ]]; then  # PETSc 3.7.x
+if [[ (${petsc_major} -eq 3) && (${petsc_minor} -eq 7) ]]; then  # PETSc 3.7.x
     if [ -z "${mpich_version}" ]; then
         wget -nc ${URL_MPICH_3_3}
         download_mpich=$(pwd)/$(basename ${URL_MPICH_3_3})

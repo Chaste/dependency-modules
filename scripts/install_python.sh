@@ -4,7 +4,7 @@ set -o nounset
 
 usage()
 {
-    echo 'Usage: '"$0"' --version=version --modules-dir=path [--parallel=value]'
+    echo 'Usage: '"$(basename $0)"' --version=version --modules-dir=path [--parallel=value]'
     exit 1
 }
 
@@ -38,6 +38,19 @@ parallel="${parallel:-$(nproc)}"
 
 version_arr=(${version//\./ })
 major=${version_arr[0]}
+minor=${version_arr[1]}
+
+# Unsupported versions: https://chaste.cs.ox.ac.uk/trac/wiki/InstallGuides/DependencyVersions
+if [[ (${major} -eq 3) && (${minor} -lt 6) ]]; then  # Python3 < 3.6.x
+    echo "$(basename $0): Python3 versions < 3.6 not supported"
+    exit 1
+fi
+
+# PETSc versions < 3.11.x need Python2 to configure builds
+if [[ (${major} -eq 2) && (${minor} -lt 7) ]]; then  # Python2 < 2.7.x
+    echo "$(basename $0): Python2 versions < 2.7 not supported (for building dependencies)"
+    exit 1
+fi
 
 mkdir -p ${base_dir}/src/python
 cd ${base_dir}/src/python
