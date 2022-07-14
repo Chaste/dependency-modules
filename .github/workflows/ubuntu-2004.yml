@@ -27,8 +27,10 @@ jobs:
       
     steps:
       - name: Get Ubuntu version
-        run: echo 'OS_VERSION="'$(grep -m 1 PRETTY_NAME /etc/os-release | cut -d'"' -f 2)'"' >> $GITHUB_ENV
-        
+        run: |
+          OS_VERSION=$(grep -m 1 PRETTY_NAME /etc/os-release | cut -d'"' -f 2 | sed -e 's/ /_/g')
+          echo "OS_VERSION=${OS_VERSION}" >> $GITHUB_ENV
+      
       - name: Checkout Chaste/dependency-modules repository
         uses: actions/checkout@v3
         with:
@@ -197,7 +199,7 @@ jobs:
           mkdir -p Chaste/build
           mkdir -p ${CHASTE_TEST_OUTPUT}
       
-      - name: Configure Chaste
+      - name: Get Chaste build info
         working-directory: Chaste/build
         run: |
           module purge
@@ -208,14 +210,7 @@ jobs:
           module load vtk/${VTK_VER}
           module load petsc_hdf5/${PETSC_VER}_${HDF5_VER}/${PETSC_LBL}
           cmake -DCMAKE_BUILD_TYPE=Release ..
-      
-      - name: Compile build info
-        working-directory: Chaste/build
-        run: cmake --build . --parallel $(nproc) --target TestChasteBuildInfo
-
-      - name: Get build info
-        working-directory: Chaste/build
-        run: |
+          cmake --build . --parallel $(nproc) --target TestChasteBuildInfo
           ctest -j $(nproc) -V -R TestChasteBuildInfo --output-on-failure | tee buildinfo
           sed -i.bak 's/"//g' buildinfo  # removes quotes from some sundials versions
 
