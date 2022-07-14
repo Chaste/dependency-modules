@@ -46,7 +46,7 @@ jobs:
           source /etc/profile.d/modules.sh 
           module avail
           
-      #==== XSD
+      #===== XSD
       - name: Install xsd module
         working-directory: dependency-modules/scripts
         run: |
@@ -100,21 +100,34 @@ jobs:
           ./install_sundials.sh --version=${SUNDIALS_VER} --modules-dir=${MODULES_DIR}
           
       - name: Check sundials module
-        working-directory: dependency-modules/scripts
         run: |
           module load sundials/${SUNDIALS_VER}
           test ${SUNDIALS_ROOT} = ${MODULES_DIR}/opt/sundials/${SUNDIALS_VER} || exit 1
           test -d ${SUNDIALS_ROOT}/include || exit 2
           test -d ${SUNDIALS_ROOT}/lib || exit 3
           
-#       - name: Build and install boost module
-#         working-directory: dependency-modules/scripts
-#         run: |
-#           ./install_boost.sh --version=${BOOST_VER} --modules-dir=${MODULES_DIR}
-#           module load boost/${BOOST_VER}
-#           test ${BOOST_ROOT} = ${MODULES_DIR}/opt/boost/${BOOST_VER} || exit 1
-#           test -d ${BOOST_ROOT}/include || exit 2
-#           test -d ${BOOST_ROOT}/lib || exit 3
+      #===== BOOST
+      - name: Cache boost module
+        id: cache-boost
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${MODULES_DIR}/opt/boost/${BOOST_VER}
+            ${MODULES_DIR}/modulefiles/boost/${BOOST_VER}
+          key: ${{ env.OS_VERSION }}-boost-${{ env.BOOST_VER }}-${{ hashFiles('dependency-modules/scripts/install_boost.sh') }}
+      
+      - name: Build and install boost module
+        if: steps.cache-boost.outputs.cache-hit == 'false'
+        working-directory: dependency-modules/scripts
+        run: |
+          ./install_boost.sh --version=${BOOST_VER} --modules-dir=${MODULES_DIR}
+          
+      - name: Check boost module
+        run: |
+          module load boost/${BOOST_VER}
+          test ${BOOST_ROOT} = ${MODULES_DIR}/opt/boost/${BOOST_VER} || exit 1
+          test -d ${BOOST_ROOT}/include || exit 2
+          test -d ${BOOST_ROOT}/lib || exit 3
           
 #       - name: Build and install vtk module
 #         working-directory: dependency-modules/scripts
@@ -161,8 +174,8 @@ jobs:
           module purge
           module load xsd/${XSD_VER}
           module load xercesc/${XERCESC_VER}
-          #module load sundials/${SUNDIALS_VER}
-          #module load boost/${BOOST_VER}
+          module load sundials/${SUNDIALS_VER}
+          module load boost/${BOOST_VER}
           #module load vtk/${VTK_VER}
           #module load petsc_hdf5/${PETSC_VER}_${HDF5_VER}/${PETSC_LBL}
           cmake -DCMAKE_BUILD_TYPE=Release ..
@@ -180,13 +193,13 @@ jobs:
       - name: Check build info
         working-directory: Chaste/build
         run: |
+          grep "<XSD>${XSD_VER}</XSD>" buildinfo || exit 1
+          grep "<Xerces>${XERCESC_VER}</Xerces>" buildinfo || exit 2
+          grep "<SUNDIALS>${SUNDIALS_VER}</SUNDIALS>" buildinfo || exit 3
+          grep "<Boost>${BOOST_VER}</Boost>" buildinfo || exit 4
           #vtk_arr=(${VTK_VER//\./ })
           #vtk_major=${vtk_arr[0]}
           #vtk_minor=${vtk_arr[1]}
-          #grep "<PETSc>${PETSC_VER}</PETSc>" buildinfo || exit 1
-          #grep "<Boost>${BOOST_VER}</Boost>" buildinfo || exit 2
-          #grep "<HDF5>${HDF5_VER}</HDF5>" buildinfo || exit 3
-          grep "<XSD>${XSD_VER}</XSD>" buildinfo || exit 4
-          #grep "<SUNDIALS>${SUNDIALS_VER}</SUNDIALS>" buildinfo || exit 5
-          #grep "<VTK>${vtk_major}.${vtk_minor}</VTK>" buildinfo || exit 6
-          grep "<Xerces>${XERCESC_VER}</Xerces>" buildinfo || exit 7
+          #grep "<VTK>${vtk_major}.${vtk_minor}</VTK>" buildinfo || exit 5
+          #grep "<PETSc>${PETSC_VER}</PETSc>" buildinfo || exit 6
+          #grep "<HDF5>${HDF5_VER}</HDF5>" buildinfo || exit 7
