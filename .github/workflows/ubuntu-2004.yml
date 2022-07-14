@@ -26,6 +26,9 @@ jobs:
       HDF5_VER: 1.10.3
       
     steps:
+      - name: Get Ubuntu version
+        run: echo 'OS_VERSION="'$(grep -m 1 PRETTY_NAME /etc/os-release | cut -d'"' -f 2)'"' >> $GITHUB_ENV
+        
       - name: Checkout Chaste/dependency-modules repository
         uses: actions/checkout@v3
         with:
@@ -62,7 +65,7 @@ jobs:
           path: |
             ${MODULES_DIR}/opt/xercesc/${XERCESC_VER}
             ${MODULES_DIR}/modulefiles/xercesc/${XERCESC_VER}
-          key: ${{ runner.os }}-${XERCESC_VER}-${{ hashFiles('scripts/install_xercesc.sh') }}
+          key: ${{ env.OS_VERSION }}-xercesc-${{ env.XERCESC_VER }}-${{ hashFiles('dependency-modules/scripts/install_xercesc.sh') }}
       
       - name: Build and install xercesc module
         if: steps.cache-xercesc.outputs.cache-hit != 'true'
