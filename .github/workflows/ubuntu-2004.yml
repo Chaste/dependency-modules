@@ -215,7 +215,7 @@ jobs:
           grep "<Xerces>${{ matrix.xercesc_ver }}</Xerces>" buildinfo || exit 2
           grep "<SUNDIALS>${{ matrix.sundials_ver }}</SUNDIALS>" buildinfo || exit 3
           grep "<Boost>${{ matrix.boost_ver }}</Boost>" buildinfo || exit 4
-          vtk_arr=(${VTK_VER//\./ })
+          vtk_arr=($(echo "${{ matrix.vtk_ver }}" | sed -e 's/\./ /g'))
           vtk_major=${vtk_arr[0]}
           vtk_minor=${vtk_arr[1]}
           grep "<VTK>${vtk_major}.${vtk_minor}</VTK>" buildinfo || exit 5
