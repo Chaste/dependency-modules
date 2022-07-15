@@ -27,8 +27,10 @@ jobs:
       
     steps:
       - name: Get Ubuntu version
-        run: echo 'OS_VERSION="'$(grep -m 1 PRETTY_NAME /etc/os-release | cut -d'"' -f 2)'"' >> $GITHUB_ENV
-        
+        run: |
+          OS_VERSION=$(grep -m 1 PRETTY_NAME /etc/os-release | cut -d'"' -f 2 | sed -e 's/ /_/g')
+          echo "OS_VERSION=${OS_VERSION}" >> $GITHUB_ENV
+      
       - name: Checkout Chaste/dependency-modules repository
         uses: actions/checkout@v3
         with:
@@ -65,8 +67,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            ${MODULES_DIR}/opt/xercesc/${XERCESC_VER}
-            ${MODULES_DIR}/modulefiles/xercesc/${XERCESC_VER}
+            ${{ env.MODULES_DIR }}/opt/xercesc/${{ env.XERCESC_VER }}
+            ${{ env.MODULES_DIR }}/modulefiles/xercesc/${{ env.XERCESC_VER }}
           key: ${{ env.OS_VERSION }}-xercesc-${{ env.XERCESC_VER }}-${{ hashFiles('dependency-modules/scripts/install_xercesc.sh') }}
       
       - name: Build and install xercesc module
@@ -89,8 +91,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            ${MODULES_DIR}/opt/sundials/${SUNDIALS_VER}
-            ${MODULES_DIR}/modulefiles/sundials/${SUNDIALS_VER}
+            ${{ env.MODULES_DIR }}/opt/sundials/${{ env.SUNDIALS_VER }}
+            ${{ env.MODULES_DIR }}/modulefiles/sundials/${{ env.SUNDIALS_VER }}
           key: ${{ env.OS_VERSION }}-sundials-${{ env.SUNDIALS_VER }}-${{ hashFiles('dependency-modules/scripts/install_sundials.sh') }}
       
       - name: Build and install sundials module
@@ -112,8 +114,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            ${MODULES_DIR}/opt/boost/${BOOST_VER}
-            ${MODULES_DIR}/modulefiles/boost/${BOOST_VER}
+            ${{ env.MODULES_DIR }}/opt/boost/${{ env.BOOST_VER }}
+            ${{ env.MODULES_DIR }}/modulefiles/boost/${{ env.BOOST_VER }}
           key: ${{ env.OS_VERSION }}-boost-${{ env.BOOST_VER }}-${{ hashFiles('dependency-modules/scripts/install_boost.sh') }}
       
       - name: Build and install boost module
@@ -135,8 +137,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            ${MODULES_DIR}/opt/vtk/${VTK_VER}
-            ${MODULES_DIR}/modulefiles/vtk/${VTK_VER}
+            ${{ env.MODULES_DIR }}/opt/vtk/${{ env.VTK_VER }}
+            ${{ env.MODULES_DIR }}/modulefiles/vtk/${{ env.VTK_VER }}
           key: ${{ env.OS_VERSION }}-vtk-${{ env.VTK_VER }}-${{ hashFiles('dependency-modules/scripts/install_vtk.sh') }}
       
       - name: Build and install vtk module
@@ -159,8 +161,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            ${MODULES_DIR}/opt/petsc_hdf5/${PETSC_VER}_${HDF5_VER}
-            ${MODULES_DIR}/modulefiles/petsc_hdf5/${PETSC_VER}_${HDF5_VER}/${PETSC_LBL}
+            ${{ env.MODULES_DIR }}/opt/petsc_hdf5/${{ env.PETSC_VER }}_${{ env.HDF5_VER }}
+            ${{ env.MODULES_DIR }}/modulefiles/petsc_hdf5/${{ env.PETSC_VER }}_${{ env.HDF5_VER }}/${{ env.PETSC_LBL }}
           key: ${{ env.OS_VERSION }}-petsc_hdf5-${{ env.PETSC_VER }}-${{ env.HDF5_VER }}-${{ env.PETSC_LBL }}-${{ hashFiles('dependency-modules/scripts/install_petsc_hdf5.sh') }}
       
       - name: Build and install petsc_hdf5 module
@@ -197,7 +199,7 @@ jobs:
           mkdir -p Chaste/build
           mkdir -p ${CHASTE_TEST_OUTPUT}
       
-      - name: Configure Chaste
+      - name: Get Chaste build info
         working-directory: Chaste/build
         run: |
           module purge
@@ -208,14 +210,7 @@ jobs:
           module load vtk/${VTK_VER}
           module load petsc_hdf5/${PETSC_VER}_${HDF5_VER}/${PETSC_LBL}
           cmake -DCMAKE_BUILD_TYPE=Release ..
-      
-      - name: Compile build info
-        working-directory: Chaste/build
-        run: cmake --build . --parallel $(nproc) --target TestChasteBuildInfo
-
-      - name: Get build info
-        working-directory: Chaste/build
-        run: |
+          cmake --build . --parallel $(nproc) --target TestChasteBuildInfo
           ctest -j $(nproc) -V -R TestChasteBuildInfo --output-on-failure | tee buildinfo
           sed -i.bak 's/"//g' buildinfo  # removes quotes from some sundials versions
 
