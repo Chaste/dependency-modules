@@ -4,7 +4,7 @@
 Utility scripts for installing Chaste dependencies as Environment Modules
 
 ## TL;DR
-```
+```bash
 MODULES_DIR=${HOME}/modules
 
 mkdir -p ${MODULES_DIR}
@@ -30,4 +30,43 @@ module load sundials/5.8.0
 module load boost/1.69.0
 module load vtk/9.0.0
 module load petsc_hdf5/3.12.4_1.10.4/linux-gnu
+```
+
+## Introduction
+[Environment Modules](https://modules.readthedocs.io/)
+`module avail`
+`module load`
+`module unload`
+`module switch`
+`module purge`
+`module show`
+
+Directory Structure
+
+```
+<modules-dir>
+|
+|-- modulefiles
+|   |
+|   |-- <dependency-1>
+|   |    | --<ver-1>
+|   |    | --<ver-2>
+|   |    ` --<ver-3>
+|   |
+|   `-- <dependency-2>
+|        | --<ver-1>
+|        ` --<ver-2>
+|
+|-- opt
+|   |
+|   |-- <dependency-1>
+|   |    | --<ver-1>
+|   |    | --<ver-2>
+|   |    ` --<ver-3>
+|   |
+|   `-- <dependency-2>
+|        | --<ver-1>
+|        ` --<ver-2>
+|
+`-- src
 ```
