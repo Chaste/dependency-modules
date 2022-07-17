@@ -1,4 +1,4 @@
-name: Ubuntu Chaste Dependency Modules test suite
+name: Ubuntu Tests
 
 on:
   workflow_dispatch:
@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - {os: ubuntu-20.04, xsd_ver: 4.0.0, xercesc_ver: 3.2.1, sundials_ver: 4.1.0, boost_ver: 1.69.0, vtk_ver: 8.1.1, petsc_ver: 3.9.4, hdf5_ver: 1.10.3, petsc_arch: linux-gnu}
+          - {os: ubuntu-22.04, xsd_ver: 4.0.0, xercesc_ver: 3.2.1, sundials_ver: 4.1.0, boost_ver: 1.69.0, vtk_ver: 8.1.1, petsc_ver: 3.9.4, hdf5_ver: 1.10.3, petsc_arch: linux-gnu}
     
     runs-on: ${{ matrix.os }}
     
@@ -34,6 +34,11 @@ jobs:
         if: matrix.os == 'ubuntu-20.04'
         working-directory: dependency-modules/scripts
         run: sudo ./setup_ubuntu2004.sh
+        
+      - name: Install required packages for Ubuntu 22.04
+        if: matrix.os == 'ubuntu-22.04'
+        working-directory: dependency-modules/scripts
+        run: sudo ./setup_ubuntu2204.sh
 
       - name: Setup modules directory
         run: |
