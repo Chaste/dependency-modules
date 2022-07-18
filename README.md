@@ -6,7 +6,7 @@ Utility scripts for installing Chaste dependencies as [Environment Modules](http
 ## Usage
 1. Install Environment Modules
 
->The [Environment Modules](https://modules.readthedocs.io/) package enables switching between different versions of an application by reconfiguring the shell environment. Installation instructions for the Environment Modules package can be found [here](https://modules.readthedocs.io/en/latest/INSTALL.html).
+>The Environment Modules package enables switching between different versions of an application by reconfiguring the shell environment. Installation instructions for the Environment Modules package can be found [here](https://modules.readthedocs.io/en/latest/INSTALL.html).
 >
 >On Ubuntu, the Environment Modules package can be installed with apt:
 
@@ -16,11 +16,11 @@ apt-get install environment-modules
 source /etc/profile.d/modules.sh
 ```
 
-2. Prepare install location
+2. Prepare install location for software versions
 
->[Modulefiles](https://modules.readthedocs.io/en/latest/modulefile.html) are used to prescribe changes to be made to the shell environment when a specific version of an application is loaded.
+>A [modulefile](https://modules.readthedocs.io/en/latest/modulefile.html) is used to prescribe changes that need to be made to the shell environment to load a specific version of an application.
 >
->Environment Modules searches for modulefiles on paths listed in the `MODULEPATH` environment variable. `module use directory` prepends `directory` to `MODULEPATH`.
+>Environment Modules searches for modulefiles on paths listed by the `MODULEPATH` environment variable. The `module use directory` command prepends `directory` to `MODULEPATH`.
 
 ```bash
 MODULES_DIR=${HOME}/modules
@@ -99,6 +99,6 @@ module load petsc_hdf5/3.12.4_1.10.4/linux-gnu
 
 `module show modulefile` prints the environment changes prescribed by modulefile.
 
->Further help on the `module` command can be found [here](https://modules.readthedocs.io/en/latest/module.html).
+>More detailed help on the `module` command can be found [here](https://modules.readthedocs.io/en/latest/module.html).
 
 
