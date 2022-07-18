@@ -20,3 +20,25 @@ wget -O /usr/share/keyrings/chaste.asc https://www.cs.ox.ac.uk/chaste/ubuntu/Cha
 apt-get update && \
 apt-get install -y --no-install-recommends \
 chaste-dependencies
+
+apt-get install -y --no-install-recommends \
+cmake-curses-gui \
+scons \
+python3-dev \
+python3-pip \
+libffi-dev \
+doxygen \
+git \
+libgoogle-perftools-dev \
+graphviz \
+gnuplot \
+mencoder \
+"libpetsc-real*-dbg" \
+hdf5-tools \
+environment-modules
+
+update-alternatives --install /usr/bin/python python /usr/bin/python3 1
+pip install --upgrade pip
+pip install texttest
+
+export TEXTTEST_HOME=/usr/local/bin/texttest
