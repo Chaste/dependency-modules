@@ -27,11 +27,18 @@ MODULES_DIR=${HOME}/modules
 
 mkdir -p ${MODULES_DIR}/modulefiles
 
+module use ${MODULES_DIR}/modulefiles
+
 echo "module use ${MODULES_DIR}/modulefiles" >> ${HOME}/.bashrc
-source ${HOME}/.bashrc
 ```
 
->The dependency-modules utility scripts use the directory structure below. `src` is a temporary location for building application versions, `opt` is the install location, and modulefiles are placed in `modulefiles`.
+>The dependency-modules utility scripts use the directory structure below. 
+>
+>`modulefiles` is where modulefiles will be placed.
+>
+>`opt` is the installation location. 
+>
+>`src` is a temporary location for building application versions.
 
 ```
 <modules-dir>
@@ -78,19 +85,19 @@ module load petsc_hdf5/3.12.4_1.10.4/linux-gnu
 
 > Some useful commands:
 
-`module unload modulefile` unloads the application version from the environment.
+`module unload modulefile` unloads modulefile from the environment.
 
-`module switch [modulefile1] modulefile2` switches application versions.
+`module switch [modulefile1] modulefile2` switches version from modulefile1 to modulefile2.
 
-`module list` lists all currently applications.
+`module list` lists all currently loaded modulefiles.
 
-`module purge` unloads all currently loaded applications.
+`module purge` unloads all currently loaded modulefiles.
 
-`module avail` lists all installed applications.
-
-`module show modulefile` prints the environment changes prescribed by modulefile.
+`module avail` lists all installed modulefiles.
 
 `module search string` searches for modulefiles that contain `string`.
+
+`module show modulefile` prints the environment changes prescribed by modulefile.
 
 >Further help on the `module` command can be found [here](https://modules.readthedocs.io/en/latest/module.html).
 
