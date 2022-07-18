@@ -4,13 +4,23 @@
 Utility scripts for installing Chaste dependencies as Environment Modules
 
 ## TL;DR
+1. Install Environment Modules
+```bash
+apt-get install environment-modules
+source /etc/profile.d/modules.sh
+```
+
+2. Prepare install location
 ```bash
 MODULES_DIR=${HOME}/modules
 
-mkdir -p ${MODULES_DIR}
+mkdir -p ${MODULES_DIR}/modulefiles
 
-module use ${MODULES_DIR}
+module use ${MODULES_DIR}/modulefiles
+```
 
+3. Install Chaste dependencies as modules
+```
 ./install_xsd.sh --version=4.0.0 --modules-dir=${MODULES_DIR}
 
 ./install_xercesc.sh --version=3.2.1 --modules-dir=${MODULES_DIR}
@@ -23,7 +33,10 @@ module use ${MODULES_DIR}
 
 ./install_petsc_hdf5.sh --petsc-version=3.12.4 --hdf5-version=1.10.4 \
     --petsc-arch=linux-gnu --modules-dir=${MODULES_DIR}
+```
 
+4. Load Chaste dependency modules
+```
 module load xsd/4.0.0
 module load xercesc/3.2.1
 module load sundials/5.8.0
@@ -42,7 +55,6 @@ module load petsc_hdf5/3.12.4_1.10.4/linux-gnu
 `module show`
 
 Directory Structure
-
 ```
 <modules-dir>
 |
