@@ -36,7 +36,7 @@ jobs:
         run: sudo ./setup_ubuntu2204.sh
 
       - name: Get list of installed packages
-        run: dpkg-query --list > dpkg_list
+        run: dpkg-query --list | tee dpkg_list
       
       - name: Checkout Chaste repository
         uses: actions/checkout@v3
