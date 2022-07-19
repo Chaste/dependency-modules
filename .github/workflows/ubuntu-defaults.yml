@@ -1,0 +1,79 @@
+name: Ubuntu Defaults
+
+on:
+  workflow_dispatch:
+
+jobs:
+  
+  setup:
+    name: Test defaults on Ubuntu LTS
+    
+    strategy:
+      matrix:
+        os: [ ubuntu-20.04, ubuntu-22.04 ]
+    
+    runs-on: ${{ matrix.os }}
+        
+    env:
+      CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
+      
+    steps:
+      - name: Checkout Chaste/dependency-modules repository
+        uses: actions/checkout@v3
+        with:
+          repository: Chaste/dependency-modules
+          path: dependency-modules
+        
+      - name: Install required packages for Ubuntu 20.04
+        if: matrix.os == 'ubuntu-20.04'
+        working-directory: dependency-modules/scripts
+        run: sudo ./setup_ubuntu2004.sh
+        
+      - name: Install required packages for Ubuntu 22.04
+        if: matrix.os == 'ubuntu-22.04'
+        working-directory: dependency-modules/scripts
+        run: sudo ./setup_ubuntu2204.sh
+
+      - name: Get list of installed packages
+        run: dpkg-query --list > dpkg_list
+      
+      - name: Checkout Chaste repository
+        uses: actions/checkout@v3
+        with:
+          repository: Chaste/Chaste
+          ref: develop
+          fetch-depth: 1
+          path: Chaste
+          submodules: recursive
+
+      - name: Make build and test directories
+        run: |
+          mkdir -p Chaste/build
+          mkdir -p ${CHASTE_TEST_OUTPUT}
+
+      - name: Get Chaste commit sha
+        working-directory: Chaste/build
+        run: echo "CHASTE_COMMIT=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Cache Chaste build
+        uses: actions/cache@v2
+        id: cache-chaste
+        with:
+          path: Chaste/build
+          key: ${{ matrix.os }}-${{ env.CHASTE_COMMIT }}-${{ hashFiles('dpkg_list') }}
+
+      - name: Build Chaste
+        if: steps.cache-chaste.outputs.cache-hit != 'true'
+        working-directory: Chaste/build
+        run: |
+          cmake -DCMAKE_BUILD_TYPE=Release ..
+          cmake --build . --parallel $(nproc) --target TestChasteBuildInfo
+          cmake --build . --parallel $(nproc) --target Continuous
+
+      - name: Get Chaste build info
+        working-directory: Chaste/build
+        run: ctest -j $(nproc) -V -R TestChasteBuildInfo --output-on-failure
+
+      - name: Run Continuous test pack
+        working-directory: Chaste/build
+        run: ctest -j $(nproc) -L Continuous --output-on-failure
