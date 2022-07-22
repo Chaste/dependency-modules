@@ -1,89 +1,83 @@
 ![tests](https://github.com/Chaste/dependency-modules/actions/workflows/ubuntu.yml/badge.svg)
 
 # Chaste Dependency Modules
-Utility scripts for installing Chaste dependencies as [Environment Modules](https://modules.readthedocs.io/).
+Utility scripts for installing Chaste dependencies as Environment Modules.
 
 ## Usage
-1. Install Environment Modules
+1. Install [Environment Modules](https://modules.readthedocs.io/)
 
->The Environment Modules package enables switching between different versions of an application by reconfiguring the shell environment. Installation instructions for the Environment Modules package can be found [here](https://modules.readthedocs.io/en/latest/INSTALL.html).
+>Environment Modules enables switching between software versions by reconfiguring the shell environment.
 >
->On Ubuntu, the Environment Modules package can be installed with apt:
-
-```bash
-apt-get install environment-modules
-
-source /etc/profile.d/modules.sh
-```
-
-2. Prepare install location for software versions
-
->A [modulefile](https://modules.readthedocs.io/en/latest/modulefile.html) is used to prescribe changes that need to be made to the shell environment to load a specific version of an application.
+>Installation on Ubuntu:
 >
->Environment Modules searches for modulefiles on paths listed by the `MODULEPATH` environment variable. The `module use directory` command prepends `directory` to `MODULEPATH`.
+>```
+>apt-get install environment-modules
+>source /etc/profile.d/modules.sh
+>```
+>For full install instructions, see [Installing Modules on Unix](https://modules.readthedocs.io/en/latest/INSTALL.html).
 
-```bash
-MODULES_DIR=${HOME}/modules
+2. Prepare modulefiles location
 
-mkdir -p ${MODULES_DIR}/modulefiles
-
-module use ${MODULES_DIR}/modulefiles
-
-echo "module use ${MODULES_DIR}/modulefiles" >> ${HOME}/.bashrc
-```
-
->The dependency-modules utility scripts use the directory structure below. 
+>[Modulefiles](https://modules.readthedocs.io/en/latest/modulefile.html) are prescriptions for configuring the shell environment to load specific software versions. Environment Modules uses modulefiles from locations on `MODULEPATH`.
 >
->`modulefiles` is where modulefiles will be placed.
+>```
+>MODULES_DIR=${HOME}/modules
+>mkdir -p ${MODULES_DIR}/modulefiles
+>module use ${MODULES_DIR}/modulefiles
+>echo "module use ${MODULES_DIR}/modulefiles" >> ${HOME}/.bashrc
+>```
 >
->`opt` is the installation location. 
+>The command `module use directory` prepends `directory` to `MODULEPATH`.
 >
->`src` is a temporary location for building application versions.
+>The utility scripts use the directory structure below:
+>
+>```
+><MODULES_DIR>
+>|-- modulefiles
+>|-- opt
+>`-- src
+>```
+>
+>Builds are done from `src`.
+>
+>Software versions are installed to `opt`.
+>
+>Modulefiles are placed under `modulefiles`.
 
-```
-<modules-dir>
-|-- modulefiles
-|-- opt
-`-- src
-```
 
-3. Install Chaste dependencies as modules
+3. Install Chaste dependencies
 
->The utility scripts under `dependency-modules/scripts` require version numbers and a path to the install location:
+>```
+>./install_xsd.sh --version=4.0.0 --modules-dir=${MODULES_DIR}
+>
+>./install_xercesc.sh --version=3.2.1 --modules-dir=${MODULES_DIR}
+>
+>./install_sundials.sh --version=5.8.0 --modules-dir=${MODULES_DIR}
+>
+>./install_boost.sh --version=1.69.0 --modules-dir=${MODULES_DIR}
+>
+>./install_vtk.sh --version=9.0.0 --modules-dir=${MODULES_DIR}
+>
+>./install_petsc_hdf5.sh --petsc-version=3.12.4 --hdf5-version=1.10.4 \
+>    --petsc-arch=linux-gnu --modules-dir=${MODULES_DIR}
+>```
 
-```
-./install_xsd.sh --version=4.0.0 --modules-dir=${MODULES_DIR}
+4. Load installed dependencies
 
-./install_xercesc.sh --version=3.2.1 --modules-dir=${MODULES_DIR}
+>```
+>module load xsd/4.0.0
+>module load xercesc/3.2.1
+>module load sundials/5.8.0
+>module load boost/1.69.0
+>module load vtk/9.0.0
+>module load petsc_hdf5/3.12.4_1.10.4/linux-gnu
+>```
 
-./install_sundials.sh --version=5.8.0 --modules-dir=${MODULES_DIR}
+5. Build Chaste
 
-./install_boost.sh --version=1.69.0 --modules-dir=${MODULES_DIR}
+>See the [Chaste Guides](https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/CmakeFirstRun) for detailed instructions on building Chaste.
 
-./install_vtk.sh --version=9.0.0 --modules-dir=${MODULES_DIR}
-
-./install_petsc_hdf5.sh --petsc-version=3.12.4 --hdf5-version=1.10.4 \
-    --petsc-arch=linux-gnu --modules-dir=${MODULES_DIR}
-```
-
-4. Load Chaste dependency modules
-
->Installed software versions can be loaded into the environment with `module load modulefile`.
-```
-module load xsd/4.0.0
-
-module load xercesc/3.2.1
-
-module load sundials/5.8.0
-
-module load boost/1.69.0
-
-module load vtk/9.0.0
-
-module load petsc_hdf5/3.12.4_1.10.4/linux-gnu
-```
-
-> Some useful commands:
+## Useful commands
 
 `module unload modulefile` unloads modulefile from the environment.
 
@@ -99,6 +93,6 @@ module load petsc_hdf5/3.12.4_1.10.4/linux-gnu
 
 `module show modulefile` prints the environment changes prescribed by modulefile.
 
->More detailed help on the `module` command can be found [here](https://modules.readthedocs.io/en/latest/module.html).
+For detailed options, see the [module command help](https://modules.readthedocs.io/en/latest/module.html).
 
 
