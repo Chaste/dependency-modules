@@ -45,10 +45,8 @@ Utility scripts for installing Chaste dependencies as Environment Modules.
 >Modulefiles are placed under `modulefiles`.
 
 
-3. Install Chaste dependencies as modules
+3. Install Chaste dependencies
 
->The utility scripts under `dependency-modules/scripts` require version numbers and a path to the install location:
->
 >```
 >./install_xsd.sh --version=4.0.0 --modules-dir=${MODULES_DIR}
 >
@@ -64,22 +62,18 @@ Utility scripts for installing Chaste dependencies as Environment Modules.
 >    --petsc-arch=linux-gnu --modules-dir=${MODULES_DIR}
 >```
 
-4. Load installed modules
+4. Load installed dependencies
 
->Installed software versions can be loaded into the environment with `module load modulefile`.
 >```
 >module load xsd/4.0.0
->
 >module load xercesc/3.2.1
->
 >module load sundials/5.8.0
->
 >module load boost/1.69.0
->
 >module load vtk/9.0.0
->
 >module load petsc_hdf5/3.12.4_1.10.4/linux-gnu
 >```
+
+5. Build Chaste
 
 ### Useful commands
 
