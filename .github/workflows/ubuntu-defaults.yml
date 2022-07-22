@@ -10,8 +10,8 @@ jobs:
     
     strategy:
       matrix:
-        os: [ ubuntu-20.04, ubuntu-22.04 ]
-      fail-fast: false
+        os: [ ubuntu-22.04 ]
+      fail-fast: true
     
     runs-on: ${{ matrix.os }}
         
@@ -66,7 +66,7 @@ jobs:
       - name: Configure Chaste
         if: steps.cache-chaste.outputs.cache-hit != 'true'
         working-directory: Chaste/build
-        run: cmake -DCMAKE_BUILD_TYPE=Release ..
+        run: cmake -DCMAKE_BUILD_TYPE=Debug ..
           
       - name: Compile Chaste build info
         if: steps.cache-chaste.outputs.cache-hit != 'true'
