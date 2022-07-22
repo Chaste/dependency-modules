@@ -1,20 +1,20 @@
 ![tests](https://github.com/Chaste/dependency-modules/actions/workflows/ubuntu.yml/badge.svg)
 
 # Chaste Dependency Modules
-Utility scripts for installing Chaste dependencies as [Environment Modules](https://modules.readthedocs.io/).
+Utility scripts for installing Chaste dependencies as Environment Modules.
 
 ## Usage
-1. Install Environment Modules
+1. Install [Environment Modules](https://modules.readthedocs.io/)
 
->The Environment Modules package enables switching between different versions of an application by reconfiguring the shell environment. Installation instructions for the Environment Modules package can be found [here](https://modules.readthedocs.io/en/latest/INSTALL.html).
+>Environment Modules enables switching between software versions by reconfiguring the shell environment.
 >
->On Ubuntu, the Environment Modules package can be installed with apt:
+>Installation on Ubuntu:
 >
->```bash
+>```
 >apt-get install environment-modules
->
 >source /etc/profile.d/modules.sh
 >```
+>For full install instructions, see [Installing Modules on Unix](https://modules.readthedocs.io/en/latest/INSTALL.html).
 
 2. Prepare install location for software version modules
 
@@ -22,7 +22,7 @@ Utility scripts for installing Chaste dependencies as [Environment Modules](http
 >
 >Environment Modules searches for modulefiles on paths listed by the `MODULEPATH` environment variable. The `module use directory` command prepends `directory` to `MODULEPATH`.
 >
->```bash
+>```
 >MODULES_DIR=${HOME}/modules
 >
 >mkdir -p ${MODULES_DIR}/modulefiles
@@ -66,7 +66,7 @@ Utility scripts for installing Chaste dependencies as [Environment Modules](http
 >    --petsc-arch=linux-gnu --modules-dir=${MODULES_DIR}
 >```
 
-4. Load Chaste dependency modules
+4. Load installed modules
 
 >Installed software versions can be loaded into the environment with `module load modulefile`.
 >```
