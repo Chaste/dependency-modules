@@ -16,36 +16,34 @@ Utility scripts for installing Chaste dependencies as Environment Modules.
 >```
 >For full install instructions, see [Installing Modules on Unix](https://modules.readthedocs.io/en/latest/INSTALL.html).
 
-2. Prepare install location for software version modules
+2. Prepare modulefiles location
 
->A [modulefile](https://modules.readthedocs.io/en/latest/modulefile.html) is used to prescribe changes that need to be made to the shell environment to load a specific version of an application.
->
->Environment Modules searches for modulefiles on paths listed by the `MODULEPATH` environment variable. The `module use directory` command prepends `directory` to `MODULEPATH`.
+>[Modulefiles](https://modules.readthedocs.io/en/latest/modulefile.html) specify how to configure the shell environment for specific software versions. Environment Modules uses modulefiles from locations on `MODULEPATH`.
 >
 >```
 >MODULES_DIR=${HOME}/modules
->
 >mkdir -p ${MODULES_DIR}/modulefiles
->
 >module use ${MODULES_DIR}/modulefiles
->
 >echo "module use ${MODULES_DIR}/modulefiles" >> ${HOME}/.bashrc
 >```
 >
->The dependency-modules utility scripts use the directory structure below. 
+>The command `module use directory` prepends `directory` to `MODULEPATH`.
 >
->`modulefiles` is where modulefiles will be placed.
->
->`opt` is the installation location. 
->
->`src` is a temporary location for building application versions.
+>The utility scripts use the directory structure below:
 >
 >```
-><modules-dir>
+><MODULES_DIR>
 >|-- modulefiles
 >|-- opt
 >`-- src
 >```
+>
+>Builds are done from `src`.
+>
+>Software versions are installed to `opt`.
+>
+>Modulefiles are placed under `modulefiles`.
+
 
 3. Install Chaste dependencies as modules
 
