@@ -75,7 +75,9 @@ Utility scripts for installing Chaste dependencies as Environment Modules.
 
 5. Build Chaste
 
-### Useful commands
+>See the [Chaste Guides](https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/CmakeFirstRun) for detailed instructions on building Chaste.
+
+## Useful commands
 
 `module unload modulefile` unloads modulefile from the environment.
 
@@ -91,6 +93,6 @@ Utility scripts for installing Chaste dependencies as Environment Modules.
 
 `module show modulefile` prints the environment changes prescribed by modulefile.
 
-More detailed help on the `module` command can be found [here](https://modules.readthedocs.io/en/latest/module.html).
+For more commands, see the [module command help](https://modules.readthedocs.io/en/latest/module.html).
 
 
