@@ -18,7 +18,7 @@ Utility scripts for installing Chaste dependencies as Environment Modules.
 
 2. Prepare modulefiles location
 
->[Modulefiles](https://modules.readthedocs.io/en/latest/modulefile.html) specify how to configure the shell environment for specific software versions. Environment Modules uses modulefiles from locations on `MODULEPATH`.
+>[Modulefiles](https://modules.readthedocs.io/en/latest/modulefile.html) are prescriptions for configuring the shell environment to load specific software versions. Environment Modules uses modulefiles from locations on `MODULEPATH`.
 >
 >```
 >MODULES_DIR=${HOME}/modules
@@ -93,6 +93,6 @@ Utility scripts for installing Chaste dependencies as Environment Modules.
 
 `module show modulefile` prints the environment changes prescribed by modulefile.
 
-For more commands, see the [module command help](https://modules.readthedocs.io/en/latest/module.html).
+For detailed options, see the [module command help](https://modules.readthedocs.io/en/latest/module.html).
 
 
