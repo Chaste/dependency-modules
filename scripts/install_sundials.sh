@@ -72,6 +72,20 @@ cat <<EOF > ${version}
 ###
 ## sundials ${version} modulefile
 ##
+proc ModulesTest { } {
+    set paths "[getenv SUNDIALS_ROOT]
+               [getenv SUNDIALS_ROOT]/include
+               [getenv SUNDIALS_ROOT]/lib"
+
+    foreach path \$paths {
+        if { ![file exists \$path] } {
+            puts stderr "ERROR: Does not exist: \$path"
+            return 0
+        }
+    }
+    return 1
+}
+
 proc ModulesHelp { } {
     puts stderr "\tThis adds the environment variables for sundials ${version}\n"
 }
