@@ -63,7 +63,7 @@ mkdir -p ${install_dir}
 
 cd boost_${ver_si_on}
 ./bootstrap.sh --prefix=${install_dir} && \
-./b2 -j ${parallel} install
+./b2 -j ${parallel} install --with-filesystem
 
 if [ ${version} = 1.64.0 ]; then
     # Fix: https://github.com/boostorg/serialization/commit/1d86261581230e2dc5d617a9b16287d326f3e229
@@ -77,6 +77,20 @@ cat <<EOF > ${version}
 ###
 ## boost ${version} modulefile
 ##
+proc ModulesTest { } {
+    set paths "[getenv BOOST_ROOT]
+               [getenv BOOST_ROOT]/lib
+               [getenv BOOST_ROOT]/include"
+
+    foreach path \$paths {
+        if { ![file exists \$path] } {
+            puts stderr "ERROR: Does not exist: \$path"
+            return 0
+        }
+    }
+    return 1
+}
+
 proc ModulesHelp { } {
     puts stderr "\tThis adds the environment variables for boost ${version}\n"
 }
