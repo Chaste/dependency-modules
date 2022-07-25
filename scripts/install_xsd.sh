@@ -56,6 +56,20 @@ cat <<EOF > ${version}
 ###
 ## xsd ${version} modulefile
 ##
+proc ModulesTest { } {
+    set paths "[getenv XSD_ROOT]
+               [getenv XSD_ROOT]/bin
+               [getenv XSD_ROOT]/libxsd"
+
+    foreach path \$paths {
+        if { ![file exists \$path] } {
+            puts stderr "ERROR: Does not exist: \$path"
+            return 0
+        }
+    }
+    return 1
+}
+
 proc ModulesHelp { } {
     puts stderr "\tThis adds the environment variables for xsd ${version}\n"
 }
