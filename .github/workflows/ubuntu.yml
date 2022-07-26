@@ -182,7 +182,7 @@ jobs:
           module load boost/${{ matrix.boost_ver }}
           module load vtk/${{ matrix.vtk_ver }}
           module load petsc_hdf5/${{ matrix.petsc_ver }}_${{ matrix.hdf5_ver }}/${{ matrix.petsc_arch }}
-          cmake -DCMAKE_BUILD_TYPE=Release ..
+          cmake -DCMAKE_BUILD_TYPE=Debug ..
           cmake --build . --parallel $(nproc) --target TestChasteBuildInfo
           ctest -j $(nproc) -V -R TestChasteBuildInfo --output-on-failure | tee buildinfo
           sed -i.bak 's/"//g' buildinfo  # removes quotes from some sundials versions
