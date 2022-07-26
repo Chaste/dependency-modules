@@ -1,6 +1,4 @@
-#!/bin/bash
-set -o errexit
-set -o nounset
+#!/bin/bash -eu
 
 usage()
 {
@@ -47,6 +45,7 @@ if [[ (${major} -lt 1) || ((${major} -eq 1) && (${minor} -lt 62)) ]]; then  # Bo
     exit 1
 fi
 
+# Download and extract source
 mkdir -p ${base_dir}/src/boost
 cd ${base_dir}/src/boost
 
@@ -58,6 +57,7 @@ else  # Boost > 1.62.x
 fi
 tar -xjf boost_${ver_si_on}.tar.bz2
 
+# Build and install
 install_dir=${base_dir}/opt/boost/${version}
 mkdir -p ${install_dir}
 
@@ -70,6 +70,7 @@ if [ ${version} = 1.64.0 ]; then
     sed -i.bak '25i\#include <boost/serialization/array_wrapper.hpp>' ${install_dir}/include/boost/serialization/array.hpp
 fi
 
+# Add modulefile
 mkdir -p ${base_dir}/modulefiles/boost
 cd  ${base_dir}/modulefiles/boost
 cat <<EOF > ${version}
