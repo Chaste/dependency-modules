@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Modified dependencies script from chaste-docker: https://github.com/Chaste/chaste-docker
 export DEBIAN_FRONTEND=noninteractive
 
 apt-get update && \
@@ -24,11 +23,7 @@ python3-dev \
 python3-pip \
 libffi-dev \
 mencoder \
-mplayer \
-openssh-client \
 environment-modules
-
-source /etc/profile.d/modules.sh
 
 update-alternatives --install /usr/bin/vtk vtk /usr/bin/vtk7 7
 update-alternatives --install /usr/bin/python python /usr/bin/python3 1
