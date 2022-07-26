@@ -219,6 +219,25 @@ cat <<EOF > ${petsc_arch}
 ###
 ## petsc_hdf5 ${petsc_version}_${hdf5_version}/${petsc_arch} modulefile
 ##
+proc ModulesTest { } {
+    set paths "[getenv PETSC_DIR]
+               [getenv PETSC_DIR]/[getenv PETSC_ARCH]
+               [getenv PETSC_DIR]/[getenv PETSC_ARCH]/bin
+               [getenv PETSC_DIR]/[getenv PETSC_ARCH]/bin/h5pcc
+               [getenv PETSC_DIR]/[getenv PETSC_ARCH]/include
+               [getenv PETSC_DIR]/[getenv PETSC_ARCH]/lib
+               [getenv PETSC_DIR]/[getenv PETSC_ARCH]/lib/libhdf5.so
+               [getenv PETSC_DIR]/[getenv PETSC_ARCH]/lib/libpetsc.so"
+
+    foreach path \$paths {
+        if { ![file exists \$path] } {
+            puts stderr "ERROR: Does not exist: \$path"
+            return 0
+        }
+    }
+    return 1
+}
+
 proc ModulesHelp { } {
     puts stderr "\tThis adds the environment variables for petsc ${petsc_version} and hdf5 ${hdf5_version}, with PETSC_ARCH=${petsc_arch}\n"
 }
