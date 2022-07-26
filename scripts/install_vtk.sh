@@ -1,6 +1,4 @@
-#!/bin/bash
-set -o errexit
-set -o nounset
+#!/bin/bash -eu
 
 usage()
 {
@@ -46,6 +44,7 @@ if [[ (${major} -lt 6) || ((${major} -eq 6) && (${minor} -lt 3)) ]]; then  # VTK
     exit 1
 fi
 
+# Download and extract source
 mkdir -p ${base_dir}/src/vtk
 cd ${base_dir}/src/vtk
 
@@ -61,12 +60,13 @@ else  # VTK > 6.0.x
     tar -xzf v${version}.tar.gz -C ${src_dir} --strip-components=1
 fi
 
-# Tweak for detecting gcc 6-9: https://public.kitware.com/pipermail/vtkusers/2017-April/098448.html
+# Tweak for detecting gcc 6-11: https://public.kitware.com/pipermail/vtkusers/2017-April/098448.html
 if [[ ${major} -lt 7 || (${major} -eq 7 && ${minor} -eq 0) ]]; then  # VTK <= 7.0.x
-    sed -i.bak 's|string (REGEX MATCH "\[345\]|string (REGEX MATCH "\[3-9\]|g' ${src_dir}/CMake/vtkCompilerExtras.cmake
-    sed -i.bak 's|string(REGEX MATCH "\[345\]|string(REGEX MATCH "\[3-9\]|g' ${src_dir}/CMake/GenerateExportHeader.cmake
+    sed -i.bak 's/string (REGEX MATCH "\[345\]/string (REGEX MATCH "(\[3-9\]\|1\[0-1\])/g' ${src_dir}/CMake/vtkCompilerExtras.cmake
+    sed -i.bak 's/string(REGEX MATCH "\[345\]/string(REGEX MATCH "(\[3-9\]\|1\[0-1\])/g' ${src_dir}/CMake/GenerateExportHeader.cmake
 fi
 
+# Build and install
 install_dir=${base_dir}/opt/vtk/${version}
 mkdir -p ${install_dir}
 
@@ -79,6 +79,7 @@ cmake \
 make -j ${parallel} && \
 make install
 
+# Add modulefile
 mkdir -p ${base_dir}/modulefiles/vtk
 cd  ${base_dir}/modulefiles/vtk
 cat <<EOF > ${version}
@@ -86,6 +87,21 @@ cat <<EOF > ${version}
 ###
 ## vtk ${version} modulefile
 ##
+proc ModulesTest { } {
+    set paths "[getenv VTK_ROOT]
+               [getenv VTK_ROOT]/bin
+               [getenv VTK_ROOT]/include/vtk-${major}.${minor}
+               [getenv VTK_ROOT]/lib"
+
+    foreach path \$paths {
+        if { ![file exists \$path] } {
+            puts stderr "ERROR: Does not exist: \$path"
+            return 0
+        }
+    }
+    return 1
+}
+
 proc ModulesHelp { } {
     puts stderr "\tThis adds the environment variables for vtk ${version}\n"
 }
@@ -93,7 +109,6 @@ proc ModulesHelp { } {
 module-whatis "This adds the environment variables for vtk ${version}"
 
 setenv          VTK_ROOT             ${install_dir}
-prepend-path    CMAKE_PREFIX_PATH    ${install_dir}
 prepend-path    PATH                 ${install_dir}/bin
 prepend-path    LIBRARY_PATH         ${install_dir}/lib
 prepend-path    LD_LIBRARY_PATH      ${install_dir}/lib

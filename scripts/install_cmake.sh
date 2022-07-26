@@ -1,6 +1,4 @@
-#!/bin/bash
-set -o errexit
-set -o nounset
+#!/bin/bash -eu
 
 usage()
 {
@@ -46,11 +44,13 @@ if [[ (${major} -lt 3) || ((${major} -eq 3) && (${minor} -lt 5)) ]]; then  # CMa
     exit 1
 fi
 
+# Download and extract source
 mkdir -p ${base_dir}/src/cmake
 cd ${base_dir}/src/cmake
 wget -nc https://cmake.org/files/v${major}.${minor}/cmake-${version}.tar.gz
 tar -xzf cmake-${version}.tar.gz
 
+# Build and install
 install_dir=${base_dir}/opt/cmake/${version}
 mkdir -p ${install_dir}
 
@@ -61,6 +61,7 @@ cd cmake-${version}
 make -j ${parallel} && \
 make install
 
+# Add modulefile
 mkdir -p ${base_dir}/modulefiles/cmake
 cd  ${base_dir}/modulefiles/cmake
 cat <<EOF > ${version}
@@ -68,6 +69,18 @@ cat <<EOF > ${version}
 ###
 ## cmake ${version} modulefile
 ##
+proc ModulesTest { } {
+    set paths "${install_dir}/bin/cmake"
+
+    foreach path \$paths {
+        if { ![file exists \$path] } {
+            puts stderr "ERROR: Does not exist: \$path"
+            return 0
+        }
+    }
+    return 1
+}
+
 proc ModulesHelp { } {
     puts stderr "\tThis adds the environment variables for cmake ${version}\n"
 }

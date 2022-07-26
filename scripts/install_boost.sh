@@ -1,6 +1,4 @@
-#!/bin/bash
-set -o errexit
-set -o nounset
+#!/bin/bash -eu
 
 usage()
 {
@@ -47,6 +45,7 @@ if [[ (${major} -lt 1) || ((${major} -eq 1) && (${minor} -lt 62)) ]]; then  # Bo
     exit 1
 fi
 
+# Download and extract source
 mkdir -p ${base_dir}/src/boost
 cd ${base_dir}/src/boost
 
@@ -58,6 +57,7 @@ else  # Boost > 1.62.x
 fi
 tar -xjf boost_${ver_si_on}.tar.bz2
 
+# Build and install
 install_dir=${base_dir}/opt/boost/${version}
 mkdir -p ${install_dir}
 
@@ -70,6 +70,7 @@ if [ ${version} = 1.64.0 ]; then
     sed -i.bak '25i\#include <boost/serialization/array_wrapper.hpp>' ${install_dir}/include/boost/serialization/array.hpp
 fi
 
+# Add modulefile
 mkdir -p ${base_dir}/modulefiles/boost
 cd  ${base_dir}/modulefiles/boost
 cat <<EOF > ${version}
@@ -77,6 +78,20 @@ cat <<EOF > ${version}
 ###
 ## boost ${version} modulefile
 ##
+proc ModulesTest { } {
+    set paths "[getenv BOOST_ROOT]
+               [getenv BOOST_ROOT]/lib
+               [getenv BOOST_ROOT]/include"
+
+    foreach path \$paths {
+        if { ![file exists \$path] } {
+            puts stderr "ERROR: Does not exist: \$path"
+            return 0
+        }
+    }
+    return 1
+}
+
 proc ModulesHelp { } {
     puts stderr "\tThis adds the environment variables for boost ${version}\n"
 }
@@ -84,7 +99,6 @@ proc ModulesHelp { } {
 module-whatis "This adds the environment variables for boost ${version}"
 
 setenv          BOOST_ROOT           ${install_dir}
-prepend-path    CMAKE_PREFIX_PATH    ${install_dir}
 prepend-path    LIBRARY_PATH         ${install_dir}/lib
 prepend-path    LD_LIBRARY_PATH      ${install_dir}/lib
 prepend-path    INCLUDE              ${install_dir}/include
