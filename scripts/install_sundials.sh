@@ -1,6 +1,4 @@
-#!/bin/bash
-set -o errexit
-set -o nounset
+#!/bin/bash -eu
 
 usage()
 {
@@ -46,11 +44,13 @@ if [[ (${major} -lt 2) || ((${major} -eq 2) && (${minor} -lt 7)) ]]; then  # Sun
     exit 1
 fi
 
+# Download and extract source
 mkdir -p ${base_dir}/src/sundials
 cd ${base_dir}/src/sundials
 wget -nc https://github.com/LLNL/sundials/releases/download/v${version}/sundials-${version}.tar.gz
 tar -xzf sundials-${version}.tar.gz
 
+# Build and install
 install_dir=${base_dir}/opt/sundials/${version}
 mkdir -p ${install_dir}
 
@@ -65,6 +65,7 @@ cmake \
 make -j ${parallel} && \
 make install
 
+# Add modulefile
 mkdir -p ${base_dir}/modulefiles/sundials
 cd  ${base_dir}/modulefiles/sundials
 cat <<EOF > ${version}
