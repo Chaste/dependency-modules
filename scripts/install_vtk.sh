@@ -86,6 +86,21 @@ cat <<EOF > ${version}
 ###
 ## vtk ${version} modulefile
 ##
+proc ModulesTest { } {
+    set paths "[getenv VTK_ROOT]
+               [getenv VTK_ROOT]/bin
+               [getenv VTK_ROOT]/include/vtk-${major}.${minor}
+               [getenv VTK_ROOT]/lib"
+
+    foreach path \$paths {
+        if { ![file exists \$path] } {
+            puts stderr "ERROR: Does not exist: \$path"
+            return 0
+        }
+    }
+    return 1
+}
+
 proc ModulesHelp { } {
     puts stderr "\tThis adds the environment variables for vtk ${version}\n"
 }
