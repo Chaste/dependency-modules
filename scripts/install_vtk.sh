@@ -60,10 +60,10 @@ else  # VTK > 6.0.x
     tar -xzf v${version}.tar.gz -C ${src_dir} --strip-components=1
 fi
 
-# Tweak for detecting gcc 6-9: https://public.kitware.com/pipermail/vtkusers/2017-April/098448.html
+# Tweak for detecting gcc 6-11: https://public.kitware.com/pipermail/vtkusers/2017-April/098448.html
 if [[ ${major} -lt 7 || (${major} -eq 7 && ${minor} -eq 0) ]]; then  # VTK <= 7.0.x
-    sed -i.bak 's|string (REGEX MATCH "\[345\]|string (REGEX MATCH "\[3-9\]|g' ${src_dir}/CMake/vtkCompilerExtras.cmake
-    sed -i.bak 's|string(REGEX MATCH "\[345\]|string(REGEX MATCH "\[3-9\]|g' ${src_dir}/CMake/GenerateExportHeader.cmake
+    sed -i.bak 's/string (REGEX MATCH "\[345\]/string (REGEX MATCH "(\[3-9\]\|1\[0-1\])/g' ${src_dir}/CMake/vtkCompilerExtras.cmake
+    sed -i.bak 's/string(REGEX MATCH "\[345\]/string(REGEX MATCH "(\[3-9\]\|1\[0-1\])/g' ${src_dir}/CMake/GenerateExportHeader.cmake
 fi
 
 # Build and install
