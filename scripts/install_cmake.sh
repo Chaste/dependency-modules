@@ -68,6 +68,18 @@ cat <<EOF > ${version}
 ###
 ## cmake ${version} modulefile
 ##
+proc ModulesTest { } {
+    set paths "${install_dir}/bin/cmake"
+
+    foreach path \$paths {
+        if { ![file exists \$path] } {
+            puts stderr "ERROR: Does not exist: \$path"
+            return 0
+        }
+    }
+    return 1
+}
+
 proc ModulesHelp { } {
     puts stderr "\tThis adds the environment variables for cmake ${version}\n"
 }
