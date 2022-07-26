@@ -1,6 +1,4 @@
-#!/bin/bash
-set -o errexit
-set -o nounset
+#!/bin/bash -eu
 
 usage()
 {
@@ -46,6 +44,7 @@ if [[ (${major} -lt 6) || ((${major} -eq 6) && (${minor} -lt 3)) ]]; then  # VTK
     exit 1
 fi
 
+# Download and extract source
 mkdir -p ${base_dir}/src/vtk
 cd ${base_dir}/src/vtk
 
@@ -67,6 +66,7 @@ if [[ ${major} -lt 7 || (${major} -eq 7 && ${minor} -eq 0) ]]; then  # VTK <= 7.
     sed -i.bak 's|string(REGEX MATCH "\[345\]|string(REGEX MATCH "\[3-9\]|g' ${src_dir}/CMake/GenerateExportHeader.cmake
 fi
 
+# Build and install
 install_dir=${base_dir}/opt/vtk/${version}
 mkdir -p ${install_dir}
 
@@ -79,6 +79,7 @@ cmake \
 make -j ${parallel} && \
 make install
 
+# Add modulefile
 mkdir -p ${base_dir}/modulefiles/vtk
 cd  ${base_dir}/modulefiles/vtk
 cat <<EOF > ${version}
