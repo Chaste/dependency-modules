@@ -1,49 +1,37 @@
-#!/bin/bash
-# set -o errexit
-# set -o nounset
+#!/bin/bash -e
 
-MODULES_DIR=~/modules
-grep -qxF "module use ${MODULES_DIR}/modulefiles" ~/.bashrc \
-    || echo "module use ${MODULES_DIR}/modulefiles" >> ~/.bashrc
-source ~/.bashrc
+# Start `module` command
+source /etc/profile.d/modules.sh
 
-NPROC=$(( $(nproc) < 8 ? $(nproc) : 8 ))
+# Prepare modules base directory
+modules_dir=${HOME}/modules
+mkdir -p ${modules_dir}/modulefiles
 
-./install_python.sh --version=2.7.18 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
-./install_python.sh --version=3.8.12 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
+# Add modulefiles directory to user profile configuration
+grep -qxF "module use ${modules_dir}/modulefiles" ${HOME}/.bashrc \
+    || echo "module use ${modules_dir}/modulefiles" >> ${HOME}/.bashrc
+source ${HOME}/.bashrc
 
-module load python/3.8.12
+# Set max number of parallel processes
+ncpu=$(( $(nproc) < 8 ? $(nproc) : 8 ))
 
-./install_cmake.sh --version=3.9.1 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
-
+# Install specific dependency versions
+./install_cmake.sh --version=3.9.1 --modules-dir=${modules_dir} --parallel=${ncpu}
 module load cmake/3.9.1
 
-./install_xsd.sh --version=4.0.0 --modules-dir=${MODULES_DIR}
+./install_xsd.sh --version=4.0.0 --modules-dir=${modules_dir}
 
-./install_xercesc.sh --version=3.2.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
-./install_xercesc.sh --version=3.2.1 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
+./install_xercesc.sh --version=3.2.0 --modules-dir=${modules_dir} --parallel=${ncpu}
 
-./install_sundials.sh --version=2.7.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
-./install_sundials.sh --version=3.1.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
-./install_sundials.sh --version=4.1.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
-./install_sundials.sh --version=5.0.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
+./install_sundials.sh --version=5.0.0 --modules-dir=${modules_dir} --parallel=${ncpu}
 
-./install_boost.sh --version=1.62.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
-./install_boost.sh --version=1.66.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
-./install_boost.sh --version=1.67.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
-./install_boost.sh --version=1.69.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
+./install_boost.sh --version=1.69.0 --modules-dir=${modules_dir} --parallel=${ncpu}
 
-./install_vtk.sh --version=6.3.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
-./install_vtk.sh --version=7.0.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
-./install_vtk.sh --version=7.1.1 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
-./install_vtk.sh --version=8.0.1 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
-./install_vtk.sh --version=8.1.1 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
-./install_vtk.sh --version=8.2.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
-./install_vtk.sh --version=9.0.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
+./install_vtk.sh --version=9.0.0 --modules-dir=${modules_dir} --parallel=${ncpu}
 
-./install_vtk.sh --version=7.0.0 --modules-dir=${MODULES_DIR} --parallel=${NPROC}
-
-module switch python/2.7.18  # For PETSc versions < 3.11.x configuration needs Python 2
+# For PETSc versions < 3.11.x configuration needs Python 2
+./install_python.sh --version=2.7.18 --modules-dir=${modules_dir} --parallel=${ncpu}
+module load python/2.7.18
 
 # PETSc 3.7.7 + HDF5 1.10.0-patch1 + MPICH 3.3
 ./install_petsc_hdf5.sh \
@@ -51,69 +39,19 @@ module switch python/2.7.18  # For PETSc versions < 3.11.x configuration needs P
     --hdf5-version=1.10.0-patch1 \
     --petsc-arch=linux-gnu \
     --mpich-version=3.3 \
-    --modules-dir=${MODULES_DIR} \
-    --parallel=${NPROC}
+    --modules-dir=${modules_dir} \
+    --parallel=${ncpu}
 
 ./install_petsc_hdf5.sh \
     --petsc-version=3.7.7 \
     --hdf5-version=1.10.0-patch1 \
     --petsc-arch=linux-gnu-opt \
     --mpich-version=3.3 \
-    --modules-dir=${MODULES_DIR} \
-    --parallel=${NPROC}
+    --modules-dir=${modules_dir} \
+    --parallel=${ncpu}
 
-# PETSc 3.9.4 + HDF5 1.10.3 + MPICH 3.3
-./install_petsc_hdf5.sh \
-    --petsc-version=3.9.4 \
-    --hdf5-version=1.10.3 \
-    --petsc-arch=linux-gnu \
-    --mpich-version=3.3 \
-    --modules-dir=${MODULES_DIR} \
-    --parallel=${NPROC}
-
-./install_petsc_hdf5.sh \
-    --petsc-version=3.9.4 \
-    --hdf5-version=1.10.3 \
-    --petsc-arch=linux-gnu-opt \
-    --mpich-version=3.3 \
-    --modules-dir=${MODULES_DIR} \
-    --parallel=${NPROC}
-
-# PETSc 3.10.5 + HDF5 1.10.4 + MPICH 3.3
-./install_petsc_hdf5.sh \
-    --petsc-version=3.10.5 \
-    --hdf5-version=1.10.4 \
-    --petsc-arch=linux-gnu \
-    --mpich-version=3.3 \
-    --modules-dir=${MODULES_DIR} \
-    --parallel=${NPROC}
-
-./install_petsc_hdf5.sh \
-    --petsc-version=3.10.5 \
-    --hdf5-version=1.10.4 \
-    --petsc-arch=linux-gnu-opt \
-    --mpich-version=3.3 \
-    --modules-dir=${MODULES_DIR} \
-    --parallel=${NPROC}
-
-module switch python/3.8.12  # For PETSc versions >= 3.11.x configuration supports Python 3
-
-# PETSc 3.11.3 + HDF5 1.10.5 + MPICH 3.3
-./install_petsc_hdf5.sh \
-    --petsc-version=3.11.3 \
-    --hdf5-version=1.10.5 \
-    --petsc-arch=linux-gnu \
-    --mpich-version=3.3 \
-    --modules-dir=${MODULES_DIR} \
-    --parallel=${NPROC}
-
-./install_petsc_hdf5.sh \
-    --petsc-version=3.11.3 \
-    --hdf5-version=1.10.5 \
-    --petsc-arch=linux-gnu-opt \
-    --mpich-version=3.3 \
-    --modules-dir=${MODULES_DIR} \
-    --parallel=${NPROC}
+# For PETSc versions >= 3.11.x configuration supports Python 3
+module unload python
 
 # PETSc 3.12.4 + HDF5 1.10.4 + MPICH 3.4a3
 ./install_petsc_hdf5.sh \
@@ -121,13 +59,13 @@ module switch python/3.8.12  # For PETSc versions >= 3.11.x configuration suppor
     --hdf5-version=1.10.4 \
     --petsc-arch=linux-gnu \
     --mpich-version=3.4a3 \
-    --modules-dir=${MODULES_DIR} \
-    --parallel=${NPROC}
+    --modules-dir=${modules_dir} \
+    --parallel=${ncpu}
 
 ./install_petsc_hdf5.sh \
     --petsc-version=3.12.4 \
     --hdf5-version=1.10.4 \
     --petsc-arch=linux-gnu-opt \
     --mpich-version=3.4a3 \
-    --modules-dir=${MODULES_DIR} \
-    --parallel=${NPROC}
+    --modules-dir=${modules_dir} \
+    --parallel=${ncpu}
