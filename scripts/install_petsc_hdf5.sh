@@ -246,7 +246,6 @@ module-whatis "This adds the environment variables for petsc ${petsc_version} an
 
 setenv          PETSC_ARCH           ${petsc_arch}
 setenv          PETSC_DIR            ${install_dir}
-prepend-path    CMAKE_PREFIX_PATH    ${install_dir}/${petsc_arch}
 prepend-path    PATH                 ${install_dir}/${petsc_arch}/bin
 prepend-path    LIBRARY_PATH         ${install_dir}/${petsc_arch}/lib
 prepend-path    LD_LIBRARY_PATH      ${install_dir}/${petsc_arch}/lib

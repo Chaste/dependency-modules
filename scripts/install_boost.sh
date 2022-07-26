@@ -98,7 +98,6 @@ proc ModulesHelp { } {
 module-whatis "This adds the environment variables for boost ${version}"
 
 setenv          BOOST_ROOT           ${install_dir}
-prepend-path    CMAKE_PREFIX_PATH    ${install_dir}
 prepend-path    LIBRARY_PATH         ${install_dir}/lib
 prepend-path    LD_LIBRARY_PATH      ${install_dir}/lib
 prepend-path    INCLUDE              ${install_dir}/include
