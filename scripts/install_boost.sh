@@ -63,7 +63,7 @@ mkdir -p ${install_dir}
 
 cd boost_${ver_si_on}
 ./bootstrap.sh --prefix=${install_dir} && \
-./b2 -j ${parallel} install --with-filesystem
+./b2 -j ${parallel} install
 
 if [ ${version} = 1.64.0 ]; then
     # Fix: https://github.com/boostorg/serialization/commit/1d86261581230e2dc5d617a9b16287d326f3e229
