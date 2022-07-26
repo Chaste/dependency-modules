@@ -1,6 +1,4 @@
-#!/bin/bash
-set -o errexit
-set -o nounset
+#!/bin/bash -eu
 
 usage()
 {
@@ -153,6 +151,7 @@ elif [[ (${petsc_major} -eq 3) && (${petsc_minor} -eq 12) ]]; then  # PETSc 3.12
     fi
 fi
 
+# Download and extract PETSc
 URL_PETSC=https://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-lite-${petsc_version}.tar.gz
 wget -nc ${URL_PETSC}
 
@@ -161,6 +160,7 @@ mkdir -p ${install_dir}
 
 tar -xzf $(basename ${URL_PETSC}) -C ${install_dir} --strip-components=1
 
+# Build and install
 cd ${install_dir}
 export PETSC_DIR=$(pwd)
 
@@ -212,6 +212,7 @@ case ${petsc_arch} in
         ;;
 esac
 
+# Add modulefile
 mkdir -p ${base_dir}/modulefiles/petsc_hdf5/${petsc_version}_${hdf5_version}
 cd  ${base_dir}/modulefiles/petsc_hdf5/${petsc_version}_${hdf5_version}
 cat <<EOF > ${petsc_arch}
@@ -219,6 +220,25 @@ cat <<EOF > ${petsc_arch}
 ###
 ## petsc_hdf5 ${petsc_version}_${hdf5_version}/${petsc_arch} modulefile
 ##
+proc ModulesTest { } {
+    set paths "[getenv PETSC_DIR]
+               [getenv PETSC_DIR]/[getenv PETSC_ARCH]
+               [getenv PETSC_DIR]/[getenv PETSC_ARCH]/bin
+               [getenv PETSC_DIR]/[getenv PETSC_ARCH]/bin/h5pcc
+               [getenv PETSC_DIR]/[getenv PETSC_ARCH]/include
+               [getenv PETSC_DIR]/[getenv PETSC_ARCH]/lib
+               [getenv PETSC_DIR]/[getenv PETSC_ARCH]/lib/libhdf5.so
+               [getenv PETSC_DIR]/[getenv PETSC_ARCH]/lib/libpetsc.so"
+
+    foreach path \$paths {
+        if { ![file exists \$path] } {
+            puts stderr "ERROR: Does not exist: \$path"
+            return 0
+        }
+    }
+    return 1
+}
+
 proc ModulesHelp { } {
     puts stderr "\tThis adds the environment variables for petsc ${petsc_version} and hdf5 ${hdf5_version}, with PETSC_ARCH=${petsc_arch}\n"
 }
@@ -227,7 +247,6 @@ module-whatis "This adds the environment variables for petsc ${petsc_version} an
 
 setenv          PETSC_ARCH           ${petsc_arch}
 setenv          PETSC_DIR            ${install_dir}
-prepend-path    CMAKE_PREFIX_PATH    ${install_dir}/${petsc_arch}
 prepend-path    PATH                 ${install_dir}/${petsc_arch}/bin
 prepend-path    LIBRARY_PATH         ${install_dir}/${petsc_arch}/lib
 prepend-path    LD_LIBRARY_PATH      ${install_dir}/${petsc_arch}/lib

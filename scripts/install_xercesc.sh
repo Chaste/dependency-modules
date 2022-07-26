@@ -78,16 +78,29 @@ cat <<EOF > ${version}
 ###
 ## xercesc ${version} modulefile
 ##
+proc ModulesTest { } {
+    set paths "[getenv XERCESC_ROOT]
+               [getenv XERCESC_INCLUDE]
+               [getenv XERCESC_LIBRARY]"
+
+    foreach path \$paths {
+        if { ![file exists \$path] } {
+            puts stderr "ERROR: Does not exist: \$path"
+            return 0
+        }
+    }
+    return 1
+}
+
 proc ModulesHelp { } {
     puts stderr "\tThis adds the environment variables for xercesc ${version}\n"
 }
 
 module-whatis "This adds the environment variables for xercesc ${version}"
 
-setenv          XERCESCROOT          ${install_dir}
 setenv          XERCESC_ROOT         ${install_dir}
-prepend-path    CMAKE_PREFIX_PATH    ${install_dir}
-prepend-path    PATH                 ${install_dir}/bin
+setenv          XERCESC_INCLUDE      ${install_dir}/include
+setenv          XERCESC_LIBRARY      ${install_dir}/lib
 prepend-path    LIBRARY_PATH         ${install_dir}/lib
 prepend-path    LD_LIBRARY_PATH      ${install_dir}/lib
 prepend-path    INCLUDE              ${install_dir}/include
