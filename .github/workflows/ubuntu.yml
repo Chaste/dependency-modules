@@ -11,8 +11,10 @@ jobs:
     strategy:
       matrix:
         include:
+          - {os: ubuntu-20.04, xsd_ver: 4.0.0, xercesc_ver: 3.2.1, sundials_ver: 4.1.0, boost_ver: 1.69.0, vtk_ver: 8.1.1, petsc_ver: 3.9.4, hdf5_ver: 1.10.3, petsc_arch: linux-gnu}
           - {os: ubuntu-22.04, xsd_ver: 4.0.0, xercesc_ver: 3.2.1, sundials_ver: 4.1.0, boost_ver: 1.69.0, vtk_ver: 8.1.1, petsc_ver: 3.9.4, hdf5_ver: 1.10.3, petsc_arch: linux-gnu}
-    
+      fail-fast: false
+      
     runs-on: ${{ matrix.os }}
     
     defaults:
@@ -50,15 +52,12 @@ jobs:
       #===== XSD
       - name: Install xsd module
         working-directory: dependency-modules/scripts
-        run: |
-          ./install_xsd.sh --version=${{ matrix.xsd_ver }} --modules-dir=${MODULES_DIR}
+        run: ./install_xsd.sh --version=${{ matrix.xsd_ver }} --modules-dir=${MODULES_DIR}
           
       - name: Check xsd module
         run: |
           module load xsd/${{ matrix.xsd_ver }}
-          test ${XSD_ROOT} = ${MODULES_DIR}/opt/xsd/${{ matrix.xsd_ver }} || exit 1
-          test -d ${XSD_ROOT}/bin || exit 2
-          test -d ${XSD_ROOT}/libxsd || exit 3
+          module test xsd/${{ matrix.xsd_ver }}
           
       #===== XERCESC
       - name: Cache xercesc module
@@ -73,16 +72,12 @@ jobs:
       - name: Build and install xercesc module
         if: steps.cache-xercesc.outputs.cache-hit != 'true'
         working-directory: dependency-modules/scripts
-        run: |
-          ./install_xercesc.sh --version=${{ matrix.xercesc_ver }} --modules-dir=${MODULES_DIR}
+        run: ./install_xercesc.sh --version=${{ matrix.xercesc_ver }} --modules-dir=${MODULES_DIR}
           
       - name: Check xercesc module
         run: |
           module load xercesc/${{ matrix.xercesc_ver }}
-          test ${XERCESCROOT} = ${MODULES_DIR}/opt/xercesc/${{ matrix.xercesc_ver }} || exit 1
-          test -d ${XERCESCROOT}/bin || exit 2
-          test -d ${XERCESCROOT}/include || exit 3
-          test -d ${XERCESCROOT}/lib || exit 4
+          module test xercesc/${{ matrix.xercesc_ver }}
           
       #===== SUNDIALS
       - name: Cache sundials module
@@ -97,15 +92,12 @@ jobs:
       - name: Build and install sundials module
         if: steps.cache-sundials.outputs.cache-hit != 'true'
         working-directory: dependency-modules/scripts
-        run: |
-          ./install_sundials.sh --version=${{ matrix.sundials_ver }} --modules-dir=${MODULES_DIR}
+        run: ./install_sundials.sh --version=${{ matrix.sundials_ver }} --modules-dir=${MODULES_DIR}
           
       - name: Check sundials module
         run: |
           module load sundials/${{ matrix.sundials_ver }}
-          test ${SUNDIALS_ROOT} = ${MODULES_DIR}/opt/sundials/${{ matrix.sundials_ver }} || exit 1
-          test -d ${SUNDIALS_ROOT}/include || exit 2
-          test -d ${SUNDIALS_ROOT}/lib || exit 3
+          module test sundials/${{ matrix.sundials_ver }}
           
       #===== BOOST
       - name: Cache boost module
@@ -120,15 +112,12 @@ jobs:
       - name: Build and install boost module
         if: steps.cache-boost.outputs.cache-hit != 'true'
         working-directory: dependency-modules/scripts
-        run: |
-          ./install_boost.sh --version=${{ matrix.boost_ver }} --modules-dir=${MODULES_DIR}
+        run: ./install_boost.sh --version=${{ matrix.boost_ver }} --modules-dir=${MODULES_DIR}
           
       - name: Check boost module
         run: |
           module load boost/${{ matrix.boost_ver }}
-          test ${BOOST_ROOT} = ${MODULES_DIR}/opt/boost/${{ matrix.boost_ver }} || exit 1
-          test -d ${BOOST_ROOT}/include || exit 2
-          test -d ${BOOST_ROOT}/lib || exit 3
+          module test boost/${{ matrix.boost_ver }}
           
       #===== VTK
       - name: Cache vtk module
@@ -143,16 +132,12 @@ jobs:
       - name: Build and install vtk module
         if: steps.cache-vtk.outputs.cache-hit != 'true'
         working-directory: dependency-modules/scripts
-        run: |
-          ./install_vtk.sh --version=${{ matrix.vtk_ver }} --modules-dir=${MODULES_DIR}
+        run: ./install_vtk.sh --version=${{ matrix.vtk_ver }} --modules-dir=${MODULES_DIR}
           
       - name: Check vtk module
         run: |
           module load vtk/${{ matrix.vtk_ver }}
-          test ${VTK_ROOT} = ${MODULES_DIR}/opt/vtk/${{ matrix.vtk_ver }} || exit 1
-          test -d ${VTK_ROOT}/bin || exit 2
-          test -d ${VTK_ROOT}/include || exit 3
-          test -d ${VTK_ROOT}/lib || exit 4
+          module test vtk/${{ matrix.vtk_ver }}
         
       #===== PETSC + HDF5
       - name: Cache petsc_hdf5 module
@@ -167,24 +152,13 @@ jobs:
       - name: Build and install petsc_hdf5 module
         if: steps.cache-petsc_hdf5.outputs.cache-hit != 'true'
         working-directory: dependency-modules/scripts
-        run: |
-          ./install_petsc_hdf5.sh --petsc-version=${{ matrix.petsc_ver }} --hdf5-version=${{ matrix.hdf5_ver }} --petsc-arch=${{ matrix.petsc_arch }} --modules-dir=${MODULES_DIR}
+        run: ./install_petsc_hdf5.sh --petsc-version=${{ matrix.petsc_ver }} --hdf5-version=${{ matrix.hdf5_ver }} --petsc-arch=${{ matrix.petsc_arch }} --modules-dir=${MODULES_DIR}
 
       - name: Check petsc_hdf5 module
         run: |
           module load petsc_hdf5/${{ matrix.petsc_ver }}_${{ matrix.hdf5_ver }}/${{ matrix.petsc_arch }}
-          test ${PETSC_DIR} = ${MODULES_DIR}/opt/petsc_hdf5/${{ matrix.petsc_ver }}_${{ matrix.hdf5_ver }} || exit 1
-          test ${PETSC_ARCH} = ${{ matrix.petsc_arch }} || exit 2
-          test -d ${PETSC_DIR}/${PETSC_ARCH}/bin || exit 3
-          test -d ${PETSC_DIR}/${PETSC_ARCH}/include || exit 4
-          test -d ${PETSC_DIR}/${PETSC_ARCH}/lib || exit 5
-          test -f ${PETSC_DIR}/${PETSC_ARCH}/lib/libhdf5.so || exit 6
-          test -f ${PETSC_DIR}/${PETSC_ARCH}/lib/libmpi.so || exit 7
-          test -f ${PETSC_DIR}/${PETSC_ARCH}/lib/libparmetis.so || exit 8
-          test -f ${PETSC_DIR}/${PETSC_ARCH}/lib/libpetsc.so || exit 9
-          test $(which h5pcc) = ${PETSC_DIR}/${PETSC_ARCH}/bin/h5pcc || exit 10
-          test $(which mpicc) = ${PETSC_DIR}/${PETSC_ARCH}/bin/mpicc || exit 11
-          
+          module test petsc_hdf5/${{ matrix.petsc_ver }}_${{ matrix.hdf5_ver }}/${{ matrix.petsc_arch }}
+
       #===== CHASTE
       - name: Checkout Chaste repository
         uses: actions/checkout@v3
@@ -213,7 +187,7 @@ jobs:
           ctest -j $(nproc) -V -R TestChasteBuildInfo --output-on-failure | tee buildinfo
           sed -i.bak 's/"//g' buildinfo  # removes quotes from some sundials versions
 
-      - name: Check build info
+      - name: Check Chaste build info
         working-directory: Chaste/build
         run: |
           grep "<XSD>${{ matrix.xsd_ver }}</XSD>" buildinfo || exit 1
