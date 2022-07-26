@@ -1,6 +1,4 @@
-#!/bin/bash
-set -o errexit
-set -o nounset
+#!/bin/bash -eu
 
 usage()
 {
