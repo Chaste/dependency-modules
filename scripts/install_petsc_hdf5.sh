@@ -1,6 +1,4 @@
-#!/bin/bash
-set -o errexit
-set -o nounset
+#!/bin/bash -eu
 
 usage()
 {
@@ -153,6 +151,7 @@ elif [[ (${petsc_major} -eq 3) && (${petsc_minor} -eq 12) ]]; then  # PETSc 3.12
     fi
 fi
 
+# Download and extract PETSc
 URL_PETSC=https://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-lite-${petsc_version}.tar.gz
 wget -nc ${URL_PETSC}
 
@@ -161,6 +160,7 @@ mkdir -p ${install_dir}
 
 tar -xzf $(basename ${URL_PETSC}) -C ${install_dir} --strip-components=1
 
+# Build and install
 cd ${install_dir}
 export PETSC_DIR=$(pwd)
 
@@ -212,6 +212,7 @@ case ${petsc_arch} in
         ;;
 esac
 
+# Add modulefile
 mkdir -p ${base_dir}/modulefiles/petsc_hdf5/${petsc_version}_${hdf5_version}
 cd  ${base_dir}/modulefiles/petsc_hdf5/${petsc_version}_${hdf5_version}
 cat <<EOF > ${petsc_arch}
