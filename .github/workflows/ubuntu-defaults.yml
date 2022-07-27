@@ -1,4 +1,4 @@
-name: Ubuntu Defaults
+name: ubuntu-defaults
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
 jobs:
   
   setup:
-    name: Test default versions on Ubuntu LTS
+    name: Test Ubuntu LTS Defaults
     
     strategy:
       matrix:
