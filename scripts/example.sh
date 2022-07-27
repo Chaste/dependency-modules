@@ -25,7 +25,7 @@ module load cmake/3.9.1
 
 ./install_sundials.sh --version=5.8.0 --modules-dir=${modules_dir} --parallel=${ncpu}
 
-./install_boost.sh --version=1.79.0 --modules-dir=${modules_dir} --parallel=${ncpu}
+./install_boost.sh --version=1.74.0 --modules-dir=${modules_dir} --parallel=${ncpu}
 
 ./install_vtk.sh --version=9.1.0 --modules-dir=${modules_dir} --parallel=${ncpu}
 
