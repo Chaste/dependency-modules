@@ -1,4 +1,4 @@
-name: xerces-c
+name: xerces
 
 on:
   workflow_dispatch:
@@ -28,15 +28,13 @@ jobs:
       - name: Setup
         run: |
           git clone --depth 1 https://github.com/Chaste/dependency-modules.git
-
           if [ ${{ matrix.os }} = 'ubuntu-20.04' ]; then
-            ./dependency-modules/scripts/setup_ubuntu2004.sh
+            sudo ./dependency-modules/scripts/setup_ubuntu2004.sh
           elif [ ${{ matrix.os }} = 'ubuntu-22.04' ]; then
-            ./dependency-modules/scripts/setup_ubuntu2204.sh
+            sudo ./dependency-modules/scripts/setup_ubuntu2204.sh
           else
               echo 'Unknown OS version'; exit 1
           fi
-
           mkdir -p ${MODULES_DIR}/modulefiles
           echo "module use ${MODULES_DIR}/modulefiles" | sudo tee -a /etc/profile.d/modules.sh
           source /etc/profile.d/modules.sh 
