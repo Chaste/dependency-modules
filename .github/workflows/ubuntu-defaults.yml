@@ -6,11 +6,12 @@ on:
 jobs:
   
   setup:
-    name: Test defaults on Ubuntu LTS
+    name: Test default versions on Ubuntu LTS
     
     strategy:
       matrix:
         os: [ ubuntu-20.04, ubuntu-22.04 ]
+      fail-fast: false
     
     runs-on: ${{ matrix.os }}
         
@@ -35,7 +36,7 @@ jobs:
         run: sudo ./setup_ubuntu2204.sh
 
       - name: Get list of installed packages
-        run: dpkg-query --list > dpkg_list
+        run: dpkg-query --list | tee dpkg_list
       
       - name: Checkout Chaste repository
         uses: actions/checkout@v3
@@ -62,18 +63,25 @@ jobs:
           path: Chaste/build
           key: ${{ matrix.os }}-${{ env.CHASTE_COMMIT }}-${{ hashFiles('dpkg_list') }}
 
-      - name: Build Chaste
+      - name: Configure Chaste
         if: steps.cache-chaste.outputs.cache-hit != 'true'
         working-directory: Chaste/build
-        run: |
-          cmake -DCMAKE_BUILD_TYPE=Release ..
-          cmake --build . --parallel $(nproc) --target TestChasteBuildInfo
-          cmake --build . --parallel $(nproc) --target Continuous
+        run: cmake -DCMAKE_BUILD_TYPE=Debug ..
+          
+      - name: Compile Chaste build info
+        if: steps.cache-chaste.outputs.cache-hit != 'true'
+        working-directory: Chaste/build
+        run: cmake --build . --parallel $(nproc) --target TestChasteBuildInfo
 
       - name: Get Chaste build info
         working-directory: Chaste/build
-        run: ctest -j $(nproc) -V -R TestChasteBuildInfo --output-on-failure
+        run: ctest -j $(nproc) -V -R TestChasteBuildInfo --output-on-failure | tee buildinfo
 
+      - name: Build Continuous test pack
+        if: steps.cache-chaste.outputs.cache-hit != 'true'
+        working-directory: Chaste/build
+        run: cmake --build . --parallel $(nproc) --target Continuous
+          
       - name: Run Continuous test pack
         working-directory: Chaste/build
         run: ctest -j $(nproc) -L Continuous --output-on-failure

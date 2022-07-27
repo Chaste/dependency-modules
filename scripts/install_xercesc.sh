@@ -1,6 +1,4 @@
-#!/bin/bash
-set -o errexit
-set -o nounset
+#!/bin/bash -eu
 
 usage()
 {
@@ -47,6 +45,7 @@ if [[ (${major} -lt 3) || ((${major} -eq 3) && (${minor} -lt 2)) ]]; then  # Xer
     exit 1
 fi
 
+# Download, build and install
 mkdir -p ${base_dir}/src/xercesc
 cd ${base_dir}/src/xercesc
 
@@ -71,6 +70,7 @@ else
     make install
 fi
 
+# Add modulefile
 mkdir -p ${base_dir}/modulefiles/xercesc
 cd  ${base_dir}/modulefiles/xercesc
 cat <<EOF > ${version}

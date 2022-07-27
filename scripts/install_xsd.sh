@@ -1,6 +1,4 @@
-#!/bin/bash
-set -o errexit
-set -o nounset
+#!/bin/bash -eu
 
 usage()
 {
@@ -40,6 +38,7 @@ if [ ${major} -lt 4 ]; then  # XSD < 4.0.x
     exit 1
 fi
 
+# Download and install
 mkdir -p ${base_dir}/src/xsd
 cd ${base_dir}/src/xsd
 wget -nc https://www.codesynthesis.com/download/xsd/${major}.${minor}/linux-gnu/x86_64/xsd-${version}-x86_64-linux-gnu.tar.bz2
@@ -49,6 +48,7 @@ mkdir -p ${install_dir}
 
 tar -xjf xsd-${version}-x86_64-linux-gnu.tar.bz2 -C ${install_dir} --strip-components=1
 
+# Add modulefile
 mkdir -p ${base_dir}/modulefiles/xsd
 cd  ${base_dir}/modulefiles/xsd
 cat <<EOF > ${version}
