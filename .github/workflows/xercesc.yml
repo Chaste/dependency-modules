@@ -1,4 +1,4 @@
-name: xerces
+name: xercesc
 
 on:
   workflow_dispatch:
