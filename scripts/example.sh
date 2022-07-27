@@ -21,13 +21,13 @@ module load cmake/3.9.1
 
 ./install_xsd.sh --version=4.0.0 --modules-dir=${modules_dir}
 
-./install_xercesc.sh --version=3.2.0 --modules-dir=${modules_dir} --parallel=${ncpu}
+./install_xercesc.sh --version=3.2.3 --modules-dir=${modules_dir} --parallel=${ncpu}
 
-./install_sundials.sh --version=5.0.0 --modules-dir=${modules_dir} --parallel=${ncpu}
+./install_sundials.sh --version=5.8.0 --modules-dir=${modules_dir} --parallel=${ncpu}
 
-./install_boost.sh --version=1.69.0 --modules-dir=${modules_dir} --parallel=${ncpu}
+./install_boost.sh --version=1.79.0 --modules-dir=${modules_dir} --parallel=${ncpu}
 
-./install_vtk.sh --version=9.0.0 --modules-dir=${modules_dir} --parallel=${ncpu}
+./install_vtk.sh --version=9.1.0 --modules-dir=${modules_dir} --parallel=${ncpu}
 
 # For PETSc versions < 3.11.x configuration needs Python 2
 ./install_python.sh --version=2.7.18 --modules-dir=${modules_dir} --parallel=${ncpu}
