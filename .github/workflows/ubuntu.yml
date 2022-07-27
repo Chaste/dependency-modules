@@ -1,4 +1,4 @@
-name: Ubuntu Tests
+name: ubuntu
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
 jobs:
   
   setup:
-    name: Test on Ubuntu LTS
+    name: Ubuntu LTS Tests
     
     strategy:
       matrix:
@@ -26,24 +26,16 @@ jobs:
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
       
     steps:
-      - name: Checkout Chaste/dependency-modules repository
-        uses: actions/checkout@v3
-        with:
-          repository: Chaste/dependency-modules
-          path: dependency-modules
-        
-      - name: Install required packages for Ubuntu 20.04
-        if: matrix.os == 'ubuntu-20.04'
-        working-directory: dependency-modules/scripts
-        run: sudo ./setup_ubuntu2004.sh
-        
-      - name: Install required packages for Ubuntu 22.04
-        if: matrix.os == 'ubuntu-22.04'
-        working-directory: dependency-modules/scripts
-        run: sudo ./setup_ubuntu2204.sh
-
-      - name: Setup modules directory
+      - name: Setup
         run: |
+          git clone --depth 1 https://github.com/Chaste/dependency-modules.git
+          if [ ${{ matrix.os }} = 'ubuntu-20.04' ]; then
+            sudo ./dependency-modules/scripts/setup_ubuntu2004.sh
+          elif [ ${{ matrix.os }} = 'ubuntu-22.04' ]; then
+            sudo ./dependency-modules/scripts/setup_ubuntu2204.sh
+          else
+              echo 'Unknown OS version'; exit 1
+          fi
           mkdir -p ${MODULES_DIR}/modulefiles
           echo "module use ${MODULES_DIR}/modulefiles" | sudo tee -a /etc/profile.d/modules.sh
           source /etc/profile.d/modules.sh 
