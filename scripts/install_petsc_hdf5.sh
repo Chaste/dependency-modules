@@ -172,8 +172,7 @@ case ${petsc_arch} in
             --with-make-np=${parallel} \
             --with-cc=gcc \
             --with-cxx=g++ \
-            --with-fc=gfortran \
-            --with-cuda=0 \
+            --with-fc=0 \
             --COPTFLAGS=-Og \
             --CXXOPTFLAGS=-Og \
             --with-x=false \
@@ -194,8 +193,7 @@ case ${petsc_arch} in
             --with-make-np=${parallel} \
             --with-cc=gcc \
             --with-cxx=g++ \
-            --with-fc=gfortran \
-            --with-cuda=0 \
+            --with-fc=0 \
             --COPTFLAGS=-Og \
             --CXXOPTFLAGS=-Og \
             --with-x=false \
