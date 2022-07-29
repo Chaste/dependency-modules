@@ -11,8 +11,8 @@ jobs:
     strategy:
       matrix:
         include:
-          - {os: ubuntu-20.04, petsc_ver: 3.12.4, hdf5_ver: 1.10.4, petsc_arch: linux-gnu}
-          - {os: ubuntu-22.04, petsc_ver: 3.12.4, hdf5_ver: 1.10.4, petsc_arch: linux-gnu}
+          - {os: ubuntu-20.04, petsc_ver: 3.11.3, hdf5_ver: 1.10.5, petsc_arch: linux-gnu}
+          - {os: ubuntu-22.04, petsc_ver: 3.11.3, hdf5_ver: 1.10.5, petsc_arch: linux-gnu}
       fail-fast: false
     
     runs-on: ${{ matrix.os }}

@@ -53,19 +53,19 @@ module load python/2.7.18
 # For PETSc versions >= 3.11.x configuration supports Python 3
 module unload python
 
-# PETSc 3.12.4 + HDF5 1.10.4 + MPICH 3.4a3
+# PETSc 3.11.3 + HDF5 1.10.5 + MPICH 3.3
 ./install_petsc_hdf5.sh \
-    --petsc-version=3.12.4 \
-    --hdf5-version=1.10.4 \
+    --petsc-version=3.11.3 \
+    --hdf5-version=1.10.5 \
     --petsc-arch=linux-gnu \
-    --mpich-version=3.4a3 \
+    --mpich-version=3.3 \
     --modules-dir=${modules_dir} \
     --parallel=${ncpu}
 
 ./install_petsc_hdf5.sh \
-    --petsc-version=3.12.4 \
-    --hdf5-version=1.10.4 \
+    --petsc-version=3.11.3 \
+    --hdf5-version=1.10.5 \
     --petsc-arch=linux-gnu-opt \
-    --mpich-version=3.4a3 \
+    --mpich-version=3.3 \
     --modules-dir=${modules_dir} \
     --parallel=${ncpu}
