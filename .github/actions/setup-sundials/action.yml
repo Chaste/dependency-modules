@@ -1,0 +1,34 @@
+name: setup-sundials
+description: Build and cache sundials module
+inputs:
+  os:
+    description: OS
+    required: true
+  modules_dir:
+    description: Modules base directory
+    required: true
+  sundials_ver:
+    description: Sundials version
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Cache sundials module
+      id: cache-sundials
+      uses: actions/cache@v3
+      with:
+        path: |
+          ${{ inputs.modules_dir }}/opt/sundials/${{ inputs.sundials_ver }}
+          ${{ inputs.modules_dir }}/modulefiles/sundials/${{ inputs.sundials_ver }}
+        key: ${{ inputs.os }}-sundials-${{ inputs.sundials_ver }}-${{ hashFiles('scripts/install_sundials.sh') }}
+    
+    - name: Build and install sundials module
+      if: steps.cache-sundials.outputs.cache-hit != 'true'
+      run: ./scripts/install_sundials.sh --version=${{ inputs.sundials_ver }} --modules-dir=${{ inputs.modules_dir }}
+      shell: bash
+        
+    - name: Check sundials module
+      run: |
+        module load sundials/${{ inputs.sundials_ver }}
+        module test sundials/${{ inputs.sundials_ver }}
+      shell: bash --login -e -o pipefail {0}  # login to load `module` from /etc/profile.d

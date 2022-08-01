@@ -1,0 +1,34 @@
+name: setup-xsd
+description: Install and cache xsd module
+inputs:
+  os:
+    description: OS
+    required: true
+  modules_dir:
+    description: Modules base directory
+    required: true
+  xsd_ver:
+    description: XSD version
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Cache xsd module
+      id: cache-xsd
+      uses: actions/cache@v3
+      with:
+        path: |
+          ${{ inputs.modules_dir }}/opt/xsd/${{ inputs.xsd_ver }}
+          ${{ inputs.modules_dir }}/modulefiles/xsd/${{ inputs.xsd_ver }}
+        key: ${{ inputs.os }}-xsd-${{ inputs.xsd_ver }}-${{ hashFiles('scripts/install_xsd.sh') }}
+    
+    - name: Install xsd module
+      if: steps.cache-xsd.outputs.cache-hit != 'true'
+      run: ./scripts/install_xsd.sh --version=${{ inputs.xsd_ver }} --modules-dir=${{ inputs.modules_dir }}
+      shell: bash
+        
+    - name: Check xsd module
+      run: |
+        module load xsd/${{ inputs.xsd_ver }}
+        module test xsd/${{ inputs.xsd_ver }}
+      shell: bash --login -e -o pipefail {0}  # login to load `module` from /etc/profile.d

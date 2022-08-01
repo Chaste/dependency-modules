@@ -16,45 +16,23 @@ jobs:
       fail-fast: false
     
     runs-on: ${{ matrix.os }}
-    
-    defaults:
-      run:
-        shell: bash --login -e -o pipefail {0}
         
     env:
       MODULES_DIR: ${{ github.workspace }}/modules
       
     steps:
-      - name: Setup
-        run: |
-          git clone --depth 1 https://github.com/Chaste/dependency-modules.git
-          if [ ${{ matrix.os }} = 'ubuntu-20.04' ]; then
-            sudo ./dependency-modules/scripts/setup_ubuntu2004.sh
-          elif [ ${{ matrix.os }} = 'ubuntu-22.04' ]; then
-            sudo ./dependency-modules/scripts/setup_ubuntu2204.sh
-          else
-              echo 'Unknown OS version'; exit 1
-          fi
-          mkdir -p ${MODULES_DIR}/modulefiles
-          echo "module use ${MODULES_DIR}/modulefiles" | sudo tee -a /etc/profile.d/modules.sh
-          source /etc/profile.d/modules.sh 
-          module avail
+      - name: Checkout
+        uses: actions/checkout@v3
 
-      - name: Cache boost module
-        id: cache-boost
-        uses: actions/cache@v3
+      - name: Setup defaults
+        uses: ./.github/actions/setup-defaults
         with:
-          path: |
-            ${{ env.MODULES_DIR }}/opt/boost/${{ matrix.boost_ver }}
-            ${{ env.MODULES_DIR }}/modulefiles/boost/${{ matrix.boost_ver }}
-          key: ${{ matrix.os }}-boost-${{ matrix.boost_ver }}-${{ hashFiles('dependency-modules/scripts/install_boost.sh') }}
-      
-      - name: Build and install boost module
-        if: steps.cache-boost.outputs.cache-hit != 'true'
-        working-directory: dependency-modules/scripts
-        run: ./install_boost.sh --version=${{ matrix.boost_ver }} --modules-dir=${MODULES_DIR}
-          
-      - name: Check boost module
-        run: |
-          module load boost/${{ matrix.boost_ver }}
-          module test boost/${{ matrix.boost_ver }}
+          os: ${{ matrix.os }}
+          modules_dir: ${{ env.MODULES_DIR }}
+
+      - name: Build and cache boost module
+        uses: ./.github/actions/setup-boost
+        with:
+          os: ${{ matrix.os }}
+          modules_dir: ${{ env.MODULES_DIR }}
+          boost_ver: ${{ matrix.boost_ver }}

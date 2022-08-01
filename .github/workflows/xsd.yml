@@ -1,4 +1,4 @@
-name: petsc_hdf5
+name: xsd
 
 on:
   workflow_dispatch:
@@ -6,13 +6,13 @@ on:
 jobs:
   
   setup:
-    name: Build and cache PETSC-HDF5 versions
+    name: Install and cache XSD versions
     
     strategy:
       matrix:
         include:
-          - {os: ubuntu-20.04, petsc_ver: 3.11.3, hdf5_ver: 1.10.5, petsc_arch: linux-gnu}
-          - {os: ubuntu-22.04, petsc_ver: 3.11.3, hdf5_ver: 1.10.5, petsc_arch: linux-gnu}
+          - {os: ubuntu-20.04, xsd_ver: 4.0.0}
+          - {os: ubuntu-22.04, xsd_ver: 4.0.0}
       fail-fast: false
     
     runs-on: ${{ matrix.os }}
@@ -30,11 +30,9 @@ jobs:
           os: ${{ matrix.os }}
           modules_dir: ${{ env.MODULES_DIR }}
 
-      - name: Build and cache petsc_hdf5 module
-        uses: ./.github/actions/setup-petsc_hdf5
+      - name: Install and cache xsd module
+        uses: ./.github/actions/setup-xsd
         with:
           os: ${{ matrix.os }}
           modules_dir: ${{ env.MODULES_DIR }}
-          petsc_ver: ${{ matrix.petsc_ver }}
-          hdf5_ver: ${{ matrix.hdf5_ver }}
-          petsc_arch: ${{ matrix.petsc_arch }}
+          xsd_ver: ${{ matrix.xsd_ver }}
