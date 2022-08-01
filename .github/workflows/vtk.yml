@@ -16,10 +16,6 @@ jobs:
       fail-fast: false
     
     runs-on: ${{ matrix.os }}
-    
-    defaults:
-      run:
-        shell: bash --login -e -o pipefail {0}
         
     env:
       MODULES_DIR: ${{ github.workspace }}/modules
@@ -34,20 +30,9 @@ jobs:
           os: ${{ matrix.os }}
           modules_dir: ${{ env.MODULES_DIR }}
 
-      - name: Cache vtk module
-        id: cache-vtk
-        uses: actions/cache@v3
+      - name: Build and cache vtk module
+        uses: ./.github/actions/setup-vtk
         with:
-          path: |
-            ${{ env.MODULES_DIR }}/opt/vtk/${{ matrix.vtk_ver }}
-            ${{ env.MODULES_DIR }}/modulefiles/vtk/${{ matrix.vtk_ver }}
-          key: ${{ matrix.os }}-vtk-${{ matrix.vtk_ver }}-${{ hashFiles('scripts/install_vtk.sh') }}
-      
-      - name: Build and install vtk module
-        if: steps.cache-vtk.outputs.cache-hit != 'true'
-        run: ./scripts/install_vtk.sh --version=${{ matrix.vtk_ver }} --modules-dir=${MODULES_DIR}
-          
-      - name: Check vtk module
-        run: |
-          module load vtk/${{ matrix.vtk_ver }}
-          module test vtk/${{ matrix.vtk_ver }}
+          os: ${{ matrix.os }}
+          modules_dir: ${{ env.MODULES_DIR }}
+          vtk_ver: ${{ matrix.vtk_ver }}

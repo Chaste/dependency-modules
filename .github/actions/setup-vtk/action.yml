@@ -1,0 +1,34 @@
+name: setup-vtk
+description: Build and cache vtk module
+inputs:
+  os:
+    description: OS
+    required: true
+  modules_dir:
+    description: Modules base directory
+    required: true
+  vtk_ver:
+    description: VTK version
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Cache vtk module
+      id: cache-vtk
+      uses: actions/cache@v3
+      with:
+        path: |
+          ${{ inputs.modules_dir }}/opt/vtk/${{ inputs.vtk_ver }}
+          ${{ inputs.modules_dir }}/modulefiles/vtk/${{ inputs.vtk_ver }}
+        key: ${{ inputs.os }}-vtk-${{ inputs.vtk_ver }}-${{ hashFiles('scripts/install_vtk.sh') }}
+    
+    - name: Build and install vtk module
+      if: steps.cache-vtk.outputs.cache-hit != 'true'
+      run: ./scripts/install_vtk.sh --version=${{ inputs.vtk_ver }} --modules-dir=${{ inputs.modules_dir }}
+      shell: bash
+        
+    - name: Check vtk module
+      run: |
+        module load vtk/${{ inputs.vtk_ver }}
+        module test vtk/${{ inputs.vtk_ver }}
+      shell: bash --login -e -o pipefail {0}
