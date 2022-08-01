@@ -21,7 +21,7 @@ See [Installing Modules on Unix](https://modules.readthedocs.io/en/latest/INSTAL
 
 ### 2. Prepare modulefiles location
 
-[Modulefiles](https://modules.readthedocs.io/en/latest/modulefile.html) are prescriptions for configuring the shell environment to access specific software versions. Environment Modules uses modulefiles from locations on `MODULEPATH`.
+[Modulefiles](https://modules.readthedocs.io/en/latest/modulefile.html) are recipes for configuring the shell environment to access specific software versions. Environment Modules uses modulefiles from locations on `MODULEPATH`.
 
 ``` bash
 MODULES_DIR=${HOME}/modules
@@ -44,7 +44,7 @@ The command `module use directory` prepends `directory` to `MODULEPATH`.
     --petsc-arch=linux-gnu --modules-dir=${MODULES_DIR}
 ```
 
-The utility scripts use this directory structure:
+The utility scripts follow this directory structure:
 
 ``` bash
 <modules-dir>
@@ -76,9 +76,13 @@ See the [Chaste Guides](https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/CmakeF
 
 ## Useful commands
 
+`module use directory` enables using modulefiles located in `directory`.
+
+`module load modulefile` loads modulefile into the environment.
+
 `module unload modulefile` unloads modulefile from the environment.
 
-`module switch [modulefile1] modulefile2` switches version from modulefile1 to modulefile2.
+`module switch [modulefile1] modulefile2` switches version to modulefile2.
 
 `module list` lists all currently loaded modulefiles.
 
