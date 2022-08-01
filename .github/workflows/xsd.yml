@@ -1,0 +1,38 @@
+name: xsd
+
+on:
+  workflow_dispatch:
+
+jobs:
+  
+  setup:
+    name: Install and cache XSD versions
+    
+    strategy:
+      matrix:
+        include:
+          - {os: ubuntu-20.04, xsd_ver: 4.0.0}
+          - {os: ubuntu-22.04, xsd_ver: 4.0.0}
+      fail-fast: false
+    
+    runs-on: ${{ matrix.os }}
+        
+    env:
+      MODULES_DIR: ${{ github.workspace }}/modules
+      
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup defaults
+        uses: ./.github/actions/setup-defaults
+        with:
+          os: ${{ matrix.os }}
+          modules_dir: ${{ env.MODULES_DIR }}
+
+      - name: Install and cache xsd module
+        uses: ./.github/actions/setup-xsd
+        with:
+          os: ${{ matrix.os }}
+          modules_dir: ${{ env.MODULES_DIR }}
+          xsd_ver: ${{ matrix.xsd_ver }}
