@@ -1,0 +1,30 @@
+name: setup-defaults
+description: Setup default dependency versions
+inputs:
+  os:
+    description: OS
+    required: true
+  modules_dir:
+    description: Modules base directory
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Install default dependencies
+      run: |
+        if [ ${{ inputs.os }} = 'ubuntu-20.04' ]; then
+          sudo ./scripts/setup_ubuntu2004.sh
+        elif [ ${{ inputs.os }} = 'ubuntu-22.04' ]; then
+          sudo ./scripts/setup_ubuntu2204.sh
+        else
+            echo 'Unknown OS version'; exit 1
+        fi
+      shell: bash
+        
+    - name: Setup modules directory
+      run: |
+        mkdir -p ${{ inputs.modules_dir }}/modulefiles
+        echo "module use ${{ inputs.modules_dir }}/modulefiles" | sudo tee -a /etc/profile.d/modules.sh
+        source /etc/profile.d/modules.sh 
+        module avail
+      shell: bash
