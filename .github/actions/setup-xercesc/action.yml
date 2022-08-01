@@ -25,7 +25,7 @@ runs:
     - name: Build and install xercesc module
       if: steps.cache-xercesc.outputs.cache-hit != 'true'
       run: ./scripts/install_xercesc.sh --version=${{ inputs.xercesc_ver }} --modules-dir=${{ inputs.modules_dir }}
-      shell: bash --login -e -o pipefail {0}
+      shell: bash
         
     - name: Check xercesc module
       run: |

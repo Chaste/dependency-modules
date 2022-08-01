@@ -16,10 +16,6 @@ jobs:
       fail-fast: false
     
     runs-on: ${{ matrix.os }}
-    
-    defaults:
-      run:
-        shell: bash --login -e -o pipefail {0}
         
     env:
       MODULES_DIR: ${{ github.workspace }}/modules
@@ -34,20 +30,9 @@ jobs:
           os: ${{ matrix.os }}
           modules_dir: ${{ env.MODULES_DIR }}
 
-      - name: Cache sundials module
-        id: cache-sundials
-        uses: actions/cache@v3
+      - name: Build and cache sundials module
+        uses: ./.github/actions/setup-sundials
         with:
-          path: |
-            ${{ env.MODULES_DIR }}/opt/sundials/${{ matrix.sundials_ver }}
-            ${{ env.MODULES_DIR }}/modulefiles/sundials/${{ matrix.sundials_ver }}
-          key: ${{ matrix.os }}-sundials-${{ matrix.sundials_ver }}-${{ hashFiles('scripts/install_sundials.sh') }}
-      
-      - name: Build and install sundials module
-        if: steps.cache-sundials.outputs.cache-hit != 'true'
-        run: ./scripts/install_sundials.sh --version=${{ matrix.sundials_ver }} --modules-dir=${MODULES_DIR}
-          
-      - name: Check sundials module
-        run: |
-          module load sundials/${{ matrix.sundials_ver }}
-          module test sundials/${{ matrix.sundials_ver }}
+          os: ${{ matrix.os }}
+          modules_dir: ${{ env.MODULES_DIR }}
+          sundials_ver: ${{ matrix.sundials_ver }}
