@@ -25,20 +25,14 @@ jobs:
       MODULES_DIR: ${{ github.workspace }}/modules
       
     steps:
-      - name: Setup
-        run: |
-          git clone --depth 1 https://github.com/Chaste/dependency-modules.git
-          if [ ${{ matrix.os }} = 'ubuntu-20.04' ]; then
-            sudo ./dependency-modules/scripts/setup_ubuntu2004.sh
-          elif [ ${{ matrix.os }} = 'ubuntu-22.04' ]; then
-            sudo ./dependency-modules/scripts/setup_ubuntu2204.sh
-          else
-              echo 'Unknown OS version'; exit 1
-          fi
-          mkdir -p ${MODULES_DIR}/modulefiles
-          echo "module use ${MODULES_DIR}/modulefiles" | sudo tee -a /etc/profile.d/modules.sh
-          source /etc/profile.d/modules.sh 
-          module avail
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup defaults
+        uses: ./.github/actions/setup-defaults
+        with:
+          os: ${{ matrix.os }}
+          modules_dir: ${{ env.MODULES_DIR }}
 
       - name: Cache petsc_hdf5 module
         id: cache-petsc_hdf5
@@ -47,12 +41,11 @@ jobs:
           path: |
             ${{ env.MODULES_DIR }}/opt/petsc_hdf5/${{ matrix.petsc_ver }}_${{ matrix.hdf5_ver }}
             ${{ env.MODULES_DIR }}/modulefiles/petsc_hdf5/${{ matrix.petsc_ver }}_${{ matrix.hdf5_ver }}/${{ matrix.petsc_arch }}
-          key: ${{ matrix.os }}-petsc_hdf5-${{ matrix.petsc_ver }}-${{ matrix.hdf5_ver }}-${{ matrix.petsc_arch }}-${{ hashFiles('dependency-modules/scripts/install_petsc_hdf5.sh') }}
+          key: ${{ matrix.os }}-petsc_hdf5-${{ matrix.petsc_ver }}-${{ matrix.hdf5_ver }}-${{ matrix.petsc_arch }}-${{ hashFiles('scripts/install_petsc_hdf5.sh') }}
       
       - name: Build and install petsc_hdf5 module
         if: steps.cache-petsc_hdf5.outputs.cache-hit != 'true'
-        working-directory: dependency-modules/scripts
-        run: ./install_petsc_hdf5.sh --petsc-version=${{ matrix.petsc_ver }} --hdf5-version=${{ matrix.hdf5_ver }} --petsc-arch=${{ matrix.petsc_arch }} --modules-dir=${MODULES_DIR}
+        run: ./scripts/install_petsc_hdf5.sh --petsc-version=${{ matrix.petsc_ver }} --hdf5-version=${{ matrix.hdf5_ver }} --petsc-arch=${{ matrix.petsc_arch }} --modules-dir=${MODULES_DIR}
 
       - name: Check petsc_hdf5 module
         run: |
