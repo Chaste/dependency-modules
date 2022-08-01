@@ -6,7 +6,7 @@ on:
 jobs:
   
   setup:
-    name: Test Ubuntu LTS Defaults
+    name: Test Ubuntu Defaults
     
     strategy:
       matrix:
@@ -19,31 +19,22 @@ jobs:
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
       
     steps:
-      - name: Checkout Chaste/dependency-modules repository
+      - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Setup defaults
+        uses: ./.github/actions/setup-defaults
         with:
-          repository: Chaste/dependency-modules
-          path: dependency-modules
-        
-      - name: Install required packages for Ubuntu 20.04
-        if: matrix.os == 'ubuntu-20.04'
-        working-directory: dependency-modules/scripts
-        run: sudo ./setup_ubuntu2004.sh
-        
-      - name: Install required packages for Ubuntu 22.04
-        if: matrix.os == 'ubuntu-22.04'
-        working-directory: dependency-modules/scripts
-        run: sudo ./setup_ubuntu2204.sh
+          os: ${{ matrix.os }}
+          modules_dir: ${{ github.workspace }}/modules
 
       - name: Get list of installed packages
         run: dpkg-query --list | tee dpkg_list
       
-      - name: Checkout Chaste repository
+      - name: Checkout Chaste
         uses: actions/checkout@v3
         with:
           repository: Chaste/Chaste
-          ref: develop
-          fetch-depth: 1
           path: Chaste
           submodules: recursive
 
