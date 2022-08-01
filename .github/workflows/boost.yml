@@ -16,10 +16,6 @@ jobs:
       fail-fast: false
     
     runs-on: ${{ matrix.os }}
-    
-    defaults:
-      run:
-        shell: bash --login -e -o pipefail {0}
         
     env:
       MODULES_DIR: ${{ github.workspace }}/modules
@@ -34,20 +30,9 @@ jobs:
           os: ${{ matrix.os }}
           modules_dir: ${{ env.MODULES_DIR }}
 
-      - name: Cache boost module
-        id: cache-boost
-        uses: actions/cache@v3
+      - name: Build and cache boost module
+        uses: ./.github/actions/setup-boost
         with:
-          path: |
-            ${{ env.MODULES_DIR }}/opt/boost/${{ matrix.boost_ver }}
-            ${{ env.MODULES_DIR }}/modulefiles/boost/${{ matrix.boost_ver }}
-          key: ${{ matrix.os }}-boost-${{ matrix.boost_ver }}-${{ hashFiles('scripts/install_boost.sh') }}
-      
-      - name: Build and install boost module
-        if: steps.cache-boost.outputs.cache-hit != 'true'
-        run: ./scripts/install_boost.sh --version=${{ matrix.boost_ver }} --modules-dir=${MODULES_DIR}
-          
-      - name: Check boost module
-        run: |
-          module load boost/${{ matrix.boost_ver }}
-          module test boost/${{ matrix.boost_ver }}
+          os: ${{ matrix.os }}
+          modules_dir: ${{ env.MODULES_DIR }}
+          boost_ver: ${{ matrix.boost_ver }}
