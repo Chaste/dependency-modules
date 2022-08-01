@@ -31,4 +31,4 @@ runs:
       run: |
         module load xercesc/${{ inputs.xercesc_ver }}
         module test xercesc/${{ inputs.xercesc_ver }}
-      shell: bash --login -e -o pipefail {0}
+      shell: bash --login -e -o pipefail {0}  # login to load `module` from /etc/profile.d

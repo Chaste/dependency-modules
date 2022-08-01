@@ -31,4 +31,4 @@ runs:
       run: |
         module load vtk/${{ inputs.vtk_ver }}
         module test vtk/${{ inputs.vtk_ver }}
-      shell: bash --login -e -o pipefail {0}
+      shell: bash --login -e -o pipefail {0}  # login to load `module` from /etc/profile.d

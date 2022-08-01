@@ -31,4 +31,4 @@ runs:
       run: |
         module load xsd/${{ inputs.xsd_ver }}
         module test xsd/${{ inputs.xsd_ver }}
-      shell: bash --login -e -o pipefail {0}
+      shell: bash --login -e -o pipefail {0}  # login to load `module` from /etc/profile.d

@@ -37,4 +37,4 @@ runs:
       run: |
         module load petsc_hdf5/${{ inputs.petsc_ver }}_${{ inputs.hdf5_ver }}/${{ inputs.petsc_arch }}
         module test petsc_hdf5/${{ inputs.petsc_ver }}_${{ inputs.hdf5_ver }}/${{ inputs.petsc_arch }}
-      shell: bash --login -e -o pipefail {0}
+      shell: bash --login -e -o pipefail {0}  # login to load `module` from /etc/profile.d
