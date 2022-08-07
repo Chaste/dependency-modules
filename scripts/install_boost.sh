@@ -99,8 +99,11 @@ proc ModulesHelp { } {
 module-whatis "This adds the environment variables for boost ${version}"
 
 setenv          BOOST_ROOT           ${install_dir}
+
 prepend-path    LIBRARY_PATH         ${install_dir}/lib
 prepend-path    LD_LIBRARY_PATH      ${install_dir}/lib
+prepend-path    LD_RUN_PATH          ${install_dir}/lib
+
 prepend-path    INCLUDE              ${install_dir}/include
 prepend-path    C_INCLUDE_PATH       ${install_dir}/include
 prepend-path    CPLUS_INCLUDE_PATH   ${install_dir}/include
