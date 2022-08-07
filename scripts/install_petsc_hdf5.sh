@@ -245,11 +245,15 @@ proc ModulesHelp { } {
 
 module-whatis "This adds the environment variables for petsc ${petsc_version} and hdf5 ${hdf5_version}, with PETSC_ARCH=${petsc_arch}"
 
-setenv          PETSC_ARCH           ${petsc_arch}
 setenv          PETSC_DIR            ${install_dir}
+setenv          PETSC_ARCH           ${petsc_arch}
+
 prepend-path    PATH                 ${install_dir}/${petsc_arch}/bin
+
 prepend-path    LIBRARY_PATH         ${install_dir}/${petsc_arch}/lib
 prepend-path    LD_LIBRARY_PATH      ${install_dir}/${petsc_arch}/lib
+prepend-path    LD_RUN_PATH          ${install_dir}/${petsc_arch}/lib
+
 prepend-path    INCLUDE              ${install_dir}/${petsc_arch}/include
 prepend-path    C_INCLUDE_PATH       ${install_dir}/${petsc_arch}/include
 prepend-path    CPLUS_INCLUDE_PATH   ${install_dir}/${petsc_arch}/include
