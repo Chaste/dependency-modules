@@ -10,9 +10,7 @@ jobs:
     
     strategy:
       matrix:
-        include:
-          - {os: ubuntu-20.04, vtk_ver: 9.1.0}
-          - {os: ubuntu-22.04, vtk_ver: 9.1.0}
+        os: [ubuntu-20.04, ubuntu-22.04]
       fail-fast: false
     
     runs-on: ${{ matrix.os }}
@@ -30,9 +28,16 @@ jobs:
           os: ${{ matrix.os }}
           modules_dir: ${{ env.MODULES_DIR }}
 
-      - name: Build and cache vtk module
+      - name: Build and cache vtk 8.2.0
         uses: ./.github/actions/setup-vtk
         with:
           os: ${{ matrix.os }}
           modules_dir: ${{ env.MODULES_DIR }}
-          vtk_ver: ${{ matrix.vtk_ver }}
+          vtk_ver: 8.2.0
+
+      - name: Build and cache vtk 9.1.0
+        uses: ./.github/actions/setup-vtk
+        with:
+          os: ${{ matrix.os }}
+          modules_dir: ${{ env.MODULES_DIR }}
+          vtk_ver: 9.1.0
