@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -17,7 +17,7 @@ echo "deb [signed-by=/usr/share/keyrings/chaste.asc] http://www.cs.ox.ac.uk/chas
 apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 422C4D99
 wget -O /usr/share/keyrings/chaste.asc https://www.cs.ox.ac.uk/chaste/ubuntu/Chaste%20Team.asc
 
-apt-get update && apt-get install -y chaste-dependencies
+apt-get update && apt-get install -y --install-recommends chaste-dependencies
 
 apt-get install -y --no-install-recommends \
 python3-dev \
@@ -26,8 +26,11 @@ libffi-dev \
 mencoder \
 environment-modules
 
-update-alternatives --install /usr/bin/python python /usr/bin/python3 1
+update-alternatives --install /usr/local/bin/python python /usr/bin/python3 10
+update-alternatives --install /usr/local/bin/pip pip /usr/bin/pip3 10
+
 pip install --upgrade pip
 pip install texttest
 
 export TEXTTEST_HOME=/usr/local/bin/texttest
+echo "export TEXTTEST_HOME=/usr/local/bin/texttest" >> ${HOME}/.bashrc
