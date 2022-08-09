@@ -10,9 +10,7 @@ jobs:
     
     strategy:
       matrix:
-        include:
-          - {os: ubuntu-20.04, xercesc_ver: 3.2.3}
-          - {os: ubuntu-22.04, xercesc_ver: 3.2.3}
+        os: [ubuntu-20.04, ubuntu-22.04]
       fail-fast: false
     
     runs-on: ${{ matrix.os }}
@@ -30,9 +28,16 @@ jobs:
           os: ${{ matrix.os }}
           modules_dir: ${{ env.MODULES_DIR }}
 
-      - name: Build and cache xercesc module
+      - name: Build and cache xercesc 3.2.2
         uses: ./.github/actions/setup-xercesc
         with:
           os: ${{ matrix.os }}
           modules_dir: ${{ env.MODULES_DIR }}
-          xercesc_ver: ${{ matrix.xercesc_ver }}
+          xercesc_ver: 3.2.2
+          
+      - name: Build and cache xercesc 3.2.3
+        uses: ./.github/actions/setup-xercesc
+        with:
+          os: ${{ matrix.os }}
+          modules_dir: ${{ env.MODULES_DIR }}
+          xercesc_ver: 3.2.3
