@@ -14,10 +14,10 @@ jobs:
       fail-fast: false
     
     runs-on: ${{ matrix.os }}
-        
+    
     env:
       MODULES_DIR: ${{ github.workspace }}/modules
-      
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -33,11 +33,11 @@ jobs:
         with:
           os: ${{ matrix.os }}
           modules_dir: ${{ env.MODULES_DIR }}
-          sundials_ver: ${{ 5.8.0 }}
+          sundials_ver: 5.8.0
           
       - name: Build and cache sundials 6.0.0
         uses: ./.github/actions/setup-sundials
         with:
           os: ${{ matrix.os }}
           modules_dir: ${{ env.MODULES_DIR }}
-          sundials_ver: ${{ 6.0.0 }}
+          sundials_ver: 6.0.0
