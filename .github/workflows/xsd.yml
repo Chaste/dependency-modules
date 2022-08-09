@@ -10,9 +10,7 @@ jobs:
     
     strategy:
       matrix:
-        include:
-          - {os: ubuntu-20.04, xsd_ver: 4.0.0}
-          - {os: ubuntu-22.04, xsd_ver: 4.0.0}
+        os: [ubuntu-20.04, ubuntu-22.04]
       fail-fast: false
     
     runs-on: ${{ matrix.os }}
@@ -30,9 +28,16 @@ jobs:
           os: ${{ matrix.os }}
           modules_dir: ${{ env.MODULES_DIR }}
 
-      - name: Install and cache xsd module
+      - name: Install and cache xsd 3.3.0
         uses: ./.github/actions/setup-xsd
         with:
           os: ${{ matrix.os }}
           modules_dir: ${{ env.MODULES_DIR }}
-          xsd_ver: ${{ matrix.xsd_ver }}
+          xsd_ver: 3.3.0
+          
+      - name: Install and cache xsd 4.0.0
+        uses: ./.github/actions/setup-xsd
+        with:
+          os: ${{ matrix.os }}
+          modules_dir: ${{ env.MODULES_DIR }}
+          xsd_ver: 4.0.0
