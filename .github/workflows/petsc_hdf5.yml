@@ -10,9 +10,7 @@ jobs:
     
     strategy:
       matrix:
-        include:
-          - {os: ubuntu-20.04, petsc_ver: 3.11.3, hdf5_ver: 1.10.5, petsc_arch: linux-gnu}
-          - {os: ubuntu-22.04, petsc_ver: 3.11.3, hdf5_ver: 1.10.5, petsc_arch: linux-gnu}
+        os: [ubuntu-20.04, ubuntu-22.04]
       fail-fast: false
     
     runs-on: ${{ matrix.os }}
@@ -30,11 +28,20 @@ jobs:
           os: ${{ matrix.os }}
           modules_dir: ${{ env.MODULES_DIR }}
 
-      - name: Build and cache petsc_hdf5 module
+      - name: Build and cache petsc 3.11.3 hdf5 1.10.5 linux-gnu
         uses: ./.github/actions/setup-petsc_hdf5
         with:
           os: ${{ matrix.os }}
           modules_dir: ${{ env.MODULES_DIR }}
-          petsc_ver: ${{ matrix.petsc_ver }}
-          hdf5_ver: ${{ matrix.hdf5_ver }}
-          petsc_arch: ${{ matrix.petsc_arch }}
+          petsc_ver: 3.11.3
+          hdf5_ver: 1.10.5
+          petsc_arch: linux-gnu
+          
+      - name: Build and cache petsc 3.11.3 hdf5 1.10.5 linux-gnu-opt
+        uses: ./.github/actions/setup-petsc_hdf5
+        with:
+          os: ${{ matrix.os }}
+          modules_dir: ${{ env.MODULES_DIR }}
+          petsc_ver: 3.11.3
+          hdf5_ver: 1.10.5
+          petsc_arch: linux-gnu-opt
