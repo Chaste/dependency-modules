@@ -27,13 +27,6 @@ jobs:
         with:
           os: ${{ matrix.os }}
           modules_dir: ${{ env.MODULES_DIR }}
-
-      - name: Install and cache xsd 3.3.0
-        uses: ./.github/actions/setup-xsd
-        with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
-          xsd_ver: 3.3.0
           
       - name: Install and cache xsd 4.0.0
         uses: ./.github/actions/setup-xsd
