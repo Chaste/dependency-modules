@@ -60,6 +60,14 @@ else  # VTK > 6.0.x
     tar -xzf v${version}.tar.gz -C ${src_dir} --strip-components=1
 fi
 
+# Patch for Python 3.7+ in VTK 7.0.x to 8.1.x
+if [[ ${major} -eq 7 || (${major} -eq 8 && ${minor} -le 1) ]]; then  # 7.0.x VTK <= 8.1.x
+    wget -O py37_api_change.patch https://gitlab.kitware.com/vtk/vtk/commit/706f1b397df09a27ab8981ab9464547028d0c322.patch
+    cd ${src_dir}
+    patch -p1 < ../py37_api_change.patch
+    cd ..
+fi
+
 # Tweak for detecting gcc 6-11: https://public.kitware.com/pipermail/vtkusers/2017-April/098448.html
 if [[ ${major} -lt 7 || (${major} -eq 7 && ${minor} -eq 0) ]]; then  # VTK <= 7.0.x
     sed -i.bak 's/string (REGEX MATCH "\[345\]/string (REGEX MATCH "(\[3-9\]\|1\[0-1\])/g' ${src_dir}/CMake/vtkCompilerExtras.cmake
