@@ -1,15 +1,23 @@
 #!/bin/bash -eu
 
-error()
+usage()
 {
+    echo 'Usage: '"$(basename $0)"' --scope={org|repo} --org=name [--repo=name] --token=token'
+    echo '        [--runner_name=name] [--runner_labels=list]  [--runner-group=group]'
+    echo '        [--runner_dir=dir] [--work_dir=dir]'
+}
+
+throw_error()
+{
+    usage
     echo "ERROR: $@" 1>&2
     exit 1
 }
 
 # Parse arguments
-owner=
-repo=
 scope=
+org=
+repo=
 token=
 runner_name=
 runner_labels=
@@ -22,8 +30,8 @@ for option; do
         --scope=*)
             scope=$(expr "x${option}" : "x--scope=\(.*\)")
             ;;
-        --owner=*)
-            owner=$(expr "x${option}" : "x--owner=\(.*\)")
+        --org=*)
+            org=$(expr "x${option}" : "x--org=\(.*\)")
             ;;
         --repo=*)
             repo=$(expr "x${option}" : "x--repo=\(.*\)")
@@ -47,25 +55,25 @@ for option; do
             work_dir=$(expr "x${option}" : "x--work_dir=\(.*\)")
             ;;
         *)
-            error "Unknown option: ${option}"
+            throw_error "Unknown option: ${option}"
             ;;
     esac
 done
 
 # Sanitize arguments
-if [ -z "${scope}" ]; then error "--scope not specified"; fi
+if [ -z "${scope}" ]; then throw_error "--scope not specified"; fi
 
 if [[ ! ("${scope}" = "org" 
       || "${scope}" = "repo") ]]; then
-    error "Unknown scope: ${scope}. Expected 'org' or 'repo'"
+    throw_error "Unknown scope: ${scope}. Expected 'org' or 'repo'"
 fi
 
 if [ "${scope}" = "repo" ]; then
-    if [ -z ${repo} ]; then error "--repo not specified" fi
+    if [ -z ${repo} ]; then throw_error "--repo not specified" fi
 fi
 
-if [ -z "${owner}" ]; then error "--owner not specified"; fi
-if [ -z "${token}" ]; then error "--token not specified"; fi
+if [ -z "${org}" ]; then throw_error "--org not specified"; fi
+if [ -z "${token}" ]; then throw_error "--token not specified"; fi
 
 runner_name="${runner_name:-$(openssl rand -hex 6)}"
 runner_labels="${runner_labels:-default}"
@@ -90,12 +98,12 @@ rm -f /tmp/actions-runner.tar.gz
 cfg_url=
 reg_url=
 if [ "${scope}" = "org" ]; then
-    cfg_url="https://github.com/${owner}"
-    reg_url="https://api.github.com/orgs/${owner}/actions/runners/registration-token"
+    cfg_url="https://github.com/${org}"
+    reg_url="https://api.github.com/orgs/${org}/actions/runners/registration-token"
 
 elif [ "${scope}" = "repo" ]; then
-    cfg_url="https://github.com/${owner}/${repo}"
-    reg_url="https://api.github.com/repos/${owner}/${repo}/actions/runners/registration-token"
+    cfg_url="https://github.com/${org}/${repo}"
+    reg_url="https://api.github.com/repos/${org}/${repo}/actions/runners/registration-token"
 fi
 
 # Get registration token
