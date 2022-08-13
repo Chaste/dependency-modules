@@ -99,7 +99,7 @@ fi
 # Get registration token
 reg_token="$(curl -X POST \
 -H "Accept: application/vnd.github+json" \
--H "Authorization: token ${PAT}" \
+-H "Authorization: token ${token}" \
 "${reg_url}")"
 reg_token="$(echo ${reg_token} | jq -r .token)"
 
