@@ -36,5 +36,5 @@ rm -f /tmp/latest.json
 
 mkdir -p ${install_dir}
 curl -o /tmp/actions-runner.tar.gz -L "https://github.com/actions/runner/releases/download/v${version}/actions-runner-linux-x64-${version}.tar.gz"
-tar -xzf /tmp/actions-runner.tar.gz -C ${runner_dir}
+tar -xzf /tmp/actions-runner.tar.gz -C ${install_dir}
 rm -f /tmp/actions-runner.tar.gz
