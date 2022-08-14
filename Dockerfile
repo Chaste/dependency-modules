@@ -8,12 +8,13 @@ USER root
 
 COPY scripts/* /usr/local/bin/
 
-# Setup user
-ENV user="runner"
-ENV home=/home/${user}
-RUN useradd -m -d ${home} -s /bin/bash ${user}
+ENV DEFAULT_USER="runner"
+ENV DEFAULT_HOME="/home/${DEFAULT_USER}"
 
-# Setup dependencies
+RUN useradd -m -d ${DEFAULT_HOME} -s /bin/bash ${DEFAULT_USER}
+
+ENV RUNNER_DIR="${DEFAULT_HOME}/actions-runner"
+
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -29,31 +30,22 @@ RUN apt-get update && \
         nano \
         vim && \
     setup_ubuntu2004.sh && \
-    mkdir -p ${home}/modules/modulefiles && \
-    chown ${user}:${user} ${home}/modules && \
-    echo "export MODULES_DIR=${home}/modules" >> ${home}/.bashrc && \
-    echo "module use \${MODULES_DIR}/modulefiles" >> ${home}/.bashrc && \
-    echo "export TEXTTEST_HOME=/usr/local/bin/texttest" >> ${home}/.bashrc && \
+    get_runner.sh --install_dir="${RUNNER_DIR}" && \
+    ${RUNNER_DIR}/bin/installdependencies.sh && \
+    chown ${DEFAULT_USER}:${DEFAULT_USER} ${RUNNER_DIR} && \
     apt-get -y clean && \
     rm -rf /var/cache/apt && \
     rm -rf /var/lib/apt/lists/* && \
     rm -rf /var/tmp/* && \
     rm -rf /tmp/*
 
-# Setup actions-runner
-ENV runner_dir="${home}/actions-runner"
-RUN get_runner.sh --install_dir="${runner_dir}" && \
-    ${runner_dir}/bin/installdependencies.sh && \
-    chown ${user}:${user} ${runner_dir} && \
-    echo "export RUNNER_DIR=${runner_dir}" >> ${home}/.bashrc && \
-    echo "export WORK_DIR=${home}/_work" >> ${home}/.bashrc && \
-    apt-get -y clean && \
-    rm -rf /var/cache/apt && \
-    rm -rf /var/lib/apt/lists/* && \
-    rm -rf /var/tmp/* && \
-    rm -rf /tmp/*
+ENV TEXTTEST_HOME="/usr/local/bin/texttest"
+ENV MODULES_DIR="${DEFAULT_HOME}/modules"
+ENV WORK_DIR="${DEFAULT_HOME}/_work"
 
-USER ${user}
-WORKDIR ${home}
+USER ${DEFAULT_USER}:${DEFAULT_USER}
+WORKDIR ${DEFAULT_HOME}
 
-ENTRYPOINT ["bash", "--login", "docker-entrypoint.sh"]
+VOLUME ["${DEFAULT_HOME}"]
+
+ENTRYPOINT ["docker-entrypoint.sh"]
