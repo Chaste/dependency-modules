@@ -30,7 +30,7 @@ done
 install_dir="${install_dir:-${HOME}/actions-runner}"
 
 # Get latest version of actions-runner
-curl -o /tmp/latest.json -L https://api.github.com/repos/actions/runner/releases/latest
+curl -o /tmp/latest.json -fsSL https://api.github.com/repos/actions/runner/releases/latest
 version="$(jq -r '.tag_name' /tmp/latest.json | cut -c2-)"
 rm -f /tmp/latest.json
 
