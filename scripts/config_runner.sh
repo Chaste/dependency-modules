@@ -2,14 +2,13 @@
 
 usage()
 {
-    echo 'Usage: '"$(basename $0)"' --scope={org|repo} --org=name [--repo=name] --token=token'
-    echo '        [--runner_name=name] [--runner_labels=list]  [--runner-group=group]'
-    echo '        --runner_dir=dir [--work_dir=dir]'
+    echo 'Usage: '"$(basename $0)"' [--scope={org|repo}] --org=org_name [--repo=repo_name]'
+    echo '         [--name=runner_name] [--labels=foo,bar]  [--group=runner_group]'
+    echo '         --runner_dir=dir [--work_dir=dir]'      
 }
 
 throw_error()
 {
-    usage
     echo "ERROR: $@" 1>&2
     exit 1
 }
@@ -18,10 +17,9 @@ throw_error()
 scope=
 org=
 repo=
-token=
-runner_name=
-runner_labels=
-runner_group=
+name=
+labels=
+group=
 runner_dir=
 work_dir=
 
@@ -39,14 +37,14 @@ for option; do
         --token=*)
             token=$(expr "x${option}" : "x--token=\(.*\)")
             ;;
-        --runner_name=*)
-            runner_name=$(expr "x${option}" : "x--runner_name=\(.*\)")
+        --name=*)
+            name=$(expr "x${option}" : "x--name=\(.*\)")
             ;;
-        --runner_labels=*)
-            runner_labels=$(expr "x${option}" : "x--runner_labels=\(.*\)")
+        --labels=*)
+            labels=$(expr "x${option}" : "x--labels=\(.*\)")
             ;;
-        --runner_group=*)
-            runner_group=$(expr "x${option}" : "x--runner_group=\(.*\)")
+        --group=*)
+            group=$(expr "x${option}" : "x--group=\(.*\)")
             ;;
         --runner_dir=*)
             runner_dir=$(expr "x${option}" : "x--runner_dir=\(.*\)")
@@ -61,57 +59,84 @@ for option; do
 done
 
 # Sanitize arguments
+scope="${scope:-repo}"
+
 if [[ ! ("${scope}" = "org" 
       || "${scope}" = "repo") ]]; then
+    usage
     throw_error "Unknown scope: '${scope}'; expected 'org' or 'repo'"
 fi
 
-if [ -z "${org}" ]; then throw_error "--org not specified"; fi
-
-if [ "${scope}" = "repo" ]; then
-    if [ -z ${repo} ]; then throw_error "--repo not specified" fi
+if [ -z "${org}" ]; then
+    usage
+    throw_error "--org not specified"
 fi
 
-if [ -z "${token}" ]; then throw_error "--token not specified"; fi
+if [ "${scope}" = "repo" ]; then
+    if [ -z ${repo} ]; then
+        usage
+        throw_error "--repo not specified"
+    fi
+fi
 
-if [ -z "${runner_dir}" ]; then throw_error "--runner_dir not specified"; fi
+if [ -z "${runner_dir}" ]; then
+    usage
+    throw_error "--runner_dir not specified"
+fi
 
-runner_name="${runner_name:-$(openssl rand -hex 6)}"
+name="${name:-$(openssl rand -hex 6)}"
 
-runner_labels="${runner_labels:-default}"
+labels="${labels:-self-hosted}"
 
-runner_group="${runner_group:-Default}"
+group="${group:-Default}"
 
 work_dir="${work_dir:-${HOME}/_work}"
 
-# Set urls for registration and configuration
+# Get access token
+for i in {0..2}; do
+    echo "Enter access token:"
+    read -s pat
+    if [ -n "${pat}" ]; then
+        break
+    fi
+done
+
+if [ -z "${pat}" ]; then
+    throw_error "Access token not provided"
+fi
+
+# Set urls for config and api
 cfg_url=
-reg_url=
+api_url=
 if [ "${scope}" = "org" ]; then
     cfg_url="https://github.com/${org}"
-    reg_url="https://api.github.com/orgs/${org}/actions/runners/registration-token"
+    api_url="https://api.github.com/orgs/${org}/actions/runners/registration-token"
 
 elif [ "${scope}" = "repo" ]; then
     cfg_url="https://github.com/${org}/${repo}"
-    reg_url="https://api.github.com/repos/${org}/${repo}/actions/runners/registration-token"
+    api_url="https://api.github.com/repos/${org}/${repo}/actions/runners/registration-token"
 fi
 
 # Get registration token
-reg_token="$(curl -X POST \
+token="$(curl -X POST -fsS \
 -H "Accept: application/vnd.github+json" \
--H "Authorization: token ${token}" \
-"${reg_url}")"
-reg_token="$(echo ${reg_token} | jq -r .token)"
+-H "Authorization: token ${pat}" \
+"${api_url}")"
+token="$(echo ${token} | jq -r .token)"
+
+unset pat
 
 # Configure actions-runner
 mkdir -p ${work_dir}
 
 ${runner_dir}/config.sh \
     --unattended \
-    --replace \
     --url "${cfg_url}" \
-    --token "${reg_token}" \
-    --name "${runner_name}" \
-    --labels "${runner_labels}" \
-    --runnergroup "${runner_group}" \
-    --work "${work_dir}"
+    --token "${token}" \
+    --name "${name}" \
+    --runnergroup "${group}" \
+    --labels "${labels}" \
+    --work "${work_dir}" \
+    --replace
+
+unset token
