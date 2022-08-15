@@ -9,7 +9,7 @@ throw_error()
 # Get unattended
 unattended="${RUNNER_UNATTENDED:-}"
 
-if [ "${unattended}" -eq 1 ]; then
+if [ ! "${unattended}" -eq 0 ]; then
     unattended="--unattended"
 else
     unattended=
