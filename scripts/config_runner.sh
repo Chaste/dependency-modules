@@ -9,7 +9,9 @@ throw_error()
 # Get unattended
 unattended="${RUNNER_UNATTENDED:-}"
 
-if [ "${unattended}" = "0" ]; then
+if [ -z "${unattended}" ]; then
+    unattended=
+elif [ "${unattended}" -eq 0 ]; then
     unattended=
 else
     unattended="--unattended"
@@ -68,6 +70,9 @@ if [ -z "${runner_dir}" ]; then
     throw_error "RUNNER_DIR not specified"
 fi
 
+# Get work_dir
+work_dir="${RUNNER_WORK_DIR:-${HOME}/_work}"
+
 # Get personal access token
 pa_token="${RUNNER_PA_TOKEN-}"
 unset RUNNER_PA_TOKEN
@@ -82,18 +87,16 @@ if [ -z "${pa_token}" ]; then
     throw_error "RUNNER_PA_TOKEN not provided"
 fi
 
-# Get name, labels, group, and work_dir
+# Get name, labels, group
 name="${RUNNER_NAME:-}"
 labels="${RUNNER_LABELS:-}"
 group="${RUNNER_GROUP:-}"
-work_dir="${RUNNER_WORK_DIR:-}"
 
-# Set defaults if unattended
+# Set unattended defaults
 if [ -n "${unattended}" ]; then
     name="${name:-$(openssl rand -hex 6)}"
     labels="${labels:-self-hosted}"
     group="${group:-Default}"
-    work_dir="${work_dir:-${HOME}/_work}"
 fi
 
 # Set urls for config and api

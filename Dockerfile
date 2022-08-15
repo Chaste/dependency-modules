@@ -14,6 +14,7 @@ ENV DEFAULT_HOME="/home/${DEFAULT_USER}"
 RUN useradd -m -d ${DEFAULT_HOME} -s /bin/bash ${DEFAULT_USER}
 
 ENV RUNNER_DIR="${DEFAULT_HOME}/actions-runner"
+ENV RUNNER_WORK_DIR="${DEFAULT_HOME}/_work"
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
@@ -41,7 +42,6 @@ RUN apt-get update && \
 
 ENV TEXTTEST_HOME="/usr/local/bin/texttest"
 ENV MODULES_DIR="${DEFAULT_HOME}/modules"
-ENV WORK_DIR="${DEFAULT_HOME}/_work"
 
 USER ${DEFAULT_USER}:${DEFAULT_USER}
 WORKDIR ${DEFAULT_HOME}
