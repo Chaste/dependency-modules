@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 if [ ! -f "${RUNNER_DIR}/.runner" ]; then
-        config_runner.sh
+    config_runner.sh
 fi
 unset RUNNER_PA_TOKEN
 

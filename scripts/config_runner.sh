@@ -9,10 +9,10 @@ throw_error()
 # Get unattended
 unattended="${RUNNER_UNATTENDED:-}"
 
-if [ ! "${unattended}" -eq 0 ]; then
-    unattended="--unattended"
-else
+if [ "${unattended}" = "0" ]; then
     unattended=
+else
+    unattended="--unattended"
 fi
 
 # Get scope
