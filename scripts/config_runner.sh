@@ -2,9 +2,10 @@
 
 usage()
 {
-    echo 'Usage: '"$(basename $0)"' [--runner_dir=dir] [--scope={org|repo}] [--org=org_name]'
+    echo 'Usage: '"$(basename $0)"' [--scope={org|repo}] [--org=org_name]'
     echo '         [--repo=repo_name] [--name=runner_name] [--labels=foo,bar]'
-    echo '         [--group=runner_group] [--work_dir=dir] [--unattended]'      
+    echo '         [--group=runner_group] [--runner_dir=dir] [--work_dir=dir]'
+    echo '         [--unattended]'      
 }
 
 throw_error()
@@ -35,9 +36,6 @@ for option; do
         --repo=*)
             repo=$(expr "x${option}" : "x--repo=\(.*\)")
             ;;
-        --token=*)
-            token=$(expr "x${option}" : "x--token=\(.*\)")
-            ;;
         --name=*)
             name=$(expr "x${option}" : "x--name=\(.*\)")
             ;;
@@ -64,7 +62,7 @@ done
 
 # Get scope
 if [[ (-z "${scope}") && (-z "${unattended}") ]]; then
-    echo -n "Enter runner scope {org|repo} (default=org): "
+    echo -n "Enter the runner scope (org or repo): [press Enter for org] "
     read scope
 fi
 
@@ -78,7 +76,7 @@ fi
 
 # Get org
 if [[ (-z "${org}") && (-z "${unattended}") ]]; then
-    echo -n "Enter org name: "
+    echo -n "Enter the org/owner name: "
     read org
 fi
 
@@ -90,7 +88,7 @@ fi
 # Get repo
 if [ "${scope}" = "repo" ]; then
     if [[ (-z "${repo}") && (-z "${unattended}") ]]; then
-        echo -n "Enter repo name: "
+        echo -n "Enter the repo name: "
         read repo
     fi
 
@@ -102,7 +100,7 @@ fi
 
 # Get runner_dir
 if [[ (-z "${runner_dir}") && (-z "${unattended}") ]]; then
-    echo -n "Enter path to runner: "
+    echo -n "Enter path to actions-runner: "
     read runner_dir
 fi
 
@@ -112,12 +110,16 @@ if [ -z "${runner_dir}" ]; then
 fi
 
 # Get personal access token
-if [[ (-z "${PA_TOKEN}") && (-z "${unattended}") ]]; then
+pat="${PA_TOKEN-}"
+unset PA_TOKEN
+
+if [[ (-z "${pat}") && (-z "${unattended}") ]]; then
     echo -n "Enter access token: "
-    read -s PA_TOKEN
+    read -s pat
+    echo
 fi
 
-if [ -z "${PA_TOKEN}" ]; then
+if [ -z "${pat}" ]; then
     throw_error "access token not provided"
 fi
 
@@ -143,14 +145,14 @@ elif [ "${scope}" = "repo" ]; then
     api_url="https://api.github.com/repos/${org}/${repo}/actions/runners/registration-token"
 fi
 
-# Get registration token
+# Get registration token from api
 token="$(curl -X POST -fsS \
 -H "Accept: application/vnd.github+json" \
--H "Authorization: token ${PA_TOKEN}" \
+-H "Authorization: token ${pat}" \
 "${api_url}")"
 token="$(echo ${token} | jq -r .token)"
 
-unset PA_TOKEN
+unset pat
 
 # Configure actions-runner
 mkdir -p ${work_dir}

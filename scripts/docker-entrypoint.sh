@@ -5,6 +5,7 @@ if [ ! -f "${RUNNER_DIR}/.runner" ]; then
         --runner_dir="${RUNNER_DIR}" \
         --work_dir="${WORK_DIR}"
 fi
+unset PA_TOKEN
 
 . /etc/profile.d/modules.sh
 mkdir -p ${MODULES_DIR}/modulefiles
