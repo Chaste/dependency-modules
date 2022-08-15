@@ -31,8 +31,7 @@ RUN apt-get update && \
         nano \
         vim && \
     setup_ubuntu2004.sh && \
-    get_runner.sh --install_dir="${RUNNER_DIR}" && \
-    ${RUNNER_DIR}/bin/installdependencies.sh && \
+    runner_install.sh --install_dir="${RUNNER_DIR}" && \
     chown ${DEFAULT_USER}:${DEFAULT_USER} ${RUNNER_DIR} && \
     apt-get -y clean && \
     rm -rf /var/cache/apt && \
