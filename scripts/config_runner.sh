@@ -2,9 +2,9 @@
 
 usage()
 {
-    echo 'Usage: '"$(basename $0)"' [--scope={org|repo}] --org=org_name [--repo=repo_name]'
-    echo '         [--name=runner_name] [--labels=foo,bar]  [--group=runner_group]'
-    echo '         --runner_dir=dir [--work_dir=dir]'      
+    echo 'Usage: '"$(basename $0)"' [--runner_dir=dir] [--scope={org|repo}] [--org=org_name]'
+    echo '         [--repo=repo_name] [--name=runner_name] [--labels=foo,bar]'
+    echo '         [--group=runner_group] [--work_dir=dir] [--unattended]'      
 }
 
 throw_error()
@@ -22,6 +22,7 @@ labels=
 group=
 runner_dir=
 work_dir=
+unattended=
 
 for option; do
     case $option in
@@ -52,57 +53,82 @@ for option; do
         --work_dir=*)
             work_dir=$(expr "x${option}" : "x--work_dir=\(.*\)")
             ;;
+        --unattended*)
+            unattended="--unattended"
+            ;;
         *)
-            throw_error "Unknown option: ${option}"
+            throw_error "unknown option: ${option}"
             ;;
     esac
 done
 
-# Sanitize arguments
-scope="${scope:-repo}"
+# Get scope
+if [[ (-z "${scope}") && (-z "${unattended}") ]]; then
+    echo -n "Enter runner scope {org|repo} (default=org): "
+    read scope
+fi
+
+scope="${scope:-org}"
 
 if [[ ! ("${scope}" = "org" 
       || "${scope}" = "repo") ]]; then
     usage
-    throw_error "Unknown scope: '${scope}'; expected 'org' or 'repo'"
+    throw_error "unknown scope: '${scope}'; expected 'org' or 'repo'"
+fi
+
+# Get org
+if [[ (-z "${org}") && (-z "${unattended}") ]]; then
+    echo -n "Enter org name: "
+    read org
 fi
 
 if [ -z "${org}" ]; then
     usage
-    throw_error "--org not specified"
+    throw_error "org not specified"
 fi
 
+# Get repo
 if [ "${scope}" = "repo" ]; then
+    if [[ (-z "${repo}") && (-z "${unattended}") ]]; then
+        echo -n "Enter repo name: "
+        read repo
+    fi
+
     if [ -z ${repo} ]; then
         usage
-        throw_error "--repo not specified"
+        throw_error "repo not specified"
     fi
+fi
+
+# Get runner_dir
+if [[ (-z "${runner_dir}") && (-z "${unattended}") ]]; then
+    echo -n "Enter path to runner: "
+    read runner_dir
 fi
 
 if [ -z "${runner_dir}" ]; then
     usage
-    throw_error "--runner_dir not specified"
+    throw_error "runner_dir not specified"
 fi
 
-name="${name:-$(openssl rand -hex 6)}"
+# Get personal access token
+if [[ (-z "${PA_TOKEN}") && (-z "${unattended}") ]]; then
+    echo -n "Enter access token: "
+    read -s PA_TOKEN
+fi
 
-labels="${labels:-self-hosted}"
+if [ -z "${PA_TOKEN}" ]; then
+    throw_error "access token not provided"
+fi
 
-group="${group:-Default}"
+if [ -n "${unattended}" ]; then
+    name="${name:-$(openssl rand -hex 6)}"
 
-work_dir="${work_dir:-${HOME}/_work}"
+    labels="${labels:-self-hosted}"
 
-# Get access token
-for i in {0..2}; do
-    echo "Enter access token:"
-    read -s pat
-    if [ -n "${pat}" ]; then
-        break
-    fi
-done
+    group="${group:-Default}"
 
-if [ -z "${pat}" ]; then
-    throw_error "Access token not provided"
+    work_dir="${work_dir:-${HOME}/_work}"
 fi
 
 # Set urls for config and api
@@ -120,23 +146,22 @@ fi
 # Get registration token
 token="$(curl -X POST -fsS \
 -H "Accept: application/vnd.github+json" \
--H "Authorization: token ${pat}" \
+-H "Authorization: token ${PA_TOKEN}" \
 "${api_url}")"
 token="$(echo ${token} | jq -r .token)"
 
-unset pat
+unset PA_TOKEN
 
 # Configure actions-runner
 mkdir -p ${work_dir}
 
 ${runner_dir}/config.sh \
-    --unattended \
     --url "${cfg_url}" \
     --token "${token}" \
     --name "${name}" \
     --runnergroup "${group}" \
     --labels "${labels}" \
     --work "${work_dir}" \
-    --replace
+    --replace ${unattended}
 
 unset token
