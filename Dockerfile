@@ -1,6 +1,6 @@
 ARG BASE=focal
 
-FROM ubuntu:${BASE} AS base
+FROM ubuntu:${BASE}
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -30,7 +30,8 @@ RUN apt-get update && \
         jq \
         nano \
         vim && \
-    setup_ubuntu2004.sh && \
+    ubuntu_version="$(cat /etc/os-release | grep VERSION_ID | cut -d\" -f2 | sed 's/\.//')" && \
+    setup_ubuntu${ubuntu_version}.sh && \
     runner_install.sh --install_dir="${RUNNER_DIR}" && \
     chown ${DEFAULT_USER}:${DEFAULT_USER} ${RUNNER_DIR} && \
     apt-get -y clean && \
@@ -44,7 +45,5 @@ ENV MODULES_DIR="${DEFAULT_HOME}/modules"
 
 USER ${DEFAULT_USER}:${DEFAULT_USER}
 WORKDIR ${DEFAULT_HOME}
-
-VOLUME ["${DEFAULT_HOME}"]
 
 ENTRYPOINT ["docker-entrypoint.sh"]
