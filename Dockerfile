@@ -2,22 +2,23 @@ ARG BASE=focal
 
 FROM ubuntu:${BASE}
 
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+SHELL ["/bin/bash", "-e", "-o", "pipefail", "-c"]
 
 USER root
-
-COPY scripts/* /usr/local/bin/
 
 ENV DEFAULT_USER="runner"
 ENV DEFAULT_HOME="/home/${DEFAULT_USER}"
 
-RUN useradd -m -d ${DEFAULT_HOME} -s /bin/bash ${DEFAULT_USER}
-
 ENV RUNNER_DIR="${DEFAULT_HOME}/actions-runner"
 ENV RUNNER_WORK_DIR="${DEFAULT_HOME}/_work"
 
-ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && \
+ENV MODULES_DIR="${DEFAULT_HOME}/modules"
+
+COPY scripts/* /usr/local/bin/
+
+RUN useradd -r -m -d ${DEFAULT_HOME} -s /bin/bash ${DEFAULT_USER} && \
+    export DEBIAN_FRONTEND=noninteractive && \
+    apt-get update && \
     apt-get install -y --no-install-recommends \
         apt-utils \
         apt-transport-https \
@@ -30,10 +31,14 @@ RUN apt-get update && \
         jq \
         nano \
         vim && \
-    ubuntu_version="$(cat /etc/os-release | grep VERSION_ID | cut -d\" -f2 | sed 's/\.//')" && \
-    setup_ubuntu${ubuntu_version}.sh && \
+    . /etc/os-release && \
+    os_num="$(echo ${VERSION_ID} | sed 's/\.//')" && \
+    setup_ubuntu${os_num}.sh && \
     runner_install.sh --install_dir="${RUNNER_DIR}" && \
-    chown ${DEFAULT_USER}:${DEFAULT_USER} ${RUNNER_DIR} && \
+    chown -R ${DEFAULT_USER}:${DEFAULT_USER} ${RUNNER_DIR} && \
+    mkdir -p ${MODULES_DIR}/modulefiles && \
+    echo "module use ${MODULES_DIR}/modulefiles" >> ${DEFAULT_HOME}/.bashrc && \
+    chown -R ${DEFAULT_USER}:${DEFAULT_USER} ${MODULES_DIR} && \
     apt-get -y clean && \
     rm -rf /var/cache/apt && \
     rm -rf /var/lib/apt/lists/* && \
@@ -41,7 +46,6 @@ RUN apt-get update && \
     rm -rf /tmp/*
 
 ENV TEXTTEST_HOME="/usr/local/bin/texttest"
-ENV MODULES_DIR="${DEFAULT_HOME}/modules"
 
 USER ${DEFAULT_USER}:${DEFAULT_USER}
 WORKDIR ${DEFAULT_HOME}

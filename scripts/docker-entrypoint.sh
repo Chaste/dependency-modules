@@ -16,8 +16,4 @@ if [ ! -f "${RUNNER_DIR}/.runner" ]; then
     exit 1
 fi
 
-. /etc/profile.d/modules.sh
-mkdir -p ${MODULES_DIR}/modulefiles
-module use ${MODULES_DIR}/modulefiles
-
 exec "${RUNNER_DIR}/run.sh"
