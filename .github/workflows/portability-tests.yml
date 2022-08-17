@@ -34,8 +34,9 @@ jobs:
     steps:
       - name: create modules init script
         run: |
+          echo "MODULES_DIR=${HOME}/modules" >> $GITHUB_ENV
           echo "module purge" > modulesinit.sh
-          echo "module use ${{ env.MODULES_DIR }}/modulefiles" >> modulesinit.sh
+          echo "module use ${HOME}/modules/modulefiles" >> modulesinit.sh
           chmod +x modulesinit.sh
 
       - name: setup xsd
