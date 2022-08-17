@@ -201,6 +201,12 @@ jobs:
           cd Chaste/build
           nice -n 10 cmake --build . --parallel ${{ env.NCPU }} --target Continuous
 
+      - name: build parallel test pack
+        run: |
+          . ./modulesinit.sh
+          cd Chaste/build
+          nice -n 10 cmake --build . --parallel ${{ env.NCPU }} --target Parallel
+
       - name: build nightly test pack
         run: |
           . ./modulesinit.sh
@@ -212,12 +218,6 @@ jobs:
           . ./modulesinit.sh
           cd Chaste/build
           nice -n 10 cmake --build . --parallel ${{ env.NCPU }} --target Weekly
-
-      - name: build parallel test pack
-        run: |
-          . ./modulesinit.sh
-          cd Chaste/build
-          nice -n 10 cmake --build . --parallel ${{ env.NCPU }} --target Parallel
 
       - name: run continuous test pack
         run: |
