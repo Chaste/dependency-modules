@@ -1,0 +1,231 @@
+name: portability-tests
+
+on:
+  workflow_dispatch:
+
+jobs:
+  setup:
+    name: portability-tests
+
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-20.04
+            xsd_ver: 4.0.0
+            xercesc_ver: 3.2.3
+            sundials_ver: 5.8.0
+            boost_ver: 1.74.0
+            vtk_ver: 9.1.0
+            petsc_ver: 3.11.3
+            hdf5_ver: 1.10.5
+            petsc_arch: linux-gnu
+      fail-fast: false
+
+    runs-on: [self-hosted, '${{ matrix.os }}']
+
+    env:
+      CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
+
+    defaults:
+      run:
+        # --login to source /etc/profile.d/modules.sh
+        shell: bash --login -e -o pipefail {0}
+
+    steps:
+      - name: create modules init script
+        run: |
+          echo "module purge" > modulesinit.sh
+          echo "module use ${{ env.MODULES_DIR }}/modulefiles" >> modulesinit.sh
+          chmod +x modulesinit.sh
+
+      - name: setup xsd
+        run: |
+          . ./modulesinit.sh
+          if ! $(module is-avail xsd/${{ matrix.xsd_ver }}); then
+            nice -n 10 install_xsd.sh \
+              --version=${{ matrix.xsd_ver }} \
+              --modules-dir=${{ env.MODULES_DIR }}
+          fi
+          module test xsd/${{ matrix.xsd_ver }}
+
+      - name: setup xercesc
+        run: |
+          . ./modulesinit.sh
+          if ! $(module is-avail xercesc/${{ matrix.xercesc_ver }}); then
+            nice -n 10 install_xercesc.sh \
+              --version=${{ matrix.xercesc_ver }} \
+              --modules-dir=${{ env.MODULES_DIR }}
+          fi
+          module test xercesc/${{ matrix.xercesc_ver }}
+
+      - name: setup sundials
+        run: |
+          . ./modulesinit.sh
+          if ! $(module is-avail sundials/${{ matrix.sundials_ver }}); then
+            nice -n 10 install_sundials.sh \
+              --version=${{ matrix.sundials_ver }} \
+              --modules-dir=${{ env.MODULES_DIR }}
+          fi
+          module test sundials/${{ matrix.sundials_ver }}
+
+      - name: setup boost
+        run: |
+          . ./modulesinit.sh
+          if ! $(module is-avail boost/${{ matrix.boost_ver }}); then
+            nice -n 10 install_boost.sh \
+              --version=${{ matrix.boost_ver }} \
+              --modules-dir=${{ env.MODULES_DIR }}
+          fi
+          module test boost/${{ matrix.boost_ver }}
+
+      - name: setup vtk
+        run: |
+          . ./modulesinit.sh
+          if ! $(module is-avail vtk/${{ matrix.vtk_ver }}); then
+            nice -n 10 install_vtk.sh \
+              --version=${{ matrix.vtk_ver }} \
+              --modules-dir=${{ env.MODULES_DIR }}
+          fi
+          module test vtk/${{ matrix.vtk_ver }}
+
+      - name: setup petsc_hdf5
+        run: |
+          . ./modulesinit.sh
+          if ! $(module is-avail petsc_hdf5/${{ matrix.petsc_ver }}_${{ matrix.hdf5_ver }}/${{ matrix.petsc_arch }}); then
+            nice -n 10 install_petsc_hdf5.sh \
+              --petsc-version=${{ matrix.petsc_ver }} \
+              --hdf5-version=${{ matrix.hdf5_ver }} \
+              --petsc-arch=${{ matrix.petsc_arch }} \
+              --modules-dir=${{ env.MODULES_DIR }}
+          fi
+          module test petsc_hdf5/${{ matrix.petsc_ver }}_${{ matrix.hdf5_ver }}/${{ matrix.petsc_arch }}
+
+      - name: add versions to modules init script
+        run: |
+          echo "module load xsd/${{ matrix.xsd_ver }}" >> modulesinit.sh
+          echo "module load xercesc/${{ matrix.xercesc_ver }}" >> modulesinit.sh
+          echo "module load sundials/${{ matrix.sundials_ver }}" >> modulesinit.sh
+          echo "module load boost/${{ matrix.boost_ver }}" >> modulesinit.sh
+          echo "module load vtk/${{ matrix.vtk_ver }}" >> modulesinit.sh
+          echo "module load petsc_hdf5/${{ matrix.petsc_ver }}_${{ matrix.hdf5_ver }}/${{ matrix.petsc_arch }}" >> modulesinit.sh
+
+      - name: checkout chaste
+        uses: actions/checkout@v3
+        with:
+          repository: Chaste/Chaste
+          path: Chaste
+          submodules: recursive
+
+      - name: configure chaste
+        run: |
+          . ./modulesinit.sh
+          mkdir -p Chaste/build
+          cd Chaste/build
+          nice -n 10 cmake \
+            -DBOOST_ROOT=${BOOST_ROOT} \
+            -DVTK_DIR=${VTK_ROOT} \
+            -DCMAKE_PREFIX_PATH=${XERCESC_ROOT} \
+            -DCMAKE_BUILD_TYPE=Release \
+            ..
+
+      - name: compile chaste build info
+        run: |
+          . ./modulesinit.sh
+          cd Chaste/build
+          nice -n 10 cmake --build . --parallel $(nproc) --target TestChasteBuildInfo
+          nice -n 10 ctest -V -R TestChasteBuildInfo --output-on-failure | tee buildinfo
+
+      - name: verify dependency versions
+        run: |
+          cd Chaste/build
+          vtk_arr=($(echo "${{ matrix.vtk_ver }}" | sed -e 's/\./ /g'))
+          vtk_major=${vtk_arr[0]}
+          vtk_minor=${vtk_arr[1]}
+
+          sed -i.bak 's/"//g' buildinfo  # removes quotes from old sundials versions
+
+          grep "<XSD>${{ matrix.xsd_ver }}</XSD>" buildinfo || exit 1
+          grep "<Xerces>${{ matrix.xercesc_ver }}</Xerces>" buildinfo || exit 2
+          grep "<SUNDIALS>${{ matrix.sundials_ver }}</SUNDIALS>" buildinfo || exit 3
+          grep "<Boost>${{ matrix.boost_ver }}</Boost>" buildinfo || exit 4
+          grep "<VTK>${vtk_major}.${vtk_minor}</VTK>" buildinfo || exit 5
+          grep "<PETSc>${{ matrix.petsc_ver }}</PETSc>" buildinfo || exit 6
+          grep "<HDF5>${{ matrix.hdf5_ver }}</HDF5>" buildinfo || exit 7
+
+      - name: build core libraries
+        run: |
+          . ./modulesinit.sh
+          cd Chaste/build
+          nice -n 10 cmake --build . --parallel $(nproc) --target chaste_core
+
+      - name: build cell_based
+        run: |
+          . ./modulesinit.sh
+          cd Chaste/build
+          nice -n 10 cmake --build . --parallel $(nproc) --target chaste_cell_based
+
+      - name: build crypt
+        run: |
+          . ./modulesinit.sh
+          cd Chaste/build
+          nice -n 10 cmake --build . --parallel $(nproc) --target chaste_crypt
+
+      - name: build heart
+        run: |
+          . ./modulesinit.sh
+          cd Chaste/build
+          nice -n 10 cmake --build . --parallel $(nproc) --target chaste_heart
+
+      - name: build lung
+        run: |
+          . ./modulesinit.sh
+          cd Chaste/build
+          nice -n 10 cmake --build . --parallel $(nproc) --target chaste_lung
+
+      - name: build continuous test pack
+        run: |
+          . ./modulesinit.sh
+          cd Chaste/build
+          nice -n 10 cmake --build . --parallel $(nproc) --target Continuous
+
+      - name: build nightly test pack
+        run: |
+          . ./modulesinit.sh
+          cd Chaste/build
+          nice -n 10 cmake --build . --parallel $(nproc) --target Nightly
+
+      - name: build weekly test pack
+        run: |
+          . ./modulesinit.sh
+          cd Chaste/build
+          nice -n 10 cmake --build . --parallel $(nproc) --target Weekly
+
+      - name: build parallel test pack
+        run: |
+          . ./modulesinit.sh
+          cd Chaste/build
+          nice -n 10 cmake --build . --parallel $(nproc) --target Parallel
+
+      - name: run continuous test pack
+        run: |
+          . ./modulesinit.sh
+          cd Chaste/build
+          nice -n 10 ctest -j $(nproc) -L Continuous --output-on-failure
+
+      - name: run nightly test pack
+        run: |
+          . ./modulesinit.sh
+          cd Chaste/build
+          nice -n 10 ctest -j $(nproc) -L Nightly --output-on-failure
+
+      - name: run weekly test pack
+        run: |
+          . ./modulesinit.sh
+          cd Chaste/build
+          nice -n 10 ctest -j $(nproc) -L Weekly --output-on-failure
+
+      - name: run parallel test pack
+        run: |
+          . ./modulesinit.sh
+          cd Chaste/build
+          nice -n 10 ctest -j $(nproc) -L Parallel --output-on-failure
