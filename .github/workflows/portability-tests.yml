@@ -23,9 +23,6 @@ jobs:
 
     runs-on: [self-hosted, '${{ matrix.os }}']
 
-    env:
-      CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
-
     defaults:
       run:
         # --login to source /etc/profile.d/modules.sh
@@ -34,8 +31,14 @@ jobs:
     steps:
       - name: set env variables
         run: |
-          echo "MODULES_DIR=${HOME}/modules" >> $GITHUB_ENV
-          echo "NCPU=$(( $(nproc) < 16 ? $(nproc) : 16 ))" >> $GITHUB_ENV
+          echo "MODULES_DIR=${HOME}/modules" >> ${GITHUB_ENV}
+          echo "CHASTE_TEST_OUTPUT=${HOME}/testoutput/$(date +'%Y%m%d%H%M%S')" >> ${GITHUB_ENV}
+          echo "NCPU=$(( $(nproc) < 16 ? $(nproc) : 16 ))" >> ${GITHUB_ENV}
+          
+      - name: make directories
+        run: |
+          mkdir -p ${{ env.MODULES_DIR }}/modulefiles
+          mkdir -p ${{ env.CHASTE_TEST_OUTPUT }}
 
       - name: create modules init script
         run: |
