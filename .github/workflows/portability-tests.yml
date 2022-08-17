@@ -36,7 +36,7 @@ jobs:
         run: |
           echo "MODULES_DIR=${HOME}/modules" >> $GITHUB_ENV
           echo "NCPU=$(( $(nproc) < 16 ? $(nproc) : 16 ))" >> $GITHUB_ENV
-        
+
       - name: create modules init script
         run: |
           echo "module purge" > modulesinit.sh
@@ -239,3 +239,7 @@ jobs:
           . ./modulesinit.sh
           cd Chaste/build
           nice -n 10 ctest -j ${{ env.NCPU }} -L Parallel --output-on-failure
+
+      - name: cleanup
+        if: always()
+        run: rm -rf ${{ env.MODULES_DIR }}/src/*
