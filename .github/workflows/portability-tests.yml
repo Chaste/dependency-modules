@@ -31,10 +31,11 @@ jobs:
     steps:
       - name: set env variables
         run: |
-          echo "MODULES_DIR=${HOME}/modules" >> ${GITHUB_ENV}
+          modules_dir="${MODULES_DIR:-${HOME}/modules}"
+          echo "MODULES_DIR=${modules_dir}" >> ${GITHUB_ENV}
           echo "CHASTE_TEST_OUTPUT=${HOME}/testoutput/$(date +'%Y%m%d%H%M%S')" >> ${GITHUB_ENV}
           echo "NCPU=$(( $(nproc) < 16 ? $(nproc) : 16 ))" >> ${GITHUB_ENV}
-          
+
       - name: make directories
         run: |
           mkdir -p ${{ env.MODULES_DIR }}/modulefiles
@@ -213,12 +214,6 @@ jobs:
           cd Chaste/build
           nice -n 10 cmake --build . --parallel ${{ env.NCPU }} --target Nightly
 
-      - name: build weekly test pack
-        run: |
-          . ./modulesinit.sh
-          cd Chaste/build
-          nice -n 10 cmake --build . --parallel ${{ env.NCPU }} --target Weekly
-
       - name: run continuous test pack
         run: |
           . ./modulesinit.sh
@@ -236,12 +231,6 @@ jobs:
           . ./modulesinit.sh
           cd Chaste/build
           nice -n 10 ctest -j ${{ env.NCPU }} -L Nightly --output-on-failure
-
-      - name: run weekly test pack
-        run: |
-          . ./modulesinit.sh
-          cd Chaste/build
-          nice -n 10 ctest -j ${{ env.NCPU }} -L Weekly --output-on-failure
 
       - name: cleanup
         if: always()
