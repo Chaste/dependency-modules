@@ -19,6 +19,17 @@ jobs:
             petsc_ver: 3.11.3
             hdf5_ver: 1.10.5
             petsc_arch: linux-gnu
+            
+          - os: ubuntu-20.04
+            xsd_ver: 4.0.0
+            xercesc_ver: 3.2.0
+            sundials_ver: 4.1.0
+            boost_ver: 1.69.0
+            vtk_ver: 8.2.0
+            petsc_ver: 3.10.5
+            hdf5_ver: 1.10.9
+            petsc_arch: linux-gnu
+            
       fail-fast: false
 
     runs-on: [self-hosted, '${{ matrix.os }}']
