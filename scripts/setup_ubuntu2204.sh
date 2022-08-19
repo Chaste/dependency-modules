@@ -23,12 +23,14 @@ apt-get install -y --no-install-recommends \
     mencoder \
     python3-dev \
     python3-pip \
+    python2.7 \
     libffi-dev \
     environment-modules
 
 update-alternatives --install /usr/local/bin/python python /usr/bin/python3 10
 update-alternatives --install /usr/local/bin/pip pip /usr/bin/pip3 10
 
+sudo update-alternatives --install /usr/local/bin/python2 python2 /usr/bin/python2.7 5
+
 pip install --upgrade pip
 pip install texttest
-

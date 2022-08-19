@@ -160,6 +160,12 @@ mkdir -p ${install_dir}
 
 tar -xzf $(basename ${URL_PETSC}) -C ${install_dir} --strip-components=1
 
+# Set Python version
+PYTHON=python3
+if [[ (${petsc_major} -lt 3) || ((${petsc_major} -eq 3) && (${petsc_minor} -lt 11)) ]]; then  # PETSc < 3.11.x
+    PYTHON=python2
+fi
+
 # Build and install
 cd ${install_dir}
 export PETSC_DIR=$(pwd)
@@ -168,7 +174,7 @@ case ${petsc_arch} in
 
     linux-gnu)
         export PETSC_ARCH=linux-gnu
-        ./configure \
+        ${PYTHON} ./configure \
             --with-make-np=${parallel} \
             --with-cc=gcc \
             --with-cxx=g++ \
@@ -189,7 +195,7 @@ case ${petsc_arch} in
 
     linux-gnu-opt)
         export PETSC_ARCH=linux-gnu-opt
-        ./configure \
+        ${PYTHON} ./configure \
             --with-make-np=${parallel} \
             --with-cc=gcc \
             --with-cxx=g++ \
