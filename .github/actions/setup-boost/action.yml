@@ -1,34 +1,28 @@
 name: setup-boost
-description: Build and cache boost module
+description: build and cache boost module
 inputs:
-  os:
-    description: OS
-    required: true
-  modules_dir:
-    description: Modules base directory
-    required: true
   boost_ver:
-    description: Boost version
+    description: boost version
     required: true
 runs:
   using: composite
   steps:
-    - name: Cache boost module
-      id: cache-boost
+    - id: cache-boost
       uses: actions/cache@v3
       with:
         path: |
-          ${{ inputs.modules_dir }}/opt/boost/${{ inputs.boost_ver }}
-          ${{ inputs.modules_dir }}/modulefiles/boost/${{ inputs.boost_ver }}
-        key: ${{ inputs.os }}-boost-${{ inputs.boost_ver }}-${{ hashFiles('scripts/install_boost.sh') }}
+          ${{ env.MODULES_DIR }}/opt/boost/${{ inputs.boost_ver }}
+          ${{ env.MODULES_DIR }}/modulefiles/boost/${{ inputs.boost_ver }}
+        key: ${{ env.OS_VERSION }}-boost-${{ inputs.boost_ver }}-${{ hashFiles('scripts/install_boost.sh') }}
     
-    - name: Build and install boost module
+    - name: install boost module
       if: steps.cache-boost.outputs.cache-hit != 'true'
-      run: ./scripts/install_boost.sh --version=${{ inputs.boost_ver }} --modules-dir=${{ inputs.modules_dir }}
+      working-directory: ${{ github.workspace }}
+      run: ./scripts/install_boost.sh --version=${{ inputs.boost_ver }} --modules-dir=${{ env.MODULES_DIR }}
       shell: bash
         
-    - name: Check boost module
+    - name: test boost module
       run: |
         module load boost/${{ inputs.boost_ver }}
         module test boost/${{ inputs.boost_ver }}
-      shell: bash --login -e -o pipefail {0}  # login to load `module` from /etc/profile.d
+      shell: bash --login -e -o pipefail {0}  # login to load /etc/profile.d/modules.sh

@@ -1,30 +1,27 @@
 name: setup-defaults
-description: Setup default dependency versions
-inputs:
-  os:
-    description: OS
-    required: true
-  modules_dir:
-    description: Modules base directory
-    required: true
+description: setup environment and dependencies
 runs:
   using: composite
   steps:
-    - name: Install default dependencies
+    - name: set environment variables
       run: |
-        if [ ${{ inputs.os }} = 'ubuntu-20.04' ]; then
-          sudo ./scripts/setup_ubuntu2004.sh
-        elif [ ${{ inputs.os }} = 'ubuntu-22.04' ]; then
-          sudo ./scripts/setup_ubuntu2204.sh
-        else
-            echo 'Unknown OS version'; exit 1
-        fi
+        . /etc/os-release
+        os_version="$(echo ${ID}${VERSION_ID} | sed 's/\.//')"
+        echo "OS_VERSION=${os_version}" >> ${GITHUB_ENV}
+        echo "MODULES_DIR=${{ github.workspace }}/modules" >> ${GITHUB_ENV}
+      shell: bash
+
+    - name: install dependencies
+      working-directory: ${{ github.workspace }}
+      run: sudo ./scripts/setup_${{ env.OS_VERSION }}.sh
       shell: bash
         
-    - name: Setup modules directory
+    - name: configure environment modules
       run: |
-        mkdir -p ${{ inputs.modules_dir }}/modulefiles
-        echo "module use ${{ inputs.modules_dir }}/modulefiles" | sudo tee -a /etc/profile.d/modules.sh
-        source /etc/profile.d/modules.sh 
-        module avail
+        mkdir -p ${{ env.MODULES_DIR }}/modulefiles
+        echo "module use ${{ env.MODULES_DIR }}/modulefiles" | sudo tee -a /etc/profile.d/modules.sh
       shell: bash
+
+    - name: test module command
+      run: module avail
+      shell: bash --login -e -o pipefail {0}  # login to load /etc/profile.d/modules.sh
