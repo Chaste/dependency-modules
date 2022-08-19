@@ -81,12 +81,12 @@ jobs:
         uses: ./.github/actions/setup-petsc_hdf5
         with:
           petsc_ver: 3.7.7
-          hdf5_ver: 1.10.0
+          hdf5_ver: 1.10.0-patch1
           petsc_arch: linux-gnu
 
       - name: build and cache petsc 3.7.7 / hdf5 1.10.0 / linux-gnu-opt
         uses: ./.github/actions/setup-petsc_hdf5
         with:
           petsc_ver: 3.7.7
-          hdf5_ver: 1.10.0
+          hdf5_ver: 1.10.0-patch1
           petsc_arch: linux-gnu-opt
