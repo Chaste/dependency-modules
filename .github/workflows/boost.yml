@@ -4,9 +4,8 @@ on:
   workflow_dispatch:
 
 jobs:
-
   setup:
-    name: Build and cache Boost versions
+    name: build and cache boost versions
 
     strategy:
       matrix:
@@ -15,57 +14,44 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
-    env:
-      MODULES_DIR: ${{ github.workspace }}/modules
-
     steps:
-      - name: Checkout
+      - name: checkout
         uses: actions/checkout@v3
 
-      - name: Setup defaults
+      - name: setup defaults
         uses: ./.github/actions/setup-defaults
-        with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
 
-      - name: Build and cache boost 1.74.0
+      - name: build and cache boost 1.74.0
         uses: ./.github/actions/setup-boost
         with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
           boost_ver: 1.74.0
 
-      - name: Build and cache boost 1.71.0
+      - name: build and cache boost 1.71.0
         uses: ./.github/actions/setup-boost
         with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
           boost_ver: 1.71.0
 
-      - name: Build and cache boost 1.69.0
+      - name: build and cache boost 1.69.0
         uses: ./.github/actions/setup-boost
         with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
           boost_ver: 1.69.0
 
-      - name: Build and cache boost 1.67.0
+      - name: build and cache boost 1.67.0
         uses: ./.github/actions/setup-boost
         with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
           boost_ver: 1.67.0
 
-      - name: Build and cache boost 1.66.0
+      - name: build and cache boost 1.66.0
         uses: ./.github/actions/setup-boost
         with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
           boost_ver: 1.66.0
 
-      - name: Build and cache boost 1.62.0
+      - name: build and cache boost 1.64.0
         uses: ./.github/actions/setup-boost
         with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
+          boost_ver: 1.64.0
+
+      - name: build and cache boost 1.62.0
+        uses: ./.github/actions/setup-boost
+        with:
           boost_ver: 1.62.0
