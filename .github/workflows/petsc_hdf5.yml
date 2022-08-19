@@ -28,93 +28,21 @@ jobs:
           os: ${{ matrix.os }}
           modules_dir: ${{ env.MODULES_DIR }}
 
-      - name: Build and cache petsc 3.6.4 hdf5 1.8.16 linux-gnu
+      - name: Build and cache petsc 3.12.4 hdf5 1.10.4 linux-gnu
         uses: ./.github/actions/setup-petsc_hdf5
         with:
           os: ${{ matrix.os }}
           modules_dir: ${{ env.MODULES_DIR }}
-          petsc_ver: 3.6.4
-          hdf5_ver: 1.8.16
-          petsc_arch: linux-gnu
-
-      - name: Build and cache petsc 3.6.4 hdf5 1.8.16 linux-gnu-opt
-        uses: ./.github/actions/setup-petsc_hdf5
-        with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
-          petsc_ver: 3.6.4
-          hdf5_ver: 1.8.16
-          petsc_arch: linux-gnu-opt
-          
-      - name: Build and cache petsc 3.7.7 hdf5 1.10.0 linux-gnu
-        uses: ./.github/actions/setup-petsc_hdf5
-        with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
-          petsc_ver: 3.7.7
-          hdf5_ver: 1.10.0
-          petsc_arch: linux-gnu
-
-      - name: Build and cache petsc 3.7.7 hdf5 1.10.0 linux-gnu-opt
-        uses: ./.github/actions/setup-petsc_hdf5
-        with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
-          petsc_ver: 3.7.7
-          hdf5_ver: 1.10.0
-          petsc_arch: linux-gnu-opt
-
-      - name: Build and cache petsc 3.8.4 hdf5 1.8.21 linux-gnu
-        uses: ./.github/actions/setup-petsc_hdf5
-        with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
-          petsc_ver: 3.8.4
-          hdf5_ver: 1.8.21
-          petsc_arch: linux-gnu
-
-      - name: Build and cache petsc 3.8.4 hdf5 1.8.21 linux-gnu-opt
-        uses: ./.github/actions/setup-petsc_hdf5
-        with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
-          petsc_ver: 3.8.4
-          hdf5_ver: 1.8.21
-          petsc_arch: linux-gnu-opt
-
-      - name: Build and cache petsc 3.9.4 hdf5 1.10.3 linux-gnu
-        uses: ./.github/actions/setup-petsc_hdf5
-        with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
-          petsc_ver: 3.9.4
-          hdf5_ver: 1.10.3
-          petsc_arch: linux-gnu
-
-      - name: Build and cache petsc 3.9.4 hdf5 1.10.3 linux-gnu-opt
-        uses: ./.github/actions/setup-petsc_hdf5
-        with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
-          petsc_ver: 3.9.4
-          hdf5_ver: 1.10.3
-          petsc_arch: linux-gnu-opt
-
-      - name: Build and cache petsc 3.10.5 hdf5 1.10.4 linux-gnu
-        uses: ./.github/actions/setup-petsc_hdf5
-        with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
-          petsc_ver: 3.10.5
+          petsc_ver: 3.12.4
           hdf5_ver: 1.10.4
           petsc_arch: linux-gnu
 
-      - name: Build and cache petsc 3.10.5 hdf5 1.10.4 linux-gnu-opt
+      - name: Build and cache petsc 3.12.4 hdf5 1.10.4 linux-gnu-opt
         uses: ./.github/actions/setup-petsc_hdf5
         with:
           os: ${{ matrix.os }}
           modules_dir: ${{ env.MODULES_DIR }}
-          petsc_ver: 3.10.5
+          petsc_ver: 3.12.4
           hdf5_ver: 1.10.4
           petsc_arch: linux-gnu-opt
 
@@ -136,20 +64,74 @@ jobs:
           hdf5_ver: 1.10.5
           petsc_arch: linux-gnu-opt
 
-      - name: Build and cache petsc 3.12.4 hdf5 1.10.4 linux-gnu
+      - name: Build and cache petsc 3.10.5 hdf5 1.10.4 linux-gnu
         uses: ./.github/actions/setup-petsc_hdf5
         with:
           os: ${{ matrix.os }}
           modules_dir: ${{ env.MODULES_DIR }}
-          petsc_ver: 3.12.4
+          petsc_ver: 3.10.5
           hdf5_ver: 1.10.4
           petsc_arch: linux-gnu
 
-      - name: Build and cache petsc 3.12.4 hdf5 1.10.4 linux-gnu-opt
+      - name: Build and cache petsc 3.10.5 hdf5 1.10.4 linux-gnu-opt
         uses: ./.github/actions/setup-petsc_hdf5
         with:
           os: ${{ matrix.os }}
           modules_dir: ${{ env.MODULES_DIR }}
-          petsc_ver: 3.12.4
+          petsc_ver: 3.10.5
           hdf5_ver: 1.10.4
+          petsc_arch: linux-gnu-opt
+
+      - name: Build and cache petsc 3.9.4 hdf5 1.10.3 linux-gnu
+        uses: ./.github/actions/setup-petsc_hdf5
+        with:
+          os: ${{ matrix.os }}
+          modules_dir: ${{ env.MODULES_DIR }}
+          petsc_ver: 3.9.4
+          hdf5_ver: 1.10.3
+          petsc_arch: linux-gnu
+
+      - name: Build and cache petsc 3.9.4 hdf5 1.10.3 linux-gnu-opt
+        uses: ./.github/actions/setup-petsc_hdf5
+        with:
+          os: ${{ matrix.os }}
+          modules_dir: ${{ env.MODULES_DIR }}
+          petsc_ver: 3.9.4
+          hdf5_ver: 1.10.3
+          petsc_arch: linux-gnu-opt
+
+      - name: Build and cache petsc 3.8.4 hdf5 1.8.21 linux-gnu
+        uses: ./.github/actions/setup-petsc_hdf5
+        with:
+          os: ${{ matrix.os }}
+          modules_dir: ${{ env.MODULES_DIR }}
+          petsc_ver: 3.8.4
+          hdf5_ver: 1.8.21
+          petsc_arch: linux-gnu
+
+      - name: Build and cache petsc 3.8.4 hdf5 1.8.21 linux-gnu-opt
+        uses: ./.github/actions/setup-petsc_hdf5
+        with:
+          os: ${{ matrix.os }}
+          modules_dir: ${{ env.MODULES_DIR }}
+          petsc_ver: 3.8.4
+          hdf5_ver: 1.8.21
+          petsc_arch: linux-gnu-opt
+
+      - name: Build and cache petsc 3.7.7 hdf5 1.10.0 linux-gnu
+        uses: ./.github/actions/setup-petsc_hdf5
+        with:
+          os: ${{ matrix.os }}
+          modules_dir: ${{ env.MODULES_DIR }}
+          petsc_ver: 3.7.7
+          hdf5_ver: 1.10.0
+          petsc_arch: linux-gnu
+
+      - name: Build and cache petsc 3.7.7 hdf5 1.10.0 linux-gnu-opt
+        uses: ./.github/actions/setup-petsc_hdf5
+        with:
+          os: ${{ matrix.os }}
+          modules_dir: ${{ env.MODULES_DIR }}
+          petsc_ver: 3.7.7
+          hdf5_ver: 1.10.0
           petsc_arch: linux-gnu-opt
