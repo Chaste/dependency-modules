@@ -97,7 +97,6 @@ cat <<EOF > ${version}
 ##
 proc ModulesTest { } {
     set paths "[getenv VTK_ROOT]
-               [getenv VTK_ROOT]/bin
                [getenv VTK_ROOT]/include/vtk-${major}.${minor}
                [getenv VTK_ROOT]/lib"
 
@@ -117,8 +116,6 @@ proc ModulesHelp { } {
 module-whatis "This adds the environment variables for vtk ${version}"
 
 setenv          VTK_ROOT             ${install_dir}
-
-prepend-path    PATH                 ${install_dir}/bin
 
 prepend-path    LIBRARY_PATH         ${install_dir}/lib
 prepend-path    LD_LIBRARY_PATH      ${install_dir}/lib
