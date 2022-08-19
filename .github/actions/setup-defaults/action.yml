@@ -9,6 +9,7 @@ runs:
         os_version="$(echo ${ID}${VERSION_ID} | sed 's/\.//')"
         echo "OS_VERSION=${os_version}" >> ${GITHUB_ENV}
         echo "MODULES_DIR=${{ github.workspace }}/modules" >> ${GITHUB_ENV}
+        echo "CHASTE_TEST_OUTPUT=${{ github.workspace }}/testoutput" >> ${GITHUB_ENV}
       shell: bash
 
     - name: install dependencies

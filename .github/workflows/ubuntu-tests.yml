@@ -4,93 +4,89 @@ on:
   workflow_dispatch:
 
 jobs:
-  
   setup:
-    name: Test on Ubuntu
-    
+    name: test modules on ubuntu
+
     strategy:
       matrix:
         include:
           - os: ubuntu-20.04
             xsd_ver: 4.0.0
             xercesc_ver: 3.2.3
-            sundials_ver: 5.8.0
+            sundials_ver: 6.0.0
             boost_ver: 1.74.0
             vtk_ver: 9.1.0
-            petsc_ver: 3.11.3
-            hdf5_ver: 1.10.5
+            petsc_ver: 3.12.4
+            hdf5_ver: 1.10.4
+            petsc_arch: linux-gnu
+
+          - os: ubuntu-20.04
+            xsd_ver: 4.0.0
+            xercesc_ver: 3.2.0
+            sundials_ver: 4.1.0
+            boost_ver: 1.62.0
+            vtk_ver: 6.3.0
+            petsc_ver: 3.7.7
+            hdf5_ver: 1.10.0
             petsc_arch: linux-gnu
 
       fail-fast: false
-      
+
     runs-on: ${{ matrix.os }}
-        
-    env:
-      MODULES_DIR: ${{ github.workspace }}/modules
-      CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
-      
+
     steps:
-      - name: Checkout
+      - name: checkout
         uses: actions/checkout@v3
 
-      - name: Setup defaults
+      - name: setup defaults
         uses: ./.github/actions/setup-defaults
-        with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
-          
-      - name: Install and cache xsd module
+
+      - name: install and cache xsd module
         uses: ./.github/actions/setup-xsd
         with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
           xsd_ver: ${{ matrix.xsd_ver }}
-          
-      - name: Build and cache xercesc module
+
+      - name: build and cache xercesc module
         uses: ./.github/actions/setup-xercesc
         with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
           xercesc_ver: ${{ matrix.xercesc_ver }}
-          
-      - name: Build and cache sundials module
+
+      - name: build and cache sundials module
         uses: ./.github/actions/setup-sundials
         with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
           sundials_ver: ${{ matrix.sundials_ver }}
-          
-      - name: Build and cache boost module
+
+      - name: build and cache boost module
         uses: ./.github/actions/setup-boost
         with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
           boost_ver: ${{ matrix.boost_ver }}
-          
-      - name: Build and cache vtk module
+
+      - name: build and cache vtk module
         uses: ./.github/actions/setup-vtk
         with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
           vtk_ver: ${{ matrix.vtk_ver }}
-        
-      - name: Build and cache petsc_hdf5 module
+
+      - name: build and cache petsc_hdf5 module
         uses: ./.github/actions/setup-petsc_hdf5
         with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
           petsc_ver: ${{ matrix.petsc_ver }}
           hdf5_ver: ${{ matrix.hdf5_ver }}
           petsc_arch: ${{ matrix.petsc_arch }}
 
-      - name: Checkout Chaste
+      - name: checkout chaste
         uses: actions/checkout@v3
         with:
           repository: Chaste/Chaste
           path: Chaste
           submodules: recursive
-      
-      - name: Compile Chaste build info
+
+      - name: make build and test directories
+        run: |
+          mkdir -p Chaste/build
+          mkdir -p ${CHASTE_TEST_OUTPUT}
+
+      - name: compile chaste build info
+        working-directory: Chaste/build
         run: |
           module purge
           module load xsd/${{ matrix.xsd_ver }}
@@ -100,25 +96,26 @@ jobs:
           module load vtk/${{ matrix.vtk_ver }}
           module load petsc_hdf5/${{ matrix.petsc_ver }}_${{ matrix.hdf5_ver }}/${{ matrix.petsc_arch }}
 
-          mkdir -p Chaste/build && cd Chaste/build
           cmake \
               -DBOOST_ROOT=${BOOST_ROOT} \
               -DVTK_DIR=${VTK_ROOT} \
               -DCMAKE_PREFIX_PATH=${XERCESC_ROOT} \
-              -DCMAKE_BUILD_TYPE=Debug ..
-              
+              -DCMAKE_BUILD_TYPE=Release \
+              ..
+
           cmake --build . --parallel $(nproc) --target TestChasteBuildInfo
 
           ctest -V -R TestChasteBuildInfo --output-on-failure | tee buildinfo
-          sed -i.bak 's/"//g' buildinfo  # removes quotes from some sundials versions
-        shell: bash --login -e -o pipefail {0}  # login to load `module` from /etc/profile.d
+        shell: bash --login -e -o pipefail {0}  # login to load /etc/profile.d/modules.sh
 
-      - name: Check Chaste build info
+      - name: verify dependency versions
         working-directory: Chaste/build
         run: |
           vtk_arr=($(echo "${{ matrix.vtk_ver }}" | sed -e 's/\./ /g'))
           vtk_major=${vtk_arr[0]}
           vtk_minor=${vtk_arr[1]}
+
+          sed -i.bak 's/"//g' buildinfo  # removes quotes from some sundials versions
 
           grep "<XSD>${{ matrix.xsd_ver }}</XSD>" buildinfo || exit 1
           grep "<Xerces>${{ matrix.xercesc_ver }}</Xerces>" buildinfo || exit 2
