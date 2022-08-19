@@ -4,20 +4,20 @@ on:
   workflow_dispatch:
 
 jobs:
-  
+
   setup:
     name: Build and cache Boost versions
-    
+
     strategy:
       matrix:
         os: [ubuntu-20.04]
       fail-fast: false
-    
+
     runs-on: ${{ matrix.os }}
-        
+
     env:
       MODULES_DIR: ${{ github.workspace }}/modules
-      
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -28,17 +28,44 @@ jobs:
           os: ${{ matrix.os }}
           modules_dir: ${{ env.MODULES_DIR }}
 
-      - name: Build and cache boost 1.75.0
+      - name: Build and cache boost 1.62.0
         uses: ./.github/actions/setup-boost
         with:
           os: ${{ matrix.os }}
           modules_dir: ${{ env.MODULES_DIR }}
-          boost_ver: 1.75.0
+          boost_ver: 1.62.0
 
-      - name: Build and cache boost 1.76.0
+      - name: Build and cache boost 1.66.0
         uses: ./.github/actions/setup-boost
         with:
           os: ${{ matrix.os }}
           modules_dir: ${{ env.MODULES_DIR }}
-          boost_ver: 1.76.0
-          
+          boost_ver: 1.66.0
+
+      - name: Build and cache boost 1.67.0
+        uses: ./.github/actions/setup-boost
+        with:
+          os: ${{ matrix.os }}
+          modules_dir: ${{ env.MODULES_DIR }}
+          boost_ver: 1.67.0
+
+      - name: Build and cache boost 1.69.0
+        uses: ./.github/actions/setup-boost
+        with:
+          os: ${{ matrix.os }}
+          modules_dir: ${{ env.MODULES_DIR }}
+          boost_ver: 1.69.0
+
+      - name: Build and cache boost 1.71.0
+        uses: ./.github/actions/setup-boost
+        with:
+          os: ${{ matrix.os }}
+          modules_dir: ${{ env.MODULES_DIR }}
+          boost_ver: 1.71.0
+
+      - name: Build and cache boost 1.74.0
+        uses: ./.github/actions/setup-boost
+        with:
+          os: ${{ matrix.os }}
+          modules_dir: ${{ env.MODULES_DIR }}
+          boost_ver: 1.74.0
