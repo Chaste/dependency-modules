@@ -28,33 +28,12 @@ jobs:
           os: ${{ matrix.os }}
           modules_dir: ${{ env.MODULES_DIR }}
 
-      - name: Build and cache boost 1.62.0
+      - name: Build and cache boost 1.74.0
         uses: ./.github/actions/setup-boost
         with:
           os: ${{ matrix.os }}
           modules_dir: ${{ env.MODULES_DIR }}
-          boost_ver: 1.62.0
-
-      - name: Build and cache boost 1.66.0
-        uses: ./.github/actions/setup-boost
-        with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
-          boost_ver: 1.66.0
-
-      - name: Build and cache boost 1.67.0
-        uses: ./.github/actions/setup-boost
-        with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
-          boost_ver: 1.67.0
-
-      - name: Build and cache boost 1.69.0
-        uses: ./.github/actions/setup-boost
-        with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
-          boost_ver: 1.69.0
+          boost_ver: 1.74.0
 
       - name: Build and cache boost 1.71.0
         uses: ./.github/actions/setup-boost
@@ -63,9 +42,30 @@ jobs:
           modules_dir: ${{ env.MODULES_DIR }}
           boost_ver: 1.71.0
 
-      - name: Build and cache boost 1.74.0
+      - name: Build and cache boost 1.69.0
         uses: ./.github/actions/setup-boost
         with:
           os: ${{ matrix.os }}
           modules_dir: ${{ env.MODULES_DIR }}
-          boost_ver: 1.74.0
+          boost_ver: 1.69.0
+
+      - name: Build and cache boost 1.67.0
+        uses: ./.github/actions/setup-boost
+        with:
+          os: ${{ matrix.os }}
+          modules_dir: ${{ env.MODULES_DIR }}
+          boost_ver: 1.67.0
+
+      - name: Build and cache boost 1.66.0
+        uses: ./.github/actions/setup-boost
+        with:
+          os: ${{ matrix.os }}
+          modules_dir: ${{ env.MODULES_DIR }}
+          boost_ver: 1.66.0
+
+      - name: Build and cache boost 1.62.0
+        uses: ./.github/actions/setup-boost
+        with:
+          os: ${{ matrix.os }}
+          modules_dir: ${{ env.MODULES_DIR }}
+          boost_ver: 1.62.0
