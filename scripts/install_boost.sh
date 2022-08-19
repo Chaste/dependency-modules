@@ -6,6 +6,8 @@ usage()
     exit 1
 }
 
+script_dir="$(cd "$(dirname "$0")"; pwd)"
+
 # Parse arguments
 version=
 base_dir=
@@ -55,20 +57,31 @@ if [[ (${major} -eq 1) && (${minor} -eq 62) ]]; then  # Boost == 1.62.x
 else  # Boost > 1.62.x
     wget -nc https://boostorg.jfrog.io/artifactory/main/release/${version}/source/boost_${ver_si_on}.tar.bz2
 fi
-tar -xjf boost_${ver_si_on}.tar.bz2
+# tar -xjf boost_${ver_si_on}.tar.bz2
+
+src_dir="$(pwd)/boost_${ver_si_on}"
+
+# Patch for Python 3.7+ in Boost <= 1.66.x
+# https://github.com/boostorg/python/commit/660487c43fde76f3e64f1cb2e644500da92fe582
+if [[ (${major} -eq 1) && (${minor} -le 66) ]]; then  # Boost <= 1.66.x
+    cd ${src_dir}/libs/python
+    patch -t -p1 < ${script_dir}/patches/boost_166-python37-unicode-as-string.patch
+fi
+
+# Patch for serialization in Boost <= 1.64.x
+# https://github.com/boostorg/serialization/commit/1d86261581230e2dc5d617a9b16287d326f3e229
+if [[ (${major} -eq 1) && (${minor} -eq 64) ]]; then  # Boost == 1.64.x
+    cd ${src_dir}
+    patch -t -p2 < ${script_dir}/patches/boost_164-serialization-array-wrapper.patch
+fi
 
 # Build and install
 install_dir=${base_dir}/opt/boost/${version}
 mkdir -p ${install_dir}
 
-cd boost_${ver_si_on}
+cd ${src_dir}
 ./bootstrap.sh --prefix=${install_dir} && \
 ./b2 -j ${parallel} toolset=gcc cxxflags=-w install
-
-if [ ${version} = 1.64.0 ]; then
-    # Fix: https://github.com/boostorg/serialization/commit/1d86261581230e2dc5d617a9b16287d326f3e229
-    sed -i.bak '25i\#include <boost/serialization/array_wrapper.hpp>' ${install_dir}/include/boost/serialization/array.hpp
-fi
 
 # Add modulefile
 mkdir -p ${base_dir}/modulefiles/boost
