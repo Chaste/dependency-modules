@@ -4,9 +4,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  
   setup:
-    name: Install and cache XSD versions
+    name: install and cache xsd versions
     
     strategy:
       matrix:
@@ -14,23 +13,15 @@ jobs:
       fail-fast: false
     
     runs-on: ${{ matrix.os }}
-        
-    env:
-      MODULES_DIR: ${{ github.workspace }}/modules
       
     steps:
-      - name: Checkout
+      - name: checkout
         uses: actions/checkout@v3
 
-      - name: Setup defaults
+      - name: setup defaults
         uses: ./.github/actions/setup-defaults
-        with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
           
-      - name: Install and cache xsd 4.0.0
+      - name: install and cache xsd 4.0.0
         uses: ./.github/actions/setup-xsd
         with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
           xsd_ver: 4.0.0
