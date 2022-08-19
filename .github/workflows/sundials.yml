@@ -4,9 +4,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  
   setup:
-    name: Build and cache Sundials versions
+    name: build and cache sundials versions
     
     strategy:
       matrix:
@@ -15,50 +14,34 @@ jobs:
     
     runs-on: ${{ matrix.os }}
     
-    env:
-      MODULES_DIR: ${{ github.workspace }}/modules
-    
     steps:
-      - name: Checkout
+      - name: checkout
         uses: actions/checkout@v3
 
-      - name: Setup defaults
+      - name: setup defaults
         uses: ./.github/actions/setup-defaults
-        with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
 
-      - name: Build and cache sundials 2.7.0
+      - name: build and cache sundials 2.7.0
         uses: ./.github/actions/setup-sundials
         with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
           sundials_ver: 2.7.0
 
-      - name: Build and cache sundials 3.1.0
+      - name: build and cache sundials 3.1.0
         uses: ./.github/actions/setup-sundials
         with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
           sundials_ver: 3.1.0
 
-      - name: Build and cache sundials 4.1.0
+      - name: build and cache sundials 4.1.0
         uses: ./.github/actions/setup-sundials
         with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
           sundials_ver: 4.1.0
 
-      - name: Build and cache sundials 5.8.0
+      - name: build and cache sundials 5.8.0
         uses: ./.github/actions/setup-sundials
         with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
           sundials_ver: 5.8.0
           
-      - name: Build and cache sundials 6.0.0
+      - name: build and cache sundials 6.0.0
         uses: ./.github/actions/setup-sundials
         with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ env.MODULES_DIR }}
           sundials_ver: 6.0.0
