@@ -28,6 +28,20 @@ jobs:
           os: ${{ matrix.os }}
           modules_dir: ${{ env.MODULES_DIR }}
 
+      - name: Build and cache xercesc 3.2.0
+        uses: ./.github/actions/setup-xercesc
+        with:
+          os: ${{ matrix.os }}
+          modules_dir: ${{ env.MODULES_DIR }}
+          xercesc_ver: 3.2.0
+
+      - name: Build and cache xercesc 3.2.1
+        uses: ./.github/actions/setup-xercesc
+        with:
+          os: ${{ matrix.os }}
+          modules_dir: ${{ env.MODULES_DIR }}
+          xercesc_ver: 3.2.1
+
       - name: Build and cache xercesc 3.2.2
         uses: ./.github/actions/setup-xercesc
         with:
