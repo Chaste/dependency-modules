@@ -4,9 +4,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  
   setup:
-    name: Test Ubuntu Defaults
+    name: test ubuntu defaults
     
     strategy:
       matrix:
@@ -14,65 +13,42 @@ jobs:
       fail-fast: false
     
     runs-on: ${{ matrix.os }}
-        
-    env:
-      CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
-      
+
     steps:
-      - name: Checkout
+      - name: checkout
         uses: actions/checkout@v3
 
-      - name: Setup defaults
+      - name: setup defaults
         uses: ./.github/actions/setup-defaults
-        with:
-          os: ${{ matrix.os }}
-          modules_dir: ${{ github.workspace }}/modules
-
-      - name: Get list of installed packages
-        run: dpkg-query --list | tee dpkg_list
       
-      - name: Checkout Chaste
+      - name: checkout chaste
         uses: actions/checkout@v3
         with:
           repository: Chaste/Chaste
           path: Chaste
           submodules: recursive
 
-      - name: Make build and test directories
+      - name: make build and test directories
         run: |
           mkdir -p Chaste/build
           mkdir -p ${CHASTE_TEST_OUTPUT}
 
-      - name: Get Chaste commit sha
-        working-directory: Chaste/build
-        run: echo "CHASTE_COMMIT=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-
-      - name: Cache Chaste build
-        uses: actions/cache@v2
-        id: cache-chaste
-        with:
-          path: Chaste/build
-          key: ${{ matrix.os }}-${{ env.CHASTE_COMMIT }}-${{ hashFiles('dpkg_list') }}
-
-      - name: Configure Chaste
-        if: steps.cache-chaste.outputs.cache-hit != 'true'
+      - name: configure chaste
         working-directory: Chaste/build
         run: cmake -DCMAKE_BUILD_TYPE=Release ..
           
-      - name: Compile Chaste build info
-        if: steps.cache-chaste.outputs.cache-hit != 'true'
+      - name: compile chaste build info
         working-directory: Chaste/build
         run: cmake --build . --parallel $(nproc) --target TestChasteBuildInfo
 
-      - name: Get Chaste build info
+      - name: get chaste build info
         working-directory: Chaste/build
         run: ctest -j $(nproc) -V -R TestChasteBuildInfo --output-on-failure | tee buildinfo
 
-      - name: Build Continuous test pack
-        if: steps.cache-chaste.outputs.cache-hit != 'true'
+      - name: build continuous test pack
         working-directory: Chaste/build
         run: cmake --build . --parallel $(nproc) --target Continuous
           
-      - name: Run Continuous test pack
+      - name: run continuous test pack
         working-directory: Chaste/build
         run: ctest -j $(nproc) -L Continuous --output-on-failure
