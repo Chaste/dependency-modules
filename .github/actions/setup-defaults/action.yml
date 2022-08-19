@@ -13,7 +13,7 @@ runs:
 
     - name: install dependencies
       working-directory: ${{ github.workspace }}
-      run: ./scripts/setup_${{ env.OS_VERSION }}.sh
+      run: sudo ./scripts/setup_${{ env.OS_VERSION }}.sh
       shell: bash
         
     - name: configure environment modules
