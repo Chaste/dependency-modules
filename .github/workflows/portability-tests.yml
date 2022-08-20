@@ -153,6 +153,8 @@ jobs:
           mkdir -p Chaste/build
           cd Chaste/build
           nice -n 10 cmake \
+            -DBoost_NO_BOOST_CMAKE=ON \
+            -DBoost_NO_SYSTEM_PATHS=ON \
             -DBOOST_ROOT=${BOOST_ROOT} \
             -DVTK_DIR=${VTK_ROOT} \
             -DCMAKE_PREFIX_PATH=${XERCESC_ROOT} \
