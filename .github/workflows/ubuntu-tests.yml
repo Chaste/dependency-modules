@@ -97,13 +97,12 @@ jobs:
           module load petsc_hdf5/${{ matrix.petsc_ver }}_${{ matrix.hdf5_ver }}/${{ matrix.petsc_arch }}
 
           cmake \
-              -DBoost_NO_BOOST_CMAKE=ON \
-              -DBoost_NO_SYSTEM_PATHS=ON \
-              -DBOOST_ROOT=${BOOST_ROOT} \
-              -DVTK_DIR=${VTK_ROOT} \
-              -DCMAKE_PREFIX_PATH=${XERCESC_ROOT} \
-              -DCMAKE_BUILD_TYPE=Release \
-              ..
+            -DBoost_NO_BOOST_CMAKE=ON \
+            -DBoost_NO_SYSTEM_PATHS=ON \
+            -DBOOST_ROOT=${BOOST_ROOT} \
+            -DCMAKE_PREFIX_PATH="${SUNDIALS_ROOT};${VTK_ROOT};${XERCESC_ROOT};${XSD_ROOT}" \
+            -DCMAKE_BUILD_TYPE=Release \
+            ..
 
           cmake --build . --parallel $(nproc) --target TestChasteBuildInfo
 
