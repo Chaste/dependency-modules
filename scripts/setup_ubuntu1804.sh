@@ -44,6 +44,10 @@ apt-get install -y --no-install-recommends \
     tcl \
     environment-modules
 
+# https://bugs.launchpad.net/ubuntu/+source/vtk7/+bug/1878103
+# https://github.com/Chaste/chaste-docker/blob/4dd5a4819716c3defa0bfb5145bfa902bf07ecf4/Dockerfile#L89
+update-alternatives --install /usr/bin/vtk vtk /usr/bin/vtk7 10
+
 update-alternatives --install /usr/local/bin/python python /usr/bin/python3 10
 update-alternatives --install /usr/local/bin/pip pip /usr/bin/pip3 10
 
