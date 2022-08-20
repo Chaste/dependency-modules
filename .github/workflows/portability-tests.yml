@@ -61,69 +61,78 @@ jobs:
       - name: setup xsd
         run: |
           . ./modulesinit.sh
-          if ! $(module is-avail xsd/${{ matrix.xsd_ver }}); then
+          err=0 && module test xsd/${{ matrix.xsd_ver }} || err=$?
+          if [ $err -ne 0 ]; then
             nice -n 10 install_xsd.sh \
               --version=${{ matrix.xsd_ver }} \
               --modules-dir=${{ env.MODULES_DIR }}
+            module test xsd/${{ matrix.xsd_ver }}
           fi
-          module test xsd/${{ matrix.xsd_ver }}
 
       - name: setup xercesc
         run: |
           . ./modulesinit.sh
-          if ! $(module is-avail xercesc/${{ matrix.xercesc_ver }}); then
+          err=0 && module test xercesc/${{ matrix.xercesc_ver }} || err=$?
+          if [ $err -ne 0 ]; then
             nice -n 10 install_xercesc.sh \
               --version=${{ matrix.xercesc_ver }} \
               --modules-dir=${{ env.MODULES_DIR }} \
               --parallel=${{ env.NCPU }}
+            module test xercesc/${{ matrix.xercesc_ver }}
           fi
-          module test xercesc/${{ matrix.xercesc_ver }}
 
       - name: setup sundials
         run: |
           . ./modulesinit.sh
-          if ! $(module is-avail sundials/${{ matrix.sundials_ver }}); then
+          err=0 && module test sundials/${{ matrix.sundials_ver }} || err=$?
+          if [ $err -ne 0 ]; then
             nice -n 10 install_sundials.sh \
               --version=${{ matrix.sundials_ver }} \
               --modules-dir=${{ env.MODULES_DIR }} \
               --parallel=${{ env.NCPU }}
+            module test sundials/${{ matrix.sundials_ver }}
           fi
-          module test sundials/${{ matrix.sundials_ver }}
 
       - name: setup boost
         run: |
           . ./modulesinit.sh
-          if ! $(module is-avail boost/${{ matrix.boost_ver }}); then
+          err=0 && module test boost/${{ matrix.boost_ver }} || err=$?
+          if [ $err -ne 0 ]; then
             nice -n 10 install_boost.sh \
               --version=${{ matrix.boost_ver }} \
               --modules-dir=${{ env.MODULES_DIR }} \
               --parallel=${{ env.NCPU }}
+            module test boost/${{ matrix.boost_ver }}
           fi
-          module test boost/${{ matrix.boost_ver }}
 
       - name: setup vtk
         run: |
           . ./modulesinit.sh
-          if ! $(module is-avail vtk/${{ matrix.vtk_ver }}); then
+          err=0 && module test vtk/${{ matrix.vtk_ver }} || err=$?
+          if [ $err -ne 0 ]; then
             nice -n 10 install_vtk.sh \
               --version=${{ matrix.vtk_ver }} \
               --modules-dir=${{ env.MODULES_DIR }} \
               --parallel=${{ env.NCPU }}
+            module test vtk/${{ matrix.vtk_ver }}
           fi
-          module test vtk/${{ matrix.vtk_ver }}
 
       - name: setup petsc_hdf5
         run: |
           . ./modulesinit.sh
-          if ! $(module is-avail petsc_hdf5/${{ matrix.petsc_ver }}_${{ matrix.hdf5_ver }}/${{ matrix.petsc_arch }}); then
+          err=0 && module test \
+            petsc_hdf5/${{ matrix.petsc_ver }}_${{ matrix.hdf5_ver }}/${{ matrix.petsc_arch }}) \
+            || err=$?
+          if [ $err -ne 0 ]; then
             nice -n 10 install_petsc_hdf5.sh \
               --petsc-version=${{ matrix.petsc_ver }} \
               --hdf5-version=${{ matrix.hdf5_ver }} \
               --petsc-arch=${{ matrix.petsc_arch }} \
               --modules-dir=${{ env.MODULES_DIR }} \
               --parallel=${{ env.NCPU }}
+            module test \
+              petsc_hdf5/${{ matrix.petsc_ver }}_${{ matrix.hdf5_ver }}/${{ matrix.petsc_arch }}
           fi
-          module test petsc_hdf5/${{ matrix.petsc_ver }}_${{ matrix.hdf5_ver }}/${{ matrix.petsc_arch }}
 
       - name: add versions to modules init script
         run: |
