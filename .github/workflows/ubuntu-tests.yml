@@ -27,7 +27,7 @@ jobs:
             boost_ver: 1.62.0
             vtk_ver: 6.3.0
             petsc_ver: 3.7.7
-            hdf5_ver: 1.10.0
+            hdf5_ver: 1.10.0-patch1
             petsc_arch: linux-gnu
 
       fail-fast: false
