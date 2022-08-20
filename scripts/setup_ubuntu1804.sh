@@ -17,6 +17,7 @@
 
 export DEBIAN_FRONTEND=noninteractive
 
+# https://chaste.cs.ox.ac.uk/trac/wiki/InstallGuides/UbuntuPackage
 echo "deb http://www.cs.ox.ac.uk/chaste/ubuntu bionic/" > /etc/apt/sources.list.d/chaste.list
 apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 422C4D99
 
