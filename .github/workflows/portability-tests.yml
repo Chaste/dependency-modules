@@ -120,7 +120,7 @@ jobs:
       - name: setup petsc_hdf5
         run: |
           . ./modulesinit.sh
-          err=0 && module test petsc_hdf5/${{ matrix.petsc_ver }}_${{ matrix.hdf5_ver }}/${{ matrix.petsc_arch }}) || err=$?
+          err=0 && module test petsc_hdf5/${{ matrix.petsc_ver }}_${{ matrix.hdf5_ver }}/${{ matrix.petsc_arch }} || err=$?
           if [ $err -ne 0 ]; then
             nice -n 10 install_petsc_hdf5.sh \
               --petsc-version=${{ matrix.petsc_ver }} \
