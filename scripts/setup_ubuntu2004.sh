@@ -22,6 +22,7 @@ apt-get install -y --no-install-recommends \
     mencoder \
     python3-dev \
     python3-pip \
+    python2.7 \
     libffi-dev \
     environment-modules
 

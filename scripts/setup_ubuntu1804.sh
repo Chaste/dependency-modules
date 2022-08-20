@@ -24,6 +24,7 @@ apt-get install -y --no-install-recommends \
     python3-venv \
     python3-dev \
     python3-pip \
+    python2.7 \
     libffi-dev \
     tcl \
     environment-modules
