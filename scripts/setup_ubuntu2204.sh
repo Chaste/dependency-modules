@@ -1,5 +1,18 @@
 #!/bin/sh
 
+# Package: chaste-dependencies
+# Version: 2022.04.11
+# Depends: cmake | scons, g++, libopenmpi-dev, petsc-dev, libhdf5-openmpi-dev,
+#     xsdcxx, libboost-serialization-dev, libboost-filesystem-dev,
+#     libboost-program-options-dev, libparmetis-dev, libmetis-dev,
+#     libxerces-c-dev, libsundials-dev, libvtk7-dev | libvtk6-dev,
+#     python3, python3-venv
+# Recommends: git, valgrind, libpetsc-real3.15-dbg | libpetsc-real3.14-dbg |
+#     libpetsc-real3.12-dbg, libfltk1.1, hdf5-tools, cmake-curses-gui
+# Suggests: libgoogle-perftools-dev, doxygen, graphviz, subversion, git-svn,
+#     gnuplot, paraview
+# APT-Sources: http://www.cs.ox.ac.uk/chaste/ubuntu jammy/ Packages
+
 export DEBIAN_FRONTEND=noninteractive
 
 echo "deb [signed-by=/usr/share/keyrings/chaste.asc] http://www.cs.ox.ac.uk/chaste/ubuntu jammy/" > /etc/apt/sources.list.d/chaste.list
