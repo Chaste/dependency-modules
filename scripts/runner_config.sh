@@ -132,8 +132,10 @@ group="${RUNNER_GROUP:-}"
 
 # Set unattended defaults
 if [ -n "${unattended}" ]; then
+    os_id="$(cat /etc/os-release | grep ^ID= | cut -d= -f2)"
+    os_ver="$(cat /etc/os-release | grep ^VERSION_CODENAME= | cut -d= -f2)"
     name="${name:-$(openssl rand -hex 6)}"
-    labels="${labels:-self-hosted}"
+    labels="${labels:-self-hosted,${os_id}-${os_ver}}"
     group="${group:-Default}"
 fi
 
