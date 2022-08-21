@@ -14,7 +14,7 @@ ENV RUNNER_WORK_DIR="${DEFAULT_HOME}/_work"
 
 ENV MODULES_DIR="${DEFAULT_HOME}/modules"
 
-COPY scripts/* /usr/local/bin/
+COPY scripts/ /usr/local/bin/
 
 RUN useradd -r -m -d ${DEFAULT_HOME} -s /bin/bash ${DEFAULT_USER} && \
     export DEBIAN_FRONTEND=noninteractive && \

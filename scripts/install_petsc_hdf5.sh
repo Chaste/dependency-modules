@@ -264,6 +264,8 @@ prepend-path    INCLUDE              ${install_dir}/${petsc_arch}/include
 prepend-path    C_INCLUDE_PATH       ${install_dir}/${petsc_arch}/include
 prepend-path    CPLUS_INCLUDE_PATH   ${install_dir}/${petsc_arch}/include
 
+prepend-path    CMAKE_PREFIX_PATH    ${install_dir}/${petsc_arch}
+
 setenv          HDF5_ROOT            ${install_dir}/${petsc_arch}
 setenv          PARMETIS_ROOT        ${install_dir}/${petsc_arch}
 

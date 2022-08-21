@@ -27,7 +27,7 @@ jobs:
             boost_ver: 1.62.0
             vtk_ver: 6.3.0
             petsc_ver: 3.7.7
-            hdf5_ver: 1.10.0
+            hdf5_ver: 1.10.0-patch1
             petsc_arch: linux-gnu
 
       fail-fast: false
@@ -97,31 +97,39 @@ jobs:
           module load petsc_hdf5/${{ matrix.petsc_ver }}_${{ matrix.hdf5_ver }}/${{ matrix.petsc_arch }}
 
           cmake \
-              -DBOOST_ROOT=${BOOST_ROOT} \
-              -DVTK_DIR=${VTK_ROOT} \
-              -DCMAKE_PREFIX_PATH=${XERCESC_ROOT} \
-              -DCMAKE_BUILD_TYPE=Release \
-              ..
+            -DBoost_NO_BOOST_CMAKE=ON \
+            -DBoost_NO_SYSTEM_PATHS=ON \
+            -DBOOST_ROOT=${BOOST_ROOT} \
+            -DCMAKE_PREFIX_PATH="${SUNDIALS_ROOT};${VTK_ROOT};${XERCESC_ROOT};${XSD_ROOT}" \
+            -DCMAKE_BUILD_TYPE=Release \
+            ..
 
           cmake --build . --parallel $(nproc) --target TestChasteBuildInfo
 
           ctest -V -R TestChasteBuildInfo --output-on-failure | tee buildinfo
-        shell: bash --login -e -o pipefail {0}  # login to load /etc/profile.d/modules.sh
+        shell: bash --login -e -o pipefail {0}  # login to source /etc/profile.d/modules.sh
 
       - name: verify dependency versions
         working-directory: Chaste/build
         run: |
-          vtk_arr=($(echo "${{ matrix.vtk_ver }}" | sed -e 's/\./ /g'))
-          vtk_major=${vtk_arr[0]}
-          vtk_minor=${vtk_arr[1]}
+          sed -i.bak 's/"//g' buildinfo  # removes quotes from old sundials versions
 
-          sed -i.bak 's/"//g' buildinfo  # removes quotes from some sundials versions
+          maj_min_rev='^[0-9]\+\.[0-9]\+\.[0-9]\+'
+          maj_min='^[0-9]\+\.[0-9]\+'
 
-          grep "<XSD>${{ matrix.xsd_ver }}</XSD>" buildinfo || exit 1
-          grep "<Xerces>${{ matrix.xercesc_ver }}</Xerces>" buildinfo || exit 2
-          grep "<SUNDIALS>${{ matrix.sundials_ver }}</SUNDIALS>" buildinfo || exit 3
-          grep "<Boost>${{ matrix.boost_ver }}</Boost>" buildinfo || exit 4
-          grep "<VTK>${vtk_major}.${vtk_minor}</VTK>" buildinfo || exit 5
-          grep "<PETSc>${{ matrix.petsc_ver }}</PETSc>" buildinfo || exit 6
-          grep "<HDF5>${{ matrix.hdf5_ver }}</HDF5>" buildinfo || exit 7
+          xsd_ver="$(echo ${{ matrix.xsd_ver }} | grep -o ${maj_min_rev})"
+          xercesc_ver="$(echo ${{ matrix.xercesc_ver }} | grep -o ${maj_min_rev})"
+          sundials_ver="$(echo ${{ matrix.sundials_ver }} | grep -o ${maj_min_rev})"
+          boost_ver="$(echo ${{ matrix.boost_ver }} | grep -o ${maj_min_rev})"
+          vtk_ver="$(echo ${{ matrix.vtk_ver }} | grep -o ${maj_min})"
+          petsc_ver="$(echo ${{ matrix.petsc_ver }} | grep -o ${maj_min_rev})"
+          hdf5_ver="$(echo ${{ matrix.hdf5_ver }} | grep -o ${maj_min_rev})"
+
+          grep "<XSD>${xsd_ver}</XSD>" buildinfo
+          grep "<Xerces>${xercesc_ver}</Xerces>" buildinfo
+          grep "<SUNDIALS>${sundials_ver}</SUNDIALS>" buildinfo
+          grep "<Boost>${boost_ver}</Boost>" buildinfo
+          grep "<VTK>${vtk_ver}</VTK>" buildinfo
+          grep "<PETSc>${petsc_ver}</PETSc>" buildinfo
+          grep "<HDF5>${hdf5_ver}</HDF5>" buildinfo
         shell: bash

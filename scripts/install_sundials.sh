@@ -103,5 +103,7 @@ prepend-path    INCLUDE              ${install_dir}/include
 prepend-path    C_INCLUDE_PATH       ${install_dir}/include
 prepend-path    CPLUS_INCLUDE_PATH   ${install_dir}/include
 
+prepend-path    CMAKE_PREFIX_PATH    ${install_dir}
+
 conflict sundials
 EOF

@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-# Start `module` command
+# Source `module` command
 source /etc/profile.d/modules.sh
 
 # Prepare modules base directory
@@ -17,55 +17,29 @@ ncpu=$(( $(nproc) < 8 ? $(nproc) : 8 ))
 
 # Install specific dependency versions
 ./install_cmake.sh --version=3.9.1 --modules-dir=${modules_dir} --parallel=${ncpu}
+module test cmake/3.9.1
 module load cmake/3.9.1
 
 ./install_xsd.sh --version=4.0.0 --modules-dir=${modules_dir}
+module test xsd/4.0.0
 
 ./install_xercesc.sh --version=3.2.3 --modules-dir=${modules_dir} --parallel=${ncpu}
+module test xercesc/3.2.3
 
 ./install_sundials.sh --version=5.8.0 --modules-dir=${modules_dir} --parallel=${ncpu}
+module test sundials/5.8.0
 
 ./install_boost.sh --version=1.74.0 --modules-dir=${modules_dir} --parallel=${ncpu}
+module test boost/1.74.0
 
 ./install_vtk.sh --version=9.1.0 --modules-dir=${modules_dir} --parallel=${ncpu}
-
-# For PETSc versions < 3.11.x configuration needs Python 2
-./install_python.sh --version=2.7.18 --modules-dir=${modules_dir} --parallel=${ncpu}
-module load python/2.7.18
-
-# PETSc 3.7.7 + HDF5 1.10.0-patch1 + MPICH 3.3
-./install_petsc_hdf5.sh \
-    --petsc-version=3.7.7 \
-    --hdf5-version=1.10.0-patch1 \
-    --petsc-arch=linux-gnu \
-    --mpich-version=3.3 \
-    --modules-dir=${modules_dir} \
-    --parallel=${ncpu}
-
-./install_petsc_hdf5.sh \
-    --petsc-version=3.7.7 \
-    --hdf5-version=1.10.0-patch1 \
-    --petsc-arch=linux-gnu-opt \
-    --mpich-version=3.3 \
-    --modules-dir=${modules_dir} \
-    --parallel=${ncpu}
-
-# For PETSc versions >= 3.11.x configuration supports Python 3
-module unload python
-
-# PETSc 3.11.3 + HDF5 1.10.5 + MPICH 3.3
-./install_petsc_hdf5.sh \
-    --petsc-version=3.11.3 \
-    --hdf5-version=1.10.5 \
-    --petsc-arch=linux-gnu \
-    --mpich-version=3.3 \
-    --modules-dir=${modules_dir} \
-    --parallel=${ncpu}
+module test vtk/9.1.0
 
 ./install_petsc_hdf5.sh \
     --petsc-version=3.11.3 \
     --hdf5-version=1.10.5 \
-    --petsc-arch=linux-gnu-opt \
-    --mpich-version=3.3 \
+    --petsc-arch=linux-gnu \
     --modules-dir=${modules_dir} \
     --parallel=${ncpu}
+
+module test petsc_hdf5/3.11.3_1.10.5/linux-gnu

@@ -10,26 +10,26 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-20.04
+          - os: ubuntu-focal
             xsd_ver: 4.0.0
             xercesc_ver: 3.2.3
-            sundials_ver: 5.8.0
+            sundials_ver: 6.0.0
             boost_ver: 1.74.0
             vtk_ver: 9.1.0
-            petsc_ver: 3.11.3
-            hdf5_ver: 1.10.5
+            petsc_ver: 3.12.4
+            hdf5_ver: 1.10.4
             petsc_arch: linux-gnu
-            
-          - os: ubuntu-20.04
+
+          - os: ubuntu-focal
             xsd_ver: 4.0.0
             xercesc_ver: 3.2.0
             sundials_ver: 4.1.0
-            boost_ver: 1.69.0
-            vtk_ver: 8.2.0
-            petsc_ver: 3.10.5
-            hdf5_ver: 1.10.9
+            boost_ver: 1.62.0
+            vtk_ver: 6.3.0
+            petsc_ver: 3.7.7
+            hdf5_ver: 1.10.0-patch1
             petsc_arch: linux-gnu
-            
+
       fail-fast: false
 
     runs-on: [self-hosted, '${{ matrix.os }}']
@@ -61,69 +61,75 @@ jobs:
       - name: setup xsd
         run: |
           . ./modulesinit.sh
-          if ! $(module is-avail xsd/${{ matrix.xsd_ver }}); then
+          err=0 && module test xsd/${{ matrix.xsd_ver }} || err=$?
+          if [ $err -ne 0 ]; then
             nice -n 10 install_xsd.sh \
               --version=${{ matrix.xsd_ver }} \
               --modules-dir=${{ env.MODULES_DIR }}
+            module test xsd/${{ matrix.xsd_ver }}
           fi
-          module test xsd/${{ matrix.xsd_ver }}
 
       - name: setup xercesc
         run: |
           . ./modulesinit.sh
-          if ! $(module is-avail xercesc/${{ matrix.xercesc_ver }}); then
+          err=0 && module test xercesc/${{ matrix.xercesc_ver }} || err=$?
+          if [ $err -ne 0 ]; then
             nice -n 10 install_xercesc.sh \
               --version=${{ matrix.xercesc_ver }} \
               --modules-dir=${{ env.MODULES_DIR }} \
               --parallel=${{ env.NCPU }}
+            module test xercesc/${{ matrix.xercesc_ver }}
           fi
-          module test xercesc/${{ matrix.xercesc_ver }}
 
       - name: setup sundials
         run: |
           . ./modulesinit.sh
-          if ! $(module is-avail sundials/${{ matrix.sundials_ver }}); then
+          err=0 && module test sundials/${{ matrix.sundials_ver }} || err=$?
+          if [ $err -ne 0 ]; then
             nice -n 10 install_sundials.sh \
               --version=${{ matrix.sundials_ver }} \
               --modules-dir=${{ env.MODULES_DIR }} \
               --parallel=${{ env.NCPU }}
+            module test sundials/${{ matrix.sundials_ver }}
           fi
-          module test sundials/${{ matrix.sundials_ver }}
 
       - name: setup boost
         run: |
           . ./modulesinit.sh
-          if ! $(module is-avail boost/${{ matrix.boost_ver }}); then
+          err=0 && module test boost/${{ matrix.boost_ver }} || err=$?
+          if [ $err -ne 0 ]; then
             nice -n 10 install_boost.sh \
               --version=${{ matrix.boost_ver }} \
               --modules-dir=${{ env.MODULES_DIR }} \
               --parallel=${{ env.NCPU }}
+            module test boost/${{ matrix.boost_ver }}
           fi
-          module test boost/${{ matrix.boost_ver }}
 
       - name: setup vtk
         run: |
           . ./modulesinit.sh
-          if ! $(module is-avail vtk/${{ matrix.vtk_ver }}); then
+          err=0 && module test vtk/${{ matrix.vtk_ver }} || err=$?
+          if [ $err -ne 0 ]; then
             nice -n 10 install_vtk.sh \
               --version=${{ matrix.vtk_ver }} \
               --modules-dir=${{ env.MODULES_DIR }} \
               --parallel=${{ env.NCPU }}
+            module test vtk/${{ matrix.vtk_ver }}
           fi
-          module test vtk/${{ matrix.vtk_ver }}
 
       - name: setup petsc_hdf5
         run: |
           . ./modulesinit.sh
-          if ! $(module is-avail petsc_hdf5/${{ matrix.petsc_ver }}_${{ matrix.hdf5_ver }}/${{ matrix.petsc_arch }}); then
+          err=0 && module test petsc_hdf5/${{ matrix.petsc_ver }}_${{ matrix.hdf5_ver }}/${{ matrix.petsc_arch }} || err=$?
+          if [ $err -ne 0 ]; then
             nice -n 10 install_petsc_hdf5.sh \
               --petsc-version=${{ matrix.petsc_ver }} \
               --hdf5-version=${{ matrix.hdf5_ver }} \
               --petsc-arch=${{ matrix.petsc_arch }} \
               --modules-dir=${{ env.MODULES_DIR }} \
               --parallel=${{ env.NCPU }}
+            module test petsc_hdf5/${{ matrix.petsc_ver }}_${{ matrix.hdf5_ver }}/${{ matrix.petsc_arch }}
           fi
-          module test petsc_hdf5/${{ matrix.petsc_ver }}_${{ matrix.hdf5_ver }}/${{ matrix.petsc_arch }}
 
       - name: add versions to modules init script
         run: |
@@ -147,9 +153,10 @@ jobs:
           mkdir -p Chaste/build
           cd Chaste/build
           nice -n 10 cmake \
+            -DBoost_NO_BOOST_CMAKE=ON \
+            -DBoost_NO_SYSTEM_PATHS=ON \
             -DBOOST_ROOT=${BOOST_ROOT} \
-            -DVTK_DIR=${VTK_ROOT} \
-            -DCMAKE_PREFIX_PATH=${XERCESC_ROOT} \
+            -DCMAKE_PREFIX_PATH="${SUNDIALS_ROOT};${VTK_ROOT};${XERCESC_ROOT};${XSD_ROOT}" \
             -DCMAKE_BUILD_TYPE=Release \
             ..
 
@@ -163,19 +170,26 @@ jobs:
       - name: verify dependency versions
         run: |
           cd Chaste/build
-          vtk_arr=($(echo "${{ matrix.vtk_ver }}" | sed -e 's/\./ /g'))
-          vtk_major=${vtk_arr[0]}
-          vtk_minor=${vtk_arr[1]}
-
           sed -i.bak 's/"//g' buildinfo  # removes quotes from old sundials versions
 
-          grep "<XSD>${{ matrix.xsd_ver }}</XSD>" buildinfo || exit 1
-          grep "<Xerces>${{ matrix.xercesc_ver }}</Xerces>" buildinfo || exit 2
-          grep "<SUNDIALS>${{ matrix.sundials_ver }}</SUNDIALS>" buildinfo || exit 3
-          grep "<Boost>${{ matrix.boost_ver }}</Boost>" buildinfo || exit 4
-          grep "<VTK>${vtk_major}.${vtk_minor}</VTK>" buildinfo || exit 5
-          grep "<PETSc>${{ matrix.petsc_ver }}</PETSc>" buildinfo || exit 6
-          grep "<HDF5>${{ matrix.hdf5_ver }}</HDF5>" buildinfo || exit 7
+          maj_min_rev='^[0-9]\+\.[0-9]\+\.[0-9]\+'
+          maj_min='^[0-9]\+\.[0-9]\+'
+
+          xsd_ver="$(echo ${{ matrix.xsd_ver }} | grep -o ${maj_min_rev})"
+          xercesc_ver="$(echo ${{ matrix.xercesc_ver }} | grep -o ${maj_min_rev})"
+          sundials_ver="$(echo ${{ matrix.sundials_ver }} | grep -o ${maj_min_rev})"
+          boost_ver="$(echo ${{ matrix.boost_ver }} | grep -o ${maj_min_rev})"
+          vtk_ver="$(echo ${{ matrix.vtk_ver }} | grep -o ${maj_min})"
+          petsc_ver="$(echo ${{ matrix.petsc_ver }} | grep -o ${maj_min_rev})"
+          hdf5_ver="$(echo ${{ matrix.hdf5_ver }} | grep -o ${maj_min_rev})"
+
+          grep "<XSD>${xsd_ver}</XSD>" buildinfo
+          grep "<Xerces>${xercesc_ver}</Xerces>" buildinfo
+          grep "<SUNDIALS>${sundials_ver}</SUNDIALS>" buildinfo
+          grep "<Boost>${boost_ver}</Boost>" buildinfo
+          grep "<VTK>${vtk_ver}</VTK>" buildinfo
+          grep "<PETSc>${petsc_ver}</PETSc>" buildinfo
+          grep "<HDF5>${hdf5_ver}</HDF5>" buildinfo
 
       - name: build core libraries
         run: |
