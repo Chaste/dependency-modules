@@ -84,5 +84,7 @@ prepend-path    LIBRARY_PATH         ${install_dir}/libxsd
 prepend-path    LD_LIBRARY_PATH      ${install_dir}/libxsd
 prepend-path    LD_RUN_PATH          ${install_dir}/libxsd
 
+prepend-path    CMAKE_PREFIX_PATH    ${install_dir}
+
 conflict xsd
 EOF

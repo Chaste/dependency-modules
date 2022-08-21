@@ -125,5 +125,7 @@ prepend-path    INCLUDE              ${install_dir}/include/vtk-${major}.${minor
 prepend-path    C_INCLUDE_PATH       ${install_dir}/include/vtk-${major}.${minor}
 prepend-path    CPLUS_INCLUDE_PATH   ${install_dir}/include/vtk-${major}.${minor}
 
+prepend-path    CMAKE_PREFIX_PATH    ${install_dir}
+
 conflict vtk
 EOF
