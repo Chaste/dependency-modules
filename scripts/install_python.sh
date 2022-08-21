@@ -61,7 +61,9 @@ install_dir=${base_dir}/opt/python/${version}
 mkdir -p ${install_dir}
 
 cd Python-${version}
-./configure --prefix=${install_dir} && \
+./configure \
+     --enable-optimizations \
+     --prefix=${install_dir} && \
 make -j ${parallel} && \
 make install
 
