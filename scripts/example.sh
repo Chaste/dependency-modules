@@ -1,24 +1,34 @@
 #!/bin/bash -e
 
+# Install Environment Modules
+sudo apt-get install tcl environment-modules
+
 # Source `module` command
 source /etc/profile.d/modules.sh
 
-# Prepare modules base directory
+# Create base directories for installing modules
 modules_dir=${HOME}/modules
+mkdir -p ${modules_dir}/src
+mkdir -p ${modules_dir}/opt
 mkdir -p ${modules_dir}/modulefiles
 
-# Add modulefiles directory to user profile configuration
-grep -qxF "module use ${modules_dir}/modulefiles" ${HOME}/.bashrc \
-    || echo "module use ${modules_dir}/modulefiles" >> ${HOME}/.bashrc
-source ${HOME}/.bashrc
+# Add modulefiles directory to MODULEPATH
+module use ${modules_dir}/modulefiles
 
-# Set max number of parallel processes
+# Add modulefiles directory to bash user profile configuration
+echo "module use ${modules_dir}/modulefiles" >> ${HOME}/.bashrc
+
+# Set number of parallel processes
 ncpu=$(( $(nproc) < 8 ? $(nproc) : 8 ))
 
+# Get install scripts
+git clone https://github.com/Chaste/dependency-modules.git /tmp/dependency-modules
+cd /tmp/dependency-modules/scripts
+
 # Install specific dependency versions
-./install_cmake.sh --version=3.9.1 --modules-dir=${modules_dir} --parallel=${ncpu}
-module test cmake/3.9.1
-module load cmake/3.9.1
+./install_cmake.sh --version=3.24.1 --modules-dir=${modules_dir} --parallel=${ncpu}
+module test cmake/3.24.1
+module load cmake/3.24.1
 
 ./install_xsd.sh --version=4.0.0 --modules-dir=${modules_dir}
 module test xsd/4.0.0
@@ -43,3 +53,8 @@ module test vtk/9.1.0
     --parallel=${ncpu}
 
 module test petsc_hdf5/3.11.3_1.10.5/linux-gnu
+
+# Cleanup
+cd -
+rm -rf ${modules_dir}/src/*
+rm -rf /tmp/dependency-modules
