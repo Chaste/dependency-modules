@@ -1,15 +1,18 @@
 #!/bin/bash -e
 
 if [ -n "${RUNNER_REMOVE}" ]; then
+    echo "Removing runner ..."
     runner_config.sh
     exit 0
 fi
 
-if [ ! -d "${RUNNER_DIR}" ]; then
+if [ ! -f "${RUNNER_DIR}/config.sh" ]; then
+    echo "Installing runner ..."
     runner_install.sh --install_dir="${RUNNER_DIR}"
 fi
 
 if [ ! -f "${RUNNER_DIR}/.runner" ]; then
+    echo "Configuring runner ..."
     runner_config.sh
 fi
 
