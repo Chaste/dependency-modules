@@ -6,47 +6,22 @@ throw_error()
     exit 1
 }
 
-# Get unattended
-unattended="${RUNNER_UNATTENDED:-}"
-
-if [ -z "${unattended}" ]; then
-    unattended=
-elif [ "${unattended}" -eq 0 ]; then
-    unattended=
-else
-    unattended="--unattended"
-fi
-
 # Get runner_dir
 runner_dir="${RUNNER_DIR:-}"
 
-if [[ (-z "${runner_dir}") && (-z "${unattended}") ]]; then
+if [ ! -d "${runner_dir}" ]; then
     echo -n "Enter path to actions-runner: "
     read runner_dir
 fi
 
-if [ -z "${runner_dir}" ]; then
+if [ ! -d "${runner_dir}" ]; then
     throw_error "RUNNER_DIR not specified"
-fi
-
-# Get personal access token
-pa_token="${RUNNER_PA_TOKEN-}"
-unset RUNNER_PA_TOKEN
-
-if [[ (-z "${pa_token}") && (-z "${unattended}") ]]; then
-    echo -n "Enter access token: "
-    read -s pa_token
-    echo
-fi
-
-if [ -z "${pa_token}" ]; then
-    throw_error "RUNNER_PA_TOKEN not provided"
 fi
 
 # Get scope
 scope="${RUNNER_SCOPE:-}"
 
-if [[ (-z "${scope}") && (-z "${unattended}") ]]; then
+if [ -z "${scope}" ]; then
     echo -n "Enter the runner scope (org or repo): [press Enter for org] "
     read scope
 fi
@@ -61,7 +36,7 @@ fi
 # Get org
 org="${RUNNER_ORG:-}"
 
-if [[ (-z "${org}") && (-z "${unattended}") ]]; then
+if [ -z "${org}" ]; then
     echo -n "Enter the org/owner name: "
     read org
 fi
@@ -74,7 +49,7 @@ fi
 repo="${RUNNER_REPO:-}"
 
 if [ "${scope}" = "repo" ]; then
-    if [[ (-z "${repo}") && (-z "${unattended}") ]]; then
+    if [ -z "${repo}" ]; then
         echo -n "Enter the repo name: "
         read repo
     fi
@@ -82,6 +57,16 @@ if [ "${scope}" = "repo" ]; then
     if [ -z ${repo} ]; then
         throw_error "RUNNER_REPO not specified"
     fi
+fi
+
+# Get personal access token
+pa_token=
+echo -n "Enter access token: "
+read -s pa_token
+echo
+
+if [ -z "${pa_token}" ]; then
+    throw_error "Access token not provided"
 fi
 
 # Runner removal
@@ -125,19 +110,16 @@ reg_token="$(curl -X POST -fsS -H "Accept: application/vnd.github+json" -H "Auth
 reg_token="$(echo ${reg_token} | jq -r .token)"
 unset pa_token
 
-# Get name, labels, group
-name="${RUNNER_NAME:-}"
-labels="${RUNNER_LABELS:-}"
-group="${RUNNER_GROUP:-}"
+# Get name
+name="${RUNNER_NAME:-$(openssl rand -hex 6)}"
 
-# Set unattended defaults
-if [ -n "${unattended}" ]; then
-    os_id="$(cat /etc/os-release | grep ^ID= | cut -d= -f2)"
-    os_ver="$(cat /etc/os-release | grep ^VERSION_CODENAME= | cut -d= -f2)"
-    name="${name:-$(openssl rand -hex 6)}"
-    labels="${labels:-self-hosted,${os_id}-${os_ver}}"
-    group="${group:-Default}"
-fi
+# Get group
+group="${RUNNER_GROUP:-Default}"
+
+# Get labels
+os_id="$(cat /etc/os-release | grep ^ID= | cut -d= -f2)"
+os_ver="$(cat /etc/os-release | grep ^VERSION_CODENAME= | cut -d= -f2)"
+labels="${RUNNER_LABELS:-self-hosted,${os_id}-${os_ver}}"
 
 # Get work_dir
 work_dir="${RUNNER_WORK_DIR:-${HOME}/_work}"
@@ -152,6 +134,6 @@ ${runner_dir}/config.sh \
     --runnergroup "${group}" \
     --labels "${labels}" \
     --work "${work_dir}" \
-    --replace ${unattended}
+    --replace
 
 unset reg_token
