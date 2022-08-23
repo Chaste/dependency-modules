@@ -47,5 +47,3 @@ curl -fsS \
 tar -xzf /tmp/actions-runner.tar.gz -C ${install_dir}
 rm -f /tmp/actions-runner.tar.gz
 
-# Install dependencies
-${install_dir}/bin/installdependencies.sh

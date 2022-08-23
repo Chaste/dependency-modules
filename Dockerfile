@@ -34,8 +34,10 @@ RUN useradd -r -m -d ${DEFAULT_HOME} -s /bin/bash ${DEFAULT_USER} && \
     . /etc/os-release && \
     os_num="$(echo ${VERSION_ID} | sed 's/\.//')" && \
     setup_ubuntu${os_num}.sh && \
-    runner_install.sh --install_dir="${RUNNER_DIR}" && \
-    chown -R ${DEFAULT_USER}:${DEFAULT_USER} ${RUNNER_DIR} && \
+    runner_install.sh --install_dir="/tmp/tmp-runner" && \
+    /tmp/tmp-runner/bin/installdependencies.sh && \
+    mkdir -p ${MODULES_DIR}/src && \
+    mkdir -p ${MODULES_DIR}/opt && \
     mkdir -p ${MODULES_DIR}/modulefiles && \
     echo "module use ${MODULES_DIR}/modulefiles" >> ${DEFAULT_HOME}/.bashrc && \
     chown -R ${DEFAULT_USER}:${DEFAULT_USER} ${MODULES_DIR} && \

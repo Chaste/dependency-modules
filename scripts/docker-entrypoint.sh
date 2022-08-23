@@ -1,15 +1,21 @@
 #!/bin/bash -e
 
 if [ -n "${RUNNER_REMOVE}" ]; then
+    echo "Removing runner ..."
     runner_config.sh
-    unset RUNNER_PA_TOKEN
     exit 0
 fi
 
+if [ ! -f "${RUNNER_DIR}/config.sh" ]; then
+    echo "Installing runner ..."
+    runner_install.sh --install_dir="${RUNNER_DIR}"
+    while read -t 1; do :; done  # skip inputs while installing
+fi
+
 if [ ! -f "${RUNNER_DIR}/.runner" ]; then
+    echo "Configuring runner ..."
     runner_config.sh
 fi
-unset RUNNER_PA_TOKEN
 
 if [ ! -f "${RUNNER_DIR}/.runner" ]; then
     echo "Runner has not been configured"
