@@ -9,6 +9,7 @@ fi
 if [ ! -f "${RUNNER_DIR}/config.sh" ]; then
     echo "Installing runner ..."
     runner_install.sh --install_dir="${RUNNER_DIR}"
+    while read -t 1; do :; done  # skip inputs while installing
 fi
 
 if [ ! -f "${RUNNER_DIR}/.runner" ]; then
