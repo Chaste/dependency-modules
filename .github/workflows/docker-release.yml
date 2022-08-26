@@ -29,7 +29,7 @@ jobs:
           context: .
           pull: true
           load: true
-          build-args: BASE:focal
+          build-args: BASE=focal
           tags: |
             chaste/runner:focal
             chaste/runner:latest
@@ -45,7 +45,7 @@ jobs:
           context: .
           pull: true
           push: true
-          build-args: BASE:focal
+          build-args: BASE=focal
           tags: |
             chaste/runner:focal
             chaste/runner:latest
