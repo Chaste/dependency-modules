@@ -87,7 +87,7 @@ jobs:
             hdf5_ver=1.10.7
             petsc_arch=linux-gnu
             ;;
-          7)
+          0)
             # Sun: Bleeding Edge
             xsd_ver=4.0.0
             xercesc_ver=3.2.3
@@ -315,17 +315,17 @@ jobs:
           cd Chaste/build
           nice -n ${{ env.NICE }} ctest -j ${{ env.NCPU }} -L Continuous --output-on-failure
 
-      - name: run parallel test pack
-        run: |
-          . ./modulesinit.sh
-          cd Chaste/build
-          nice -n ${{ env.NICE }} ctest -j ${{ env.NCPU }} -L Parallel --output-on-failure
-
       - name: run nightly test pack
         run: |
           . ./modulesinit.sh
           cd Chaste/build
           nice -n ${{ env.NICE }} ctest -j ${{ env.NCPU }} -L Nightly --output-on-failure
+
+      - name: run parallel test pack
+        run: |
+          . ./modulesinit.sh
+          cd Chaste/build
+          nice -n ${{ env.NICE }} ctest -j ${{ env.NCPU }} -L Parallel --output-on-failure
 
       - name: cleanup
         if: always()
