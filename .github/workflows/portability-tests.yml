@@ -51,7 +51,7 @@ jobs:
               boost_ver=1.67.0
               vtk_ver=
               petsc_ver=3.9.4
-              hdf5_ver=1.10.2
+              hdf5_ver=1.10.3
               petsc_arch=linux-gnu
               ;;
             4)
@@ -62,7 +62,7 @@ jobs:
               boost_ver=1.71.0
               vtk_ver=8.1.0
               petsc_ver=3.11.3
-              hdf5_ver=1.10.3
+              hdf5_ver=1.10.4
               petsc_arch=linux-gnu
               ;;
             5)
@@ -73,7 +73,7 @@ jobs:
               boost_ver=1.73.0
               vtk_ver=8.2.0
               petsc_ver=3.12.4
-              hdf5_ver=1.10.4
+              hdf5_ver=1.10.5
               petsc_arch=linux-gnu
               ;;
             6)
