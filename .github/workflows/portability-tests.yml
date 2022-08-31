@@ -21,86 +21,88 @@ jobs:
           weekday=$(date +'%w')
           
           case ${weekday} in
-          1)
-            # Mon: Oldest on Ubuntu 18.04 LTS
-            xsd_ver=4.0.0
-            xercesc_ver=3.2.0
-            sundials_ver=2.7.0
-            boost_ver=1.62.0
-            vtk_ver=6.3.0
-            petsc_ver=3.7.7
-            hdf5_ver=1.10.0-patch1
-            petsc_arch=linux-gnu
-            ;;
-          2)
-            # Tue
-            xsd_ver=4.0.0
-            xercesc_ver=3.2.1
-            sundials_ver=3.1.2
-            boost_ver=1.66.0
-            vtk_ver=7.1.0
-            petsc_ver=3.8.4
-            hdf5_ver=1.10.1
-            petsc_arch=linux-gnu
-            ;;
-          3)
-            # Wed: Minimal config - no Sundials or VTK
-            xsd_ver=4.0.0
-            xercesc_ver=3.2.2
-            sundials_ver=
-            boost_ver=1.67.0
-            vtk_ver=
-            petsc_ver=3.9.4
-            hdf5_ver=1.10.2
-            petsc_arch=linux-gnu
-            ;;
-          4)
-            # Thu
-            xsd_ver=4.0.0
-            xercesc_ver=3.2.1
-            sundials_ver=4.1.0
-            boost_ver=1.71.0
-            vtk_ver=8.1.0
-            petsc_ver=3.11.3
-            hdf5_ver=1.10.3
-            petsc_arch=linux-gnu
-            ;;
-          5)
-            # Fri
-            xsd_ver=4.0.0
-            xercesc_ver=3.2.2
-            sundials_ver=5.1.0
-            boost_ver=1.73.0
-            vtk_ver=8.2.0
-            petsc_ver=3.12.4
-            hdf5_ver=1.10.4
-            petsc_arch=linux-gnu
-            ;;
-          6)
-            # Sat: Newest on Ubuntu 22.04 LTS
-            xsd_ver=4.0.0
-            xercesc_ver=3.2.3
-            sundials_ver=5.8.0
-            boost_ver=1.74.0
-            vtk_ver=9.1.0
-            petsc_ver=3.15.5
-            hdf5_ver=1.10.7
-            petsc_arch=linux-gnu
-            ;;
-          0)
-            # Sun: Bleeding Edge
-            xsd_ver=4.0.0
-            xercesc_ver=3.2.3
-            sundials_ver=6.3.0
-            boost_ver=1.80.0
-            vtk_ver=9.2.0
-            petsc_ver=3.17.4
-            hdf5_ver=1.12.2
-            petsc_arch=linux-gnu
-            ;;
-          *)
-            echo "Unknown weekday: ${weekday}"
-            exit 1
+            1)
+              # Mon: Oldest on Ubuntu 18.04 LTS
+              xsd_ver=4.0.0
+              xercesc_ver=3.2.0
+              sundials_ver=2.7.0
+              boost_ver=1.62.0
+              vtk_ver=6.3.0
+              petsc_ver=3.7.7
+              hdf5_ver=1.10.0-patch1
+              petsc_arch=linux-gnu
+              ;;
+            2)
+              # Tue
+              xsd_ver=4.0.0
+              xercesc_ver=3.2.1
+              sundials_ver=3.1.2
+              boost_ver=1.66.0
+              vtk_ver=7.1.0
+              petsc_ver=3.8.4
+              hdf5_ver=1.10.1
+              petsc_arch=linux-gnu
+              ;;
+            3)
+              # Wed: Minimal config - no Sundials or VTK
+              xsd_ver=4.0.0
+              xercesc_ver=3.2.2
+              sundials_ver=
+              boost_ver=1.67.0
+              vtk_ver=
+              petsc_ver=3.9.4
+              hdf5_ver=1.10.2
+              petsc_arch=linux-gnu
+              ;;
+            4)
+              # Thu
+              xsd_ver=4.0.0
+              xercesc_ver=3.2.1
+              sundials_ver=4.1.0
+              boost_ver=1.71.0
+              vtk_ver=8.1.0
+              petsc_ver=3.11.3
+              hdf5_ver=1.10.3
+              petsc_arch=linux-gnu
+              ;;
+            5)
+              # Fri
+              xsd_ver=4.0.0
+              xercesc_ver=3.2.2
+              sundials_ver=5.1.0
+              boost_ver=1.73.0
+              vtk_ver=8.2.0
+              petsc_ver=3.12.4
+              hdf5_ver=1.10.4
+              petsc_arch=linux-gnu
+              ;;
+            6)
+              # Sat: Newest on Ubuntu 22.04 LTS
+              xsd_ver=4.0.0
+              xercesc_ver=3.2.3
+              sundials_ver=5.8.0
+              boost_ver=1.74.0
+              vtk_ver=9.1.0
+              petsc_ver=3.15.5
+              hdf5_ver=1.10.7
+              petsc_arch=linux-gnu
+              ;;
+            0)
+              # Sun: Bleeding Edge
+              xsd_ver=4.0.0
+              xercesc_ver=3.2.3
+              sundials_ver=6.3.0
+              boost_ver=1.80.0
+              vtk_ver=9.2.0
+              petsc_ver=3.17.4
+              hdf5_ver=1.12.2
+              petsc_arch=linux-gnu
+              ;;
+            *)
+              echo "Unknown weekday: ${weekday}"
+              exit 1
+              ;;
+          esac
           
           echo "xsd_ver=${xsd_ver}" >> ${GITHUB_ENV}
           echo "xercesc_ver=${xercesc_ver}" >> ${GITHUB_ENV}
