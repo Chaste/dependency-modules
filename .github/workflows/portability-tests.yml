@@ -2,50 +2,127 @@ name: portability-tests
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '0 1 * * *'
 
 jobs:
-  setup:
-    name: portability-tests
-
-    strategy:
-      matrix:
-        include:
-          - os: ubuntu-focal
-            xsd_ver: 4.0.0
-            xercesc_ver: 3.2.3
-            sundials_ver: 6.0.0
-            boost_ver: 1.74.0
-            vtk_ver: 9.1.0
-            petsc_ver: 3.12.4
-            hdf5_ver: 1.10.4
-            petsc_arch: linux-gnu
-
-          - os: ubuntu-focal
-            xsd_ver: 4.0.0
-            xercesc_ver: 3.2.0
-            sundials_ver: 4.1.0
-            boost_ver: 1.62.0
-            vtk_ver: 6.3.0
-            petsc_ver: 3.7.7
-            hdf5_ver: 1.10.0-patch1
-            petsc_arch: linux-gnu
-
-      fail-fast: false
-
-    runs-on: [self-hosted, '${{ matrix.os }}']
-
+  run-tests:
+    runs-on: [self-hosted, ubuntu-focal]
+    timeout-minutes: 360
+    
     defaults:
       run:
         # --login to source /etc/profile.d/modules.sh
         shell: bash --login -e -o pipefail {0}
-
+        
     steps:
+      - name: set versions by weekday
+        run: |
+          weekday=$(date +'%w')
+          
+          case ${weekday} in
+            1)
+              # Mon: Oldest on Ubuntu 18.04 LTS
+              xsd_ver=4.0.0
+              xercesc_ver=3.2.0
+              sundials_ver=2.7.0
+              boost_ver=1.62.0
+              vtk_ver=6.3.0
+              petsc_ver=3.7.7
+              hdf5_ver=1.10.0-patch1
+              petsc_arch=linux-gnu
+              ;;
+            2)
+              # Tue
+              xsd_ver=4.0.0
+              xercesc_ver=3.2.1
+              sundials_ver=3.1.2
+              boost_ver=1.66.0
+              vtk_ver=7.1.0
+              petsc_ver=3.8.4
+              hdf5_ver=1.10.1
+              petsc_arch=linux-gnu
+              ;;
+            3)
+              # Wed: Minimal config - no Sundials or VTK
+              xsd_ver=4.0.0
+              xercesc_ver=3.2.2
+              sundials_ver=
+              boost_ver=1.67.0
+              vtk_ver=
+              petsc_ver=3.9.4
+              hdf5_ver=1.10.3
+              petsc_arch=linux-gnu
+              ;;
+            4)
+              # Thu
+              xsd_ver=4.0.0
+              xercesc_ver=3.2.1
+              sundials_ver=4.1.0
+              boost_ver=1.71.0
+              vtk_ver=8.1.0
+              petsc_ver=3.11.3
+              hdf5_ver=1.10.4
+              petsc_arch=linux-gnu
+              ;;
+            5)
+              # Fri
+              xsd_ver=4.0.0
+              xercesc_ver=3.2.2
+              sundials_ver=5.1.0
+              boost_ver=1.73.0
+              vtk_ver=8.2.0
+              petsc_ver=3.12.4
+              hdf5_ver=1.10.5
+              petsc_arch=linux-gnu
+              ;;
+            6)
+              # Sat: Newest on Ubuntu 22.04 LTS
+              xsd_ver=4.0.0
+              xercesc_ver=3.2.3
+              sundials_ver=5.8.0
+              boost_ver=1.74.0
+              vtk_ver=9.1.0
+              petsc_ver=3.15.5
+              hdf5_ver=1.10.7
+              petsc_arch=linux-gnu
+              ;;
+            0)
+              # Sun: Bleeding Edge
+              xsd_ver=4.0.0
+              xercesc_ver=3.2.3
+              sundials_ver=6.3.0
+              boost_ver=1.80.0
+              vtk_ver=9.2.0
+              petsc_ver=3.17.4
+              hdf5_ver=1.12.2
+              petsc_arch=linux-gnu
+              ;;
+            *)
+              echo "Unknown weekday: ${weekday}"
+              exit 1
+              ;;
+          esac
+          
+          echo "xsd_ver=${xsd_ver}" >> ${GITHUB_ENV}
+          echo "xercesc_ver=${xercesc_ver}" >> ${GITHUB_ENV}
+          echo "sundials_ver=${sundials_ver}" >> ${GITHUB_ENV}
+          echo "boost_ver=${boost_ver}" >> ${GITHUB_ENV}
+          echo "vtk_ver=${vtk_ver}" >> ${GITHUB_ENV}
+          echo "petsc_ver=${petsc_ver}" >> ${GITHUB_ENV}
+          echo "hdf5_ver=${hdf5_ver}" >> ${GITHUB_ENV}
+          echo "petsc_arch=${petsc_arch}" >> ${GITHUB_ENV}
+
       - name: set env variables
         run: |
-          modules_dir="${MODULES_DIR:-${HOME}/modules}"
-          echo "MODULES_DIR=${modules_dir}" >> ${GITHUB_ENV}
+          MODULES_DIR="${MODULES_DIR:-${HOME}/modules}"
+          echo "MODULES_DIR=${MODULES_DIR}" >> ${GITHUB_ENV}
+          
           echo "CHASTE_TEST_OUTPUT=${HOME}/testoutput/$(date +'%Y%m%d%H%M%S')" >> ${GITHUB_ENV}
+          
           echo "NCPU=$(( $(nproc) < 16 ? $(nproc) : 16 ))" >> ${GITHUB_ENV}
+          
+          echo "NICE=10" >> ${GITHUB_ENV}
 
       - name: make directories
         run: |
@@ -61,84 +138,97 @@ jobs:
       - name: setup xsd
         run: |
           . ./modulesinit.sh
-          err=0 && module test xsd/${{ matrix.xsd_ver }} || err=$?
+          err=0 && module test xsd/${{ env.xsd_ver }} || err=$?
           if [ $err -ne 0 ]; then
-            nice -n 10 install_xsd.sh \
-              --version=${{ matrix.xsd_ver }} \
+            nice -n ${{ env.NICE }} install_xsd.sh \
+              --version=${{ env.xsd_ver }} \
               --modules-dir=${{ env.MODULES_DIR }}
-            module test xsd/${{ matrix.xsd_ver }}
+            module test xsd/${{ env.xsd_ver }}
           fi
 
       - name: setup xercesc
         run: |
           . ./modulesinit.sh
-          err=0 && module test xercesc/${{ matrix.xercesc_ver }} || err=$?
+          err=0 && module test xercesc/${{ env.xercesc_ver }} || err=$?
           if [ $err -ne 0 ]; then
-            nice -n 10 install_xercesc.sh \
-              --version=${{ matrix.xercesc_ver }} \
+            nice -n ${{ env.NICE }} install_xercesc.sh \
+              --version=${{ env.xercesc_ver }} \
               --modules-dir=${{ env.MODULES_DIR }} \
               --parallel=${{ env.NCPU }}
-            module test xercesc/${{ matrix.xercesc_ver }}
+            module test xercesc/${{ env.xercesc_ver }}
           fi
 
       - name: setup sundials
         run: |
-          . ./modulesinit.sh
-          err=0 && module test sundials/${{ matrix.sundials_ver }} || err=$?
-          if [ $err -ne 0 ]; then
-            nice -n 10 install_sundials.sh \
-              --version=${{ matrix.sundials_ver }} \
-              --modules-dir=${{ env.MODULES_DIR }} \
-              --parallel=${{ env.NCPU }}
-            module test sundials/${{ matrix.sundials_ver }}
+          if [ -n "${{ env.sundials_ver }}" ]; then
+            . ./modulesinit.sh
+            err=0 && module test sundials/${{ env.sundials_ver }} || err=$?
+            if [ $err -ne 0 ]; then
+              nice -n ${{ env.NICE }} install_sundials.sh \
+                --version=${{ env.sundials_ver }} \
+                --modules-dir=${{ env.MODULES_DIR }} \
+                --parallel=${{ env.NCPU }}
+              module test sundials/${{ env.sundials_ver }}
+            fi
           fi
 
       - name: setup boost
         run: |
           . ./modulesinit.sh
-          err=0 && module test boost/${{ matrix.boost_ver }} || err=$?
+          err=0 && module test boost/${{ env.boost_ver }} || err=$?
           if [ $err -ne 0 ]; then
-            nice -n 10 install_boost.sh \
-              --version=${{ matrix.boost_ver }} \
+            nice -n ${{ env.NICE }} install_boost.sh \
+              --version=${{ env.boost_ver }} \
               --modules-dir=${{ env.MODULES_DIR }} \
               --parallel=${{ env.NCPU }}
-            module test boost/${{ matrix.boost_ver }}
+            module test boost/${{ env.boost_ver }}
           fi
 
       - name: setup vtk
         run: |
-          . ./modulesinit.sh
-          err=0 && module test vtk/${{ matrix.vtk_ver }} || err=$?
-          if [ $err -ne 0 ]; then
-            nice -n 10 install_vtk.sh \
-              --version=${{ matrix.vtk_ver }} \
-              --modules-dir=${{ env.MODULES_DIR }} \
-              --parallel=${{ env.NCPU }}
-            module test vtk/${{ matrix.vtk_ver }}
+          if [ -n "${{ env.vtk_ver }}" ]; then
+            . ./modulesinit.sh
+            err=0 && module test vtk/${{ env.vtk_ver }} || err=$?
+            if [ $err -ne 0 ]; then
+              nice -n ${{ env.NICE }} install_vtk.sh \
+                --version=${{ env.vtk_ver }} \
+                --modules-dir=${{ env.MODULES_DIR }} \
+                --parallel=${{ env.NCPU }}
+              module test vtk/${{ env.vtk_ver }}
+            fi
           fi
 
       - name: setup petsc_hdf5
         run: |
           . ./modulesinit.sh
-          err=0 && module test petsc_hdf5/${{ matrix.petsc_ver }}_${{ matrix.hdf5_ver }}/${{ matrix.petsc_arch }} || err=$?
+          err=0 && module test petsc_hdf5/${{ env.petsc_ver }}_${{ env.hdf5_ver }}/${{ env.petsc_arch }} || err=$?
           if [ $err -ne 0 ]; then
-            nice -n 10 install_petsc_hdf5.sh \
-              --petsc-version=${{ matrix.petsc_ver }} \
-              --hdf5-version=${{ matrix.hdf5_ver }} \
-              --petsc-arch=${{ matrix.petsc_arch }} \
+            nice -n ${{ env.NICE }} install_petsc_hdf5.sh \
+              --petsc-version=${{ env.petsc_ver }} \
+              --hdf5-version=${{ env.hdf5_ver }} \
+              --petsc-arch=${{ env.petsc_arch }} \
               --modules-dir=${{ env.MODULES_DIR }} \
               --parallel=${{ env.NCPU }}
-            module test petsc_hdf5/${{ matrix.petsc_ver }}_${{ matrix.hdf5_ver }}/${{ matrix.petsc_arch }}
+            module test petsc_hdf5/${{ env.petsc_ver }}_${{ env.hdf5_ver }}/${{ env.petsc_arch }}
           fi
 
       - name: add versions to modules init script
         run: |
-          echo "module load xsd/${{ matrix.xsd_ver }}" >> modulesinit.sh
-          echo "module load xercesc/${{ matrix.xercesc_ver }}" >> modulesinit.sh
-          echo "module load sundials/${{ matrix.sundials_ver }}" >> modulesinit.sh
-          echo "module load boost/${{ matrix.boost_ver }}" >> modulesinit.sh
-          echo "module load vtk/${{ matrix.vtk_ver }}" >> modulesinit.sh
-          echo "module load petsc_hdf5/${{ matrix.petsc_ver }}_${{ matrix.hdf5_ver }}/${{ matrix.petsc_arch }}" >> modulesinit.sh
+          echo "module load xsd/${{ env.xsd_ver }}" >> modulesinit.sh
+          
+          echo "module load xercesc/${{ env.xercesc_ver }}" >> modulesinit.sh
+          
+          if [ -n "${{ env.sundials_ver }}" ]; then
+            echo "module load sundials/${{ env.sundials_ver }}" >> modulesinit.sh
+          fi
+          
+          echo "module load boost/${{ env.boost_ver }}" >> modulesinit.sh
+          
+          if [ -n "${{ env.vtk_ver }}" ]; then
+            echo "module load vtk/${{ env.vtk_ver }}" >> modulesinit.sh
+          fi
+          
+          echo "module load petsc_hdf5/${{ env.petsc_ver }}_${{ env.hdf5_ver }}/${{ env.petsc_arch }}" >> modulesinit.sh
 
       - name: checkout chaste
         uses: actions/checkout@v3
@@ -150,13 +240,28 @@ jobs:
       - name: configure chaste
         run: |
           . ./modulesinit.sh
+          
+          if [ -z "${{ env.sundials_ver }}" ]; then
+            use_cvode="OFF"
+          else
+            use_cvode="ON"
+          fi
+          
+          if [ -z "${{ env.vtk_ver }}" ]; then
+            use_vtk="OFF"
+          else
+            use_vtk="ON"
+          fi
+
           mkdir -p Chaste/build
           cd Chaste/build
-          nice -n 10 cmake \
+          nice -n ${{ env.NICE }} cmake \
             -DBoost_NO_BOOST_CMAKE=ON \
             -DBoost_NO_SYSTEM_PATHS=ON \
             -DBOOST_ROOT=${BOOST_ROOT} \
-            -DCMAKE_PREFIX_PATH="${SUNDIALS_ROOT};${VTK_ROOT};${XERCESC_ROOT};${XSD_ROOT}" \
+            -DChaste_USE_CVODE=${use_cvode} \
+            -DChaste_USE_VTK=${use_vtk} \
+            -DCMAKE_PREFIX_PATH="${XERCESC_ROOT};${XSD_ROOT};${SUNDIALS_ROOT};${VTK_ROOT}" \
             -DCMAKE_BUILD_TYPE=Release \
             ..
 
@@ -164,8 +269,8 @@ jobs:
         run: |
           . ./modulesinit.sh
           cd Chaste/build
-          nice -n 10 cmake --build . --parallel ${{ env.NCPU }} --target TestChasteBuildInfo
-          nice -n 10 ctest -V -R TestChasteBuildInfo --output-on-failure | tee buildinfo
+          nice -n ${{ env.NICE }} cmake --build . --parallel ${{ env.NCPU }} --target TestChasteBuildInfo
+          nice -n ${{ env.NICE }} ctest -V -R TestChasteBuildInfo --output-on-failure | tee buildinfo
 
       - name: verify dependency versions
         run: |
@@ -175,87 +280,54 @@ jobs:
           maj_min_rev='^[0-9]\+\.[0-9]\+\.[0-9]\+'
           maj_min='^[0-9]\+\.[0-9]\+'
 
-          xsd_ver="$(echo ${{ matrix.xsd_ver }} | grep -o ${maj_min_rev})"
-          xercesc_ver="$(echo ${{ matrix.xercesc_ver }} | grep -o ${maj_min_rev})"
-          sundials_ver="$(echo ${{ matrix.sundials_ver }} | grep -o ${maj_min_rev})"
-          boost_ver="$(echo ${{ matrix.boost_ver }} | grep -o ${maj_min_rev})"
-          vtk_ver="$(echo ${{ matrix.vtk_ver }} | grep -o ${maj_min})"
-          petsc_ver="$(echo ${{ matrix.petsc_ver }} | grep -o ${maj_min_rev})"
-          hdf5_ver="$(echo ${{ matrix.hdf5_ver }} | grep -o ${maj_min_rev})"
-
+          xsd_ver="$(echo ${{ env.xsd_ver }} | grep -o ${maj_min_rev})"
           grep "<XSD>${xsd_ver}</XSD>" buildinfo
+          
+          xercesc_ver="$(echo ${{ env.xercesc_ver }} | grep -o ${maj_min_rev})"
           grep "<Xerces>${xercesc_ver}</Xerces>" buildinfo
-          grep "<SUNDIALS>${sundials_ver}</SUNDIALS>" buildinfo
+          
+          if [ -n "${{ env.sundials_ver }}" ]; then
+            sundials_ver="$(echo ${{ env.sundials_ver }} | grep -o ${maj_min_rev})"
+            grep "<SUNDIALS>${sundials_ver}</SUNDIALS>" buildinfo
+          fi
+          
+          boost_ver="$(echo ${{ env.boost_ver }} | grep -o ${maj_min_rev})"
           grep "<Boost>${boost_ver}</Boost>" buildinfo
-          grep "<VTK>${vtk_ver}</VTK>" buildinfo
+          
+          if [ -n "${{ env.vtk_ver }}" ]; then
+            vtk_ver="$(echo ${{ env.vtk_ver }} | grep -o ${maj_min})"
+            grep "<VTK>${vtk_ver}</VTK>" buildinfo
+          fi
+          
+          petsc_ver="$(echo ${{ env.petsc_ver }} | grep -o ${maj_min_rev})"
           grep "<PETSc>${petsc_ver}</PETSc>" buildinfo
+          
+          hdf5_ver="$(echo ${{ env.hdf5_ver }} | grep -o ${maj_min_rev})"
           grep "<HDF5>${hdf5_ver}</HDF5>" buildinfo
 
-      - name: build core libraries
+      - name: build all
         run: |
           . ./modulesinit.sh
           cd Chaste/build
-          nice -n 10 cmake --build . --parallel ${{ env.NCPU }} --target chaste_core
-
-      - name: build cell_based
-        run: |
-          . ./modulesinit.sh
-          cd Chaste/build
-          nice -n 10 cmake --build . --parallel ${{ env.NCPU }} --target chaste_cell_based
-
-      - name: build crypt
-        run: |
-          . ./modulesinit.sh
-          cd Chaste/build
-          nice -n 10 cmake --build . --parallel ${{ env.NCPU }} --target chaste_crypt
-
-      - name: build heart
-        run: |
-          . ./modulesinit.sh
-          cd Chaste/build
-          nice -n 10 cmake --build . --parallel ${{ env.NCPU }} --target chaste_heart
-
-      - name: build lung
-        run: |
-          . ./modulesinit.sh
-          cd Chaste/build
-          nice -n 10 cmake --build . --parallel ${{ env.NCPU }} --target chaste_lung
-
-      - name: build continuous test pack
-        run: |
-          . ./modulesinit.sh
-          cd Chaste/build
-          nice -n 10 cmake --build . --parallel ${{ env.NCPU }} --target Continuous
-
-      - name: build parallel test pack
-        run: |
-          . ./modulesinit.sh
-          cd Chaste/build
-          nice -n 10 cmake --build . --parallel ${{ env.NCPU }} --target Parallel
-
-      - name: build nightly test pack
-        run: |
-          . ./modulesinit.sh
-          cd Chaste/build
-          nice -n 10 cmake --build . --parallel ${{ env.NCPU }} --target Nightly
+          nice -n ${{ env.NICE }} cmake --build . --parallel ${{ env.NCPU }} --target all
 
       - name: run continuous test pack
         run: |
           . ./modulesinit.sh
           cd Chaste/build
-          nice -n 10 ctest -j ${{ env.NCPU }} -L Continuous --output-on-failure
-
-      - name: run parallel test pack
-        run: |
-          . ./modulesinit.sh
-          cd Chaste/build
-          nice -n 10 ctest -j ${{ env.NCPU }} -L Parallel --output-on-failure
+          nice -n ${{ env.NICE }} ctest -j ${{ env.NCPU }} -L Continuous --output-on-failure
 
       - name: run nightly test pack
         run: |
           . ./modulesinit.sh
           cd Chaste/build
-          nice -n 10 ctest -j ${{ env.NCPU }} -L Nightly --output-on-failure
+          nice -n ${{ env.NICE }} ctest -j ${{ env.NCPU }} -L Nightly --output-on-failure
+
+      - name: run parallel test pack
+        run: |
+          . ./modulesinit.sh
+          cd Chaste/build
+          nice -n ${{ env.NICE }} ctest -j ${{ env.NCPU }} -L Parallel --output-on-failure
 
       - name: cleanup
         if: always()
