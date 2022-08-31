@@ -2,49 +2,123 @@ name: portability-tests
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '0 1 * * *'
 
 jobs:
-  setup:
-    name: portability-tests
-
-    strategy:
-      matrix:
-        include:
-          - os: ubuntu-focal
-            xsd_ver: 4.0.0
-            xercesc_ver: 3.2.3
-            sundials_ver: 6.0.0
-            boost_ver: 1.74.0
-            vtk_ver: 9.1.0
-            petsc_ver: 3.12.4
-            hdf5_ver: 1.10.4
-            petsc_arch: linux-gnu
-
-          - os: ubuntu-focal
-            xsd_ver: 4.0.0
-            xercesc_ver: 3.2.0
-            sundials_ver: 4.1.0
-            boost_ver: 1.62.0
-            vtk_ver: 6.3.0
-            petsc_ver: 3.7.7
-            hdf5_ver: 1.10.0-patch1
-            petsc_arch: linux-gnu
-
-      fail-fast: false
-
-    runs-on: [self-hosted, '${{ matrix.os }}']
-
+  run-tests:
+    runs-on: [self-hosted, ubuntu-focal]
+    timeout-minutes: 360
+    
     defaults:
       run:
         # --login to source /etc/profile.d/modules.sh
         shell: bash --login -e -o pipefail {0}
-
+        
     steps:
+      - name: set versions by 
+      
+        run: |
+          weekday=$(date +'%w')
+          
+          case ${weekday} in
+          1)
+            # Mon: Oldest on Ubuntu 18.04 LTS
+            xsd_ver=4.0.0
+            xercesc_ver=3.2.0
+            sundials_ver=2.7.0
+            boost_ver=1.62.0
+            vtk_ver=6.3.0
+            petsc_ver=3.7.7
+            hdf5_ver=1.10.0-patch1
+            petsc_arch=linux-gnu
+            ;;
+          2)
+            # Tue
+            xsd_ver=4.0.0
+            xercesc_ver=3.2.1
+            sundials_ver=3.1.2
+            boost_ver=1.66.0
+            vtk_ver=7.1.0
+            petsc_ver=3.8.4
+            hdf5_ver=1.10.1
+            petsc_arch=linux-gnu
+            ;;
+          3)
+            # Wed: Minimal config - no Sundials or VTK
+            xsd_ver=4.0.0
+            xercesc_ver=3.2.2
+            sundials_ver=
+            boost_ver=1.67.0
+            vtk_ver=
+            petsc_ver=3.9.4
+            hdf5_ver=1.10.2
+            petsc_arch=linux-gnu
+            ;;
+          4)
+            # Thu
+            xsd_ver=4.0.0
+            xercesc_ver=3.2.1
+            sundials_ver=4.1.0
+            boost_ver=1.71.0
+            vtk_ver=8.1.0
+            petsc_ver=3.11.3
+            hdf5_ver=1.10.3
+            petsc_arch=linux-gnu
+            ;;
+          5)
+            # Fri
+            xsd_ver=4.0.0
+            xercesc_ver=3.2.2
+            sundials_ver=5.1.0
+            boost_ver=1.73.0
+            vtk_ver=8.2.0
+            petsc_ver=3.12.4
+            hdf5_ver=1.10.4
+            petsc_arch=linux-gnu
+            ;;
+          6)
+            # Sat: Newest on Ubuntu 22.04 LTS
+            xsd_ver=4.0.0
+            xercesc_ver=3.2.3
+            sundials_ver=5.8.0
+            boost_ver=1.74.0
+            vtk_ver=9.1.0
+            petsc_ver=3.15.5
+            hdf5_ver=1.10.7
+            petsc_arch=linux-gnu
+            ;;
+          7)
+            # Sun: Bleeding Edge
+            xsd_ver=4.0.0
+            xercesc_ver=3.2.3
+            sundials_ver=6.3.0
+            boost_ver=1.80.0
+            vtk_ver=9.2.0
+            petsc_ver=3.17.4
+            hdf5_ver=1.12.2
+            petsc_arch=linux-gnu
+            ;;
+          *)
+            echo "Unknown weekday: ${weekday}"
+            exit 1
+          
+          echo "xsd_ver=${xsd_ver}" >> ${GITHUB_ENV}
+          echo "xercesc_ver=${xercesc_ver}" >> ${GITHUB_ENV}
+          echo "sundials_ver=${sundials_ver}" >> ${GITHUB_ENV}
+          echo "boost_ver=${boost_ver}" >> ${GITHUB_ENV}
+          echo "vtk_ver=${vtk_ver}" >> ${GITHUB_ENV}
+          echo "petsc_ver=${petsc_ver}" >> ${GITHUB_ENV}
+          echo "hdf5_ver=${hdf5_ver}" >> ${GITHUB_ENV}
+          echo "petsc_arch=${petsc_arch}" >> ${GITHUB_ENV}
+
       - name: set env variables
         run: |
-          modules_dir="${MODULES_DIR:-${HOME}/modules}"
-          echo "MODULES_DIR=${modules_dir}" >> ${GITHUB_ENV}
+          MODULES_DIR="${MODULES_DIR:-${HOME}/modules}"
+          echo "MODULES_DIR=${MODULES_DIR}" >> ${GITHUB_ENV}
+          
           echo "CHASTE_TEST_OUTPUT=${HOME}/testoutput/$(date +'%Y%m%d%H%M%S')" >> ${GITHUB_ENV}
+          
           echo "NCPU=$(( $(nproc) < 16 ? $(nproc) : 16 ))" >> ${GITHUB_ENV}
 
       - name: make directories
@@ -61,84 +135,84 @@ jobs:
       - name: setup xsd
         run: |
           . ./modulesinit.sh
-          err=0 && module test xsd/${{ matrix.xsd_ver }} || err=$?
+          err=0 && module test xsd/${{ env.xsd_ver }} || err=$?
           if [ $err -ne 0 ]; then
             nice -n 10 install_xsd.sh \
-              --version=${{ matrix.xsd_ver }} \
+              --version=${{ env.xsd_ver }} \
               --modules-dir=${{ env.MODULES_DIR }}
-            module test xsd/${{ matrix.xsd_ver }}
+            module test xsd/${{ env.xsd_ver }}
           fi
 
       - name: setup xercesc
         run: |
           . ./modulesinit.sh
-          err=0 && module test xercesc/${{ matrix.xercesc_ver }} || err=$?
+          err=0 && module test xercesc/${{ env.xercesc_ver }} || err=$?
           if [ $err -ne 0 ]; then
             nice -n 10 install_xercesc.sh \
-              --version=${{ matrix.xercesc_ver }} \
+              --version=${{ env.xercesc_ver }} \
               --modules-dir=${{ env.MODULES_DIR }} \
               --parallel=${{ env.NCPU }}
-            module test xercesc/${{ matrix.xercesc_ver }}
+            module test xercesc/${{ env.xercesc_ver }}
           fi
 
       - name: setup sundials
         run: |
           . ./modulesinit.sh
-          err=0 && module test sundials/${{ matrix.sundials_ver }} || err=$?
+          err=0 && module test sundials/${{ env.sundials_ver }} || err=$?
           if [ $err -ne 0 ]; then
             nice -n 10 install_sundials.sh \
-              --version=${{ matrix.sundials_ver }} \
+              --version=${{ env.sundials_ver }} \
               --modules-dir=${{ env.MODULES_DIR }} \
               --parallel=${{ env.NCPU }}
-            module test sundials/${{ matrix.sundials_ver }}
+            module test sundials/${{ env.sundials_ver }}
           fi
 
       - name: setup boost
         run: |
           . ./modulesinit.sh
-          err=0 && module test boost/${{ matrix.boost_ver }} || err=$?
+          err=0 && module test boost/${{ env.boost_ver }} || err=$?
           if [ $err -ne 0 ]; then
             nice -n 10 install_boost.sh \
-              --version=${{ matrix.boost_ver }} \
+              --version=${{ env.boost_ver }} \
               --modules-dir=${{ env.MODULES_DIR }} \
               --parallel=${{ env.NCPU }}
-            module test boost/${{ matrix.boost_ver }}
+            module test boost/${{ env.boost_ver }}
           fi
 
       - name: setup vtk
         run: |
           . ./modulesinit.sh
-          err=0 && module test vtk/${{ matrix.vtk_ver }} || err=$?
+          err=0 && module test vtk/${{ env.vtk_ver }} || err=$?
           if [ $err -ne 0 ]; then
             nice -n 10 install_vtk.sh \
-              --version=${{ matrix.vtk_ver }} \
+              --version=${{ env.vtk_ver }} \
               --modules-dir=${{ env.MODULES_DIR }} \
               --parallel=${{ env.NCPU }}
-            module test vtk/${{ matrix.vtk_ver }}
+            module test vtk/${{ env.vtk_ver }}
           fi
 
       - name: setup petsc_hdf5
         run: |
           . ./modulesinit.sh
-          err=0 && module test petsc_hdf5/${{ matrix.petsc_ver }}_${{ matrix.hdf5_ver }}/${{ matrix.petsc_arch }} || err=$?
+          err=0 && module test petsc_hdf5/${{ env.petsc_ver }}_${{ env.hdf5_ver }}/${{ env.petsc_arch }} || err=$?
           if [ $err -ne 0 ]; then
             nice -n 10 install_petsc_hdf5.sh \
-              --petsc-version=${{ matrix.petsc_ver }} \
-              --hdf5-version=${{ matrix.hdf5_ver }} \
-              --petsc-arch=${{ matrix.petsc_arch }} \
+              --petsc-version=${{ env.petsc_ver }} \
+              --hdf5-version=${{ env.hdf5_ver }} \
+              --petsc-arch=${{ env.petsc_arch }} \
               --modules-dir=${{ env.MODULES_DIR }} \
               --parallel=${{ env.NCPU }}
-            module test petsc_hdf5/${{ matrix.petsc_ver }}_${{ matrix.hdf5_ver }}/${{ matrix.petsc_arch }}
+            module test petsc_hdf5/${{ env.petsc_ver }}_${{ env.hdf5_ver }}/${{ env.petsc_arch }}
           fi
 
       - name: add versions to modules init script
         run: |
-          echo "module load xsd/${{ matrix.xsd_ver }}" >> modulesinit.sh
-          echo "module load xercesc/${{ matrix.xercesc_ver }}" >> modulesinit.sh
-          echo "module load sundials/${{ matrix.sundials_ver }}" >> modulesinit.sh
-          echo "module load boost/${{ matrix.boost_ver }}" >> modulesinit.sh
-          echo "module load vtk/${{ matrix.vtk_ver }}" >> modulesinit.sh
-          echo "module load petsc_hdf5/${{ matrix.petsc_ver }}_${{ matrix.hdf5_ver }}/${{ matrix.petsc_arch }}" >> modulesinit.sh
+          echo "module load xsd/${{ env.xsd_ver }}" >> modulesinit.sh
+          echo "module load xercesc/${{ env.xercesc_ver }}" >> modulesinit.sh
+          echo "module load sundials/${{ env.sundials_ver }}" >> modulesinit.sh
+          echo "module load boost/${{ env.boost_ver }}" >> modulesinit.sh
+          echo "module load vtk/${{ env.vtk_ver }}" >> modulesinit.sh
+          echo "module load petsc_hdf5/${{ env.petsc_ver }}_${{ env.hdf5_ver }}/${{ env.petsc_arch }}" >> modulesinit.sh
 
       - name: checkout chaste
         uses: actions/checkout@v3
@@ -175,13 +249,13 @@ jobs:
           maj_min_rev='^[0-9]\+\.[0-9]\+\.[0-9]\+'
           maj_min='^[0-9]\+\.[0-9]\+'
 
-          xsd_ver="$(echo ${{ matrix.xsd_ver }} | grep -o ${maj_min_rev})"
-          xercesc_ver="$(echo ${{ matrix.xercesc_ver }} | grep -o ${maj_min_rev})"
-          sundials_ver="$(echo ${{ matrix.sundials_ver }} | grep -o ${maj_min_rev})"
-          boost_ver="$(echo ${{ matrix.boost_ver }} | grep -o ${maj_min_rev})"
-          vtk_ver="$(echo ${{ matrix.vtk_ver }} | grep -o ${maj_min})"
-          petsc_ver="$(echo ${{ matrix.petsc_ver }} | grep -o ${maj_min_rev})"
-          hdf5_ver="$(echo ${{ matrix.hdf5_ver }} | grep -o ${maj_min_rev})"
+          xsd_ver="$(echo ${{ env.xsd_ver }} | grep -o ${maj_min_rev})"
+          xercesc_ver="$(echo ${{ env.xercesc_ver }} | grep -o ${maj_min_rev})"
+          sundials_ver="$(echo ${{ env.sundials_ver }} | grep -o ${maj_min_rev})"
+          boost_ver="$(echo ${{ env.boost_ver }} | grep -o ${maj_min_rev})"
+          vtk_ver="$(echo ${{ env.vtk_ver }} | grep -o ${maj_min})"
+          petsc_ver="$(echo ${{ env.petsc_ver }} | grep -o ${maj_min_rev})"
+          hdf5_ver="$(echo ${{ env.hdf5_ver }} | grep -o ${maj_min_rev})"
 
           grep "<XSD>${xsd_ver}</XSD>" buildinfo
           grep "<Xerces>${xercesc_ver}</Xerces>" buildinfo
