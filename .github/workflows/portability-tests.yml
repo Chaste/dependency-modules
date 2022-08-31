@@ -119,6 +119,8 @@ jobs:
           echo "CHASTE_TEST_OUTPUT=${HOME}/testoutput/$(date +'%Y%m%d%H%M%S')" >> ${GITHUB_ENV}
           
           echo "NCPU=$(( $(nproc) < 16 ? $(nproc) : 16 ))" >> ${GITHUB_ENV}
+          
+          echo "NICE=10" >> ${GITHUB_ENV}
 
       - name: make directories
         run: |
@@ -136,7 +138,7 @@ jobs:
           . ./modulesinit.sh
           err=0 && module test xsd/${{ env.xsd_ver }} || err=$?
           if [ $err -ne 0 ]; then
-            nice -n 10 install_xsd.sh \
+            nice -n ${{ env.NICE }} install_xsd.sh \
               --version=${{ env.xsd_ver }} \
               --modules-dir=${{ env.MODULES_DIR }}
             module test xsd/${{ env.xsd_ver }}
@@ -147,7 +149,7 @@ jobs:
           . ./modulesinit.sh
           err=0 && module test xercesc/${{ env.xercesc_ver }} || err=$?
           if [ $err -ne 0 ]; then
-            nice -n 10 install_xercesc.sh \
+            nice -n ${{ env.NICE }} install_xercesc.sh \
               --version=${{ env.xercesc_ver }} \
               --modules-dir=${{ env.MODULES_DIR }} \
               --parallel=${{ env.NCPU }}
@@ -160,7 +162,7 @@ jobs:
             . ./modulesinit.sh
             err=0 && module test sundials/${{ env.sundials_ver }} || err=$?
             if [ $err -ne 0 ]; then
-              nice -n 10 install_sundials.sh \
+              nice -n ${{ env.NICE }} install_sundials.sh \
                 --version=${{ env.sundials_ver }} \
                 --modules-dir=${{ env.MODULES_DIR }} \
                 --parallel=${{ env.NCPU }}
@@ -173,7 +175,7 @@ jobs:
           . ./modulesinit.sh
           err=0 && module test boost/${{ env.boost_ver }} || err=$?
           if [ $err -ne 0 ]; then
-            nice -n 10 install_boost.sh \
+            nice -n ${{ env.NICE }} install_boost.sh \
               --version=${{ env.boost_ver }} \
               --modules-dir=${{ env.MODULES_DIR }} \
               --parallel=${{ env.NCPU }}
@@ -186,7 +188,7 @@ jobs:
             . ./modulesinit.sh
             err=0 && module test vtk/${{ env.vtk_ver }} || err=$?
             if [ $err -ne 0 ]; then
-              nice -n 10 install_vtk.sh \
+              nice -n ${{ env.NICE }} install_vtk.sh \
                 --version=${{ env.vtk_ver }} \
                 --modules-dir=${{ env.MODULES_DIR }} \
                 --parallel=${{ env.NCPU }}
@@ -199,7 +201,7 @@ jobs:
           . ./modulesinit.sh
           err=0 && module test petsc_hdf5/${{ env.petsc_ver }}_${{ env.hdf5_ver }}/${{ env.petsc_arch }} || err=$?
           if [ $err -ne 0 ]; then
-            nice -n 10 install_petsc_hdf5.sh \
+            nice -n ${{ env.NICE }} install_petsc_hdf5.sh \
               --petsc-version=${{ env.petsc_ver }} \
               --hdf5-version=${{ env.hdf5_ver }} \
               --petsc-arch=${{ env.petsc_arch }} \
@@ -251,7 +253,7 @@ jobs:
 
           mkdir -p Chaste/build
           cd Chaste/build
-          nice -n 10 cmake \
+          nice -n ${{ env.NICE }} cmake \
             -DBoost_NO_BOOST_CMAKE=ON \
             -DBoost_NO_SYSTEM_PATHS=ON \
             -DBOOST_ROOT=${BOOST_ROOT} \
@@ -265,8 +267,8 @@ jobs:
         run: |
           . ./modulesinit.sh
           cd Chaste/build
-          nice -n 10 cmake --build . --parallel ${{ env.NCPU }} --target TestChasteBuildInfo
-          nice -n 10 ctest -V -R TestChasteBuildInfo --output-on-failure | tee buildinfo
+          nice -n ${{ env.NICE }} cmake --build . --parallel ${{ env.NCPU }} --target TestChasteBuildInfo
+          nice -n ${{ env.NICE }} ctest -V -R TestChasteBuildInfo --output-on-failure | tee buildinfo
 
       - name: verify dependency versions
         run: |
@@ -301,71 +303,29 @@ jobs:
           hdf5_ver="$(echo ${{ env.hdf5_ver }} | grep -o ${maj_min_rev})"
           grep "<HDF5>${hdf5_ver}</HDF5>" buildinfo
 
-      - name: build core libraries
+      - name: build all
         run: |
           . ./modulesinit.sh
           cd Chaste/build
-          nice -n 10 cmake --build . --parallel ${{ env.NCPU }} --target chaste_core
-
-      - name: build cell_based
-        run: |
-          . ./modulesinit.sh
-          cd Chaste/build
-          nice -n 10 cmake --build . --parallel ${{ env.NCPU }} --target chaste_cell_based
-
-      - name: build crypt
-        run: |
-          . ./modulesinit.sh
-          cd Chaste/build
-          nice -n 10 cmake --build . --parallel ${{ env.NCPU }} --target chaste_crypt
-
-      - name: build heart
-        run: |
-          . ./modulesinit.sh
-          cd Chaste/build
-          nice -n 10 cmake --build . --parallel ${{ env.NCPU }} --target chaste_heart
-
-      - name: build lung
-        run: |
-          . ./modulesinit.sh
-          cd Chaste/build
-          nice -n 10 cmake --build . --parallel ${{ env.NCPU }} --target chaste_lung
-
-      - name: build continuous test pack
-        run: |
-          . ./modulesinit.sh
-          cd Chaste/build
-          nice -n 10 cmake --build . --parallel ${{ env.NCPU }} --target Continuous
-
-      - name: build parallel test pack
-        run: |
-          . ./modulesinit.sh
-          cd Chaste/build
-          nice -n 10 cmake --build . --parallel ${{ env.NCPU }} --target Parallel
-
-      - name: build nightly test pack
-        run: |
-          . ./modulesinit.sh
-          cd Chaste/build
-          nice -n 10 cmake --build . --parallel ${{ env.NCPU }} --target Nightly
+          nice -n ${{ env.NICE }} cmake --build . --parallel ${{ env.NCPU }} --target all
 
       - name: run continuous test pack
         run: |
           . ./modulesinit.sh
           cd Chaste/build
-          nice -n 10 ctest -j ${{ env.NCPU }} -L Continuous --output-on-failure
+          nice -n ${{ env.NICE }} ctest -j ${{ env.NCPU }} -L Continuous --output-on-failure
 
       - name: run parallel test pack
         run: |
           . ./modulesinit.sh
           cd Chaste/build
-          nice -n 10 ctest -j ${{ env.NCPU }} -L Parallel --output-on-failure
+          nice -n ${{ env.NICE }} ctest -j ${{ env.NCPU }} -L Parallel --output-on-failure
 
       - name: run nightly test pack
         run: |
           . ./modulesinit.sh
           cd Chaste/build
-          nice -n 10 ctest -j ${{ env.NCPU }} -L Nightly --output-on-failure
+          nice -n ${{ env.NICE }} ctest -j ${{ env.NCPU }} -L Nightly --output-on-failure
 
       - name: cleanup
         if: always()
