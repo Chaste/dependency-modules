@@ -16,8 +16,7 @@ jobs:
         shell: bash --login -e -o pipefail {0}
         
     steps:
-      - name: set versions by 
-      
+      - name: set versions by weekday
         run: |
           weekday=$(date +'%w')
           
@@ -157,14 +156,16 @@ jobs:
 
       - name: setup sundials
         run: |
-          . ./modulesinit.sh
-          err=0 && module test sundials/${{ env.sundials_ver }} || err=$?
-          if [ $err -ne 0 ]; then
-            nice -n 10 install_sundials.sh \
-              --version=${{ env.sundials_ver }} \
-              --modules-dir=${{ env.MODULES_DIR }} \
-              --parallel=${{ env.NCPU }}
-            module test sundials/${{ env.sundials_ver }}
+          if [ -n "${{ env.sundials_ver }}" ]; then
+            . ./modulesinit.sh
+            err=0 && module test sundials/${{ env.sundials_ver }} || err=$?
+            if [ $err -ne 0 ]; then
+              nice -n 10 install_sundials.sh \
+                --version=${{ env.sundials_ver }} \
+                --modules-dir=${{ env.MODULES_DIR }} \
+                --parallel=${{ env.NCPU }}
+              module test sundials/${{ env.sundials_ver }}
+            fi
           fi
 
       - name: setup boost
@@ -181,14 +182,16 @@ jobs:
 
       - name: setup vtk
         run: |
-          . ./modulesinit.sh
-          err=0 && module test vtk/${{ env.vtk_ver }} || err=$?
-          if [ $err -ne 0 ]; then
-            nice -n 10 install_vtk.sh \
-              --version=${{ env.vtk_ver }} \
-              --modules-dir=${{ env.MODULES_DIR }} \
-              --parallel=${{ env.NCPU }}
-            module test vtk/${{ env.vtk_ver }}
+          if [ -n "${{ env.vtk_ver }}" ]; then
+            . ./modulesinit.sh
+            err=0 && module test vtk/${{ env.vtk_ver }} || err=$?
+            if [ $err -ne 0 ]; then
+              nice -n 10 install_vtk.sh \
+                --version=${{ env.vtk_ver }} \
+                --modules-dir=${{ env.MODULES_DIR }} \
+                --parallel=${{ env.NCPU }}
+              module test vtk/${{ env.vtk_ver }}
+            fi
           fi
 
       - name: setup petsc_hdf5
@@ -208,10 +211,19 @@ jobs:
       - name: add versions to modules init script
         run: |
           echo "module load xsd/${{ env.xsd_ver }}" >> modulesinit.sh
+          
           echo "module load xercesc/${{ env.xercesc_ver }}" >> modulesinit.sh
-          echo "module load sundials/${{ env.sundials_ver }}" >> modulesinit.sh
+          
+          if [ -n "${{ env.sundials_ver }}" ]; then
+            echo "module load sundials/${{ env.sundials_ver }}" >> modulesinit.sh
+          fi
+          
           echo "module load boost/${{ env.boost_ver }}" >> modulesinit.sh
-          echo "module load vtk/${{ env.vtk_ver }}" >> modulesinit.sh
+          
+          if [ -n "${{ env.vtk_ver }}" ]; then
+            echo "module load vtk/${{ env.vtk_ver }}" >> modulesinit.sh
+          fi
+          
           echo "module load petsc_hdf5/${{ env.petsc_ver }}_${{ env.hdf5_ver }}/${{ env.petsc_arch }}" >> modulesinit.sh
 
       - name: checkout chaste
@@ -224,13 +236,28 @@ jobs:
       - name: configure chaste
         run: |
           . ./modulesinit.sh
+          
+          if [ -z "${{ env.sundials_ver }}" ]; then
+            use_cvode="OFF"
+          else
+            use_cvode="ON"
+          fi
+          
+          if [ -z "${{ env.vtk_ver }}" ]; then
+            use_vtk="OFF"
+          else
+            use_vtk="ON"
+          fi
+
           mkdir -p Chaste/build
           cd Chaste/build
           nice -n 10 cmake \
             -DBoost_NO_BOOST_CMAKE=ON \
             -DBoost_NO_SYSTEM_PATHS=ON \
             -DBOOST_ROOT=${BOOST_ROOT} \
-            -DCMAKE_PREFIX_PATH="${SUNDIALS_ROOT};${VTK_ROOT};${XERCESC_ROOT};${XSD_ROOT}" \
+            -DChaste_USE_CVODE=${use_cvode} \
+            -DChaste_USE_VTK=${use_vtk} \
+            -DCMAKE_PREFIX_PATH="${XERCESC_ROOT};${XSD_ROOT};${SUNDIALS_ROOT};${VTK_ROOT}" \
             -DCMAKE_BUILD_TYPE=Release \
             ..
 
@@ -250,19 +277,28 @@ jobs:
           maj_min='^[0-9]\+\.[0-9]\+'
 
           xsd_ver="$(echo ${{ env.xsd_ver }} | grep -o ${maj_min_rev})"
-          xercesc_ver="$(echo ${{ env.xercesc_ver }} | grep -o ${maj_min_rev})"
-          sundials_ver="$(echo ${{ env.sundials_ver }} | grep -o ${maj_min_rev})"
-          boost_ver="$(echo ${{ env.boost_ver }} | grep -o ${maj_min_rev})"
-          vtk_ver="$(echo ${{ env.vtk_ver }} | grep -o ${maj_min})"
-          petsc_ver="$(echo ${{ env.petsc_ver }} | grep -o ${maj_min_rev})"
-          hdf5_ver="$(echo ${{ env.hdf5_ver }} | grep -o ${maj_min_rev})"
-
           grep "<XSD>${xsd_ver}</XSD>" buildinfo
+          
+          xercesc_ver="$(echo ${{ env.xercesc_ver }} | grep -o ${maj_min_rev})"
           grep "<Xerces>${xercesc_ver}</Xerces>" buildinfo
-          grep "<SUNDIALS>${sundials_ver}</SUNDIALS>" buildinfo
+          
+          if [ -n "${{ env.sundials_ver }}" ]; then
+            sundials_ver="$(echo ${{ env.sundials_ver }} | grep -o ${maj_min_rev})"
+            grep "<SUNDIALS>${sundials_ver}</SUNDIALS>" buildinfo
+          fi
+          
+          boost_ver="$(echo ${{ env.boost_ver }} | grep -o ${maj_min_rev})"
           grep "<Boost>${boost_ver}</Boost>" buildinfo
-          grep "<VTK>${vtk_ver}</VTK>" buildinfo
+          
+          if [ -n "${{ env.vtk_ver }}" ]; then
+            vtk_ver="$(echo ${{ env.vtk_ver }} | grep -o ${maj_min})"
+            grep "<VTK>${vtk_ver}</VTK>" buildinfo
+          fi
+          
+          petsc_ver="$(echo ${{ env.petsc_ver }} | grep -o ${maj_min_rev})"
           grep "<PETSc>${petsc_ver}</PETSc>" buildinfo
+          
+          hdf5_ver="$(echo ${{ env.hdf5_ver }} | grep -o ${maj_min_rev})"
           grep "<HDF5>${hdf5_ver}</HDF5>" buildinfo
 
       - name: build core libraries
