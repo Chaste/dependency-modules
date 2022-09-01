@@ -1,12 +1,27 @@
 name: portability-tests
 
 on:
-  workflow_dispatch:
   schedule:
     - cron: '0 1 * * *'
 
+  workflow_dispatch:
+    inputs:
+      weekday:
+        description: 'Weekday: Sun=0, Mon=1 ... Sat=6'
+        required: true
+        type: choice 
+        options: 
+          - '0'
+          - '1'
+          - '2'
+          - '3'
+          - '4'
+          - '5'
+          - '6'
+        default: '1'
+          
 jobs:
-  run-tests:
+  build-and-test:
     runs-on: [self-hosted, ubuntu-focal]
     timeout-minutes: 360
     
@@ -18,7 +33,11 @@ jobs:
     steps:
       - name: set versions by weekday
         run: |
-          weekday=$(date +'%w')
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            weekday=${{ github.event.inputs.weekday }}
+          else
+            weekday=$(date +'%w')
+          fi
           
           case ${weekday} in
             1)
