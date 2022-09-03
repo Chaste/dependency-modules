@@ -1,5 +1,10 @@
 #!/bin/bash -e
 
+if [ -n "${RUNNER_OFF}" ]; then
+    /bin/bash --login  # login to source /etc/profile.d/modules.sh
+    exit 0
+fi
+
 if [ -n "${RUNNER_REMOVE}" ]; then
     echo "Removing runner ..."
     runner_config.sh
