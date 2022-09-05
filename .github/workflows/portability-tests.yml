@@ -112,7 +112,7 @@ jobs:
               xercesc_ver=3.2.3
               sundials_ver=6.3.0
               boost_ver=1.80.0
-              vtk_ver=9.2.0
+              vtk_ver=9.1.0
               petsc_ver=3.17.4
               hdf5_ver=1.12.2
               petsc_arch=linux-gnu
