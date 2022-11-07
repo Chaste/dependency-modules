@@ -1,0 +1,48 @@
+name: petsc-portability-tests
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    strategy:
+      matrix:
+        include:
+          - xsd_ver: 4.0.0
+            xercesc_ver: 3.2.3
+            sundials_ver: 5.8.0
+            boost_ver: 1.73.0
+            vtk_ver: 6.3.0
+            petsc_ver: 3.7.7
+            petsc_arch: linux-gnu
+            hdf5_ver: 1.10.7
+
+          - xsd_ver: 4.0.0
+            xercesc_ver: 3.2.3
+            sundials_ver: 5.8.0
+            boost_ver: 1.73.0
+            vtk_ver: 6.3.0
+            petsc_ver: 3.7.7
+            petsc_arch: linux-gnu
+            hdf5_ver: 1.10.7
+
+      fail-fast: false
+
+    runs-on: [self-hosted]
+    timeout-minutes: 360
+        
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Run portability actions
+        uses: ./.github/actions/portability
+        with:
+          xsd_ver: ${{ matrix.xsd_ver }}
+          xercesc_ver: ${{ matrix.xercesc_ver }}
+          sundials_ver: ${{ matrix.sundials_ver }}
+          boost_ver: ${{ matrix.boost_ver }}
+          vtk_ver: ${{ matrix.vtk_ver }}
+          petsc_ver: ${{ matrix.petsc_ver }}
+          petsc_arch: ${{ matrix.petsc_arch }}
+          hdf5_ver: ${{ matrix.hdf5_ver }}
