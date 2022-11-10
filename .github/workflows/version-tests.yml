@@ -1,0 +1,299 @@
+name: version-tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      xsd_ver:
+        description: 'XSD version'
+        required: true
+        type: string 
+        default: '4.0.0'
+
+      xercesc_ver:
+        description: 'Xerces-C version'
+        required: true
+        type: string 
+        default: '3.2.3'
+
+      sundials_ver:
+        description: 'Sundials version'
+        required: false
+        type: string 
+        default: '5.8.0'
+
+      boost_ver:
+        description: 'Boost version'
+        required: true
+        type: string 
+        default: '1.73.0'
+
+      vtk_ver:
+        description: 'VTK version'
+        required: false
+        type: string 
+        default: '6.3.0'
+
+      petsc_ver:
+        description: 'PETSc version'
+        required: true
+        type: string 
+        default: '3.12.4'
+
+      petsc_arch:
+        description: 'PETSc arch'
+        required: true
+        type: choice
+        options:
+          - 'linux-gnu'
+          - 'linux-gnu-opt'
+        default: 'linux-gnu'
+      
+      hdf5_ver:
+        description: 'HDF5 version'
+        required: true
+        type: string 
+        default: '1.10.7'
+
+jobs:
+  build-and-test:
+    runs-on: [self-hosted]
+    timeout-minutes: 360
+    
+    defaults:
+      run:
+        # --login to source /etc/profile.d/modules.sh
+        shell: bash --login -e -o pipefail {0}
+        
+    steps:
+      - name: Set dependency versions
+        run: |
+          xsd_ver=${{ github.event.inputs.xsd_ver }}
+          xercesc_ver=${{ github.event.inputs.xercesc_ver }}
+          sundials_ver=${{ github.event.inputs.sundials_ver }}
+          boost_ver=${{ github.event.inputs.boost_ver }}
+          vtk_ver=${{ github.event.inputs.vtk_ver }}
+          petsc_ver=${{ github.event.inputs.petsc_ver }}
+          petsc_arch=${{ github.event.inputs.petsc_arch }}
+          hdf5_ver=${{ github.event.inputs.hdf5_ver }}
+
+          echo "xsd_ver=${xsd_ver}" >> ${GITHUB_ENV}
+          echo "xercesc_ver=${xercesc_ver}" >> ${GITHUB_ENV}
+          echo "sundials_ver=${sundials_ver}" >> ${GITHUB_ENV}
+          echo "boost_ver=${boost_ver}" >> ${GITHUB_ENV}
+          echo "vtk_ver=${vtk_ver}" >> ${GITHUB_ENV}
+          echo "petsc_ver=${petsc_ver}" >> ${GITHUB_ENV}
+          echo "petsc_arch=${petsc_arch}" >> ${GITHUB_ENV}
+          echo "hdf5_ver=${hdf5_ver}" >> ${GITHUB_ENV}
+
+      - name: Set environment variables
+        run: |
+          modules_dir="${MODULES_DIR:-${HOME}/modules}"
+          echo "modules_dir=${modules_dir}" >> ${GITHUB_ENV}
+          echo "parallel=$(( $(nproc) < 16 ? $(nproc) : 16 ))" >> ${GITHUB_ENV}
+          echo "niceness=10" >> ${GITHUB_ENV}
+          echo "CHASTE_TEST_OUTPUT=${HOME}/testoutput/$(date +'%Y%m%d%H%M%S')" >> ${GITHUB_ENV}
+
+      - name: Make required directories
+        run: |
+          mkdir -p ${{ env.modules_dir }}/modulefiles
+          mkdir -p ${{ env.CHASTE_TEST_OUTPUT }}
+
+      - name: Create module loading script
+        run: |
+          echo "module purge" > modulesinit.sh
+          echo "module use ${{ env.modules_dir }}/modulefiles" >> modulesinit.sh
+
+      - name: Setup xsd
+        run: |
+          source modulesinit.sh
+          err=0 && module test xsd/${{ env.xsd_ver }} || err=$?
+          if [ $err -ne 0 ]; then
+            nice -n ${{ env.niceness }} install_xsd.sh \
+              --version=${{ env.xsd_ver }} \
+              --modules-dir=${{ env.modules_dir }}
+            module test xsd/${{ env.xsd_ver }}
+          fi
+
+      - name: Setup xercesc
+        run: |
+          source modulesinit.sh
+          err=0 && module test xercesc/${{ env.xercesc_ver }} || err=$?
+          if [ $err -ne 0 ]; then
+            nice -n ${{ env.niceness }} install_xercesc.sh \
+              --version=${{ env.xercesc_ver }} \
+              --modules-dir=${{ env.modules_dir }} \
+              --parallel=${{ env.parallel }}
+            module test xercesc/${{ env.xercesc_ver }}
+          fi
+
+      - name: Setup sundials
+        run: |
+          if [ -n "${{ env.sundials_ver }}" ]; then
+            source modulesinit.sh
+            err=0 && module test sundials/${{ env.sundials_ver }} || err=$?
+            if [ $err -ne 0 ]; then
+              nice -n ${{ env.niceness }} install_sundials.sh \
+                --version=${{ env.sundials_ver }} \
+                --modules-dir=${{ env.modules_dir }} \
+                --parallel=${{ env.parallel }}
+              module test sundials/${{ env.sundials_ver }}
+            fi
+          fi
+
+      - name: Setup boost
+        run: |
+          source modulesinit.sh
+          err=0 && module test boost/${{ env.boost_ver }} || err=$?
+          if [ $err -ne 0 ]; then
+            nice -n ${{ env.niceness }} install_boost.sh \
+              --version=${{ env.boost_ver }} \
+              --modules-dir=${{ env.modules_dir }} \
+              --parallel=${{ env.parallel }}
+            module test boost/${{ env.boost_ver }}
+          fi
+
+      - name: Setup vtk
+        run: |
+          if [ -n "${{ env.vtk_ver }}" ]; then
+            source modulesinit.sh
+            err=0 && module test vtk/${{ env.vtk_ver }} || err=$?
+            if [ $err -ne 0 ]; then
+              nice -n ${{ env.niceness }} install_vtk.sh \
+                --version=${{ env.vtk_ver }} \
+                --modules-dir=${{ env.modules_dir }} \
+                --parallel=${{ env.parallel }}
+              module test vtk/${{ env.vtk_ver }}
+            fi
+          fi
+
+      - name: Setup petsc_hdf5
+        run: |
+          source modulesinit.sh
+          err=0 && module test petsc_hdf5/${{ env.petsc_ver }}_${{ env.hdf5_ver }}/${{ env.petsc_arch }} || err=$?
+          if [ $err -ne 0 ]; then
+            nice -n ${{ env.niceness }} install_petsc_hdf5.sh \
+              --petsc-version=${{ env.petsc_ver }} \
+              --hdf5-version=${{ env.hdf5_ver }} \
+              --petsc-arch=${{ env.petsc_arch }} \
+              --modules-dir=${{ env.modules_dir }} \
+              --parallel=${{ env.parallel }}
+            module test petsc_hdf5/${{ env.petsc_ver }}_${{ env.hdf5_ver }}/${{ env.petsc_arch }}
+          fi
+
+      - name: Add versions to module loading script
+        run: |
+          echo "module load xsd/${{ env.xsd_ver }}" >> modulesinit.sh
+          echo "module load xercesc/${{ env.xercesc_ver }}" >> modulesinit.sh
+          echo "module load boost/${{ env.boost_ver }}" >> modulesinit.sh
+          echo "module load petsc_hdf5/${{ env.petsc_ver }}_${{ env.hdf5_ver }}/${{ env.petsc_arch }}" >> modulesinit.sh
+          
+          if [ -n "${{ env.sundials_ver }}" ]; then
+            echo "module load sundials/${{ env.sundials_ver }}" >> modulesinit.sh
+          fi
+          
+          if [ -n "${{ env.vtk_ver }}" ]; then
+            echo "module load vtk/${{ env.vtk_ver }}" >> modulesinit.sh
+          fi
+          
+      - name: Checkout Chaste
+        uses: actions/checkout@v3
+        with:
+          repository: Chaste/Chaste
+          path: Chaste
+          submodules: recursive
+
+      - name: Configure Chaste
+        run: |
+          source modulesinit.sh
+
+          if [ -z "${{ env.sundials_ver }}" ]; then
+            use_cvode="OFF"
+          else
+            use_cvode="ON"
+          fi
+          
+          if [ -z "${{ env.vtk_ver }}" ]; then
+            use_vtk="OFF"
+          else
+            use_vtk="ON"
+          fi
+
+          mkdir -p Chaste/build
+          cd Chaste/build
+          nice -n ${{ env.niceness }} cmake \
+            -DBoost_NO_BOOST_CMAKE=ON \
+            -DBoost_NO_SYSTEM_PATHS=ON \
+            -DBOOST_ROOT=${BOOST_ROOT} \
+            -DChaste_USE_CVODE=${use_cvode} \
+            -DChaste_USE_VTK=${use_vtk} \
+            -DCMAKE_PREFIX_PATH="${XERCESC_ROOT};${XSD_ROOT};${SUNDIALS_ROOT};${VTK_ROOT}" \
+            -DCMAKE_BUILD_TYPE=Release \
+            ..
+
+      - name: Compile Chaste build info
+        run: |
+          source modulesinit.sh
+          cd Chaste/build
+          nice -n ${{ env.niceness }} cmake --build . --parallel ${{ env.parallel }} --target TestChasteBuildInfo
+          nice -n ${{ env.niceness }} ctest -V -R TestChasteBuildInfo --output-on-failure | tee buildinfo
+
+      - name: Verify dependency versions
+        run: |
+          cd Chaste/build
+          sed -i.bak 's/"//g' buildinfo  # removes quotes from old sundials versions
+
+          maj_min_rev='^[0-9]\+\.[0-9]\+\.[0-9]\+'
+          maj_min='^[0-9]\+\.[0-9]\+'
+
+          xsd_ver="$(echo ${{ env.xsd_ver }} | grep -o ${maj_min_rev})"
+          grep "<XSD>${xsd_ver}</XSD>" buildinfo
+          
+          xercesc_ver="$(echo ${{ env.xercesc_ver }} | grep -o ${maj_min_rev})"
+          grep "<Xerces>${xercesc_ver}</Xerces>" buildinfo
+          
+          if [ -n "${{ env.sundials_ver }}" ]; then
+            sundials_ver="$(echo ${{ env.sundials_ver }} | grep -o ${maj_min_rev})"
+            grep "<SUNDIALS>${sundials_ver}</SUNDIALS>" buildinfo
+          fi
+          
+          boost_ver="$(echo ${{ env.boost_ver }} | grep -o ${maj_min_rev})"
+          grep "<Boost>${boost_ver}</Boost>" buildinfo
+          
+          if [ -n "${{ env.vtk_ver }}" ]; then
+            vtk_ver="$(echo ${{ env.vtk_ver }} | grep -o ${maj_min})"
+            grep "<VTK>${vtk_ver}</VTK>" buildinfo
+          fi
+          
+          petsc_ver="$(echo ${{ env.petsc_ver }} | grep -o ${maj_min_rev})"
+          grep "<PETSc>${petsc_ver}</PETSc>" buildinfo
+          
+          hdf5_ver="$(echo ${{ env.hdf5_ver }} | grep -o ${maj_min_rev})"
+          grep "<HDF5>${hdf5_ver}</HDF5>" buildinfo
+
+      - name: Build Chaste all target
+        run: |
+          source modulesinit.sh
+          cd Chaste/build
+          nice -n ${{ env.niceness }} cmake --build . --parallel ${{ env.parallel }} --target all
+
+      - name: Run Continuous test pack
+        run: |
+          source modulesinit.sh
+          cd Chaste/build
+          nice -n ${{ env.niceness }} ctest -j ${{ env.parallel }} -L Continuous --output-on-failure
+
+      - name: Run Nightly test pack
+        run: |
+          source modulesinit.sh
+          cd Chaste/build
+          nice -n ${{ env.niceness }} ctest -j ${{ env.parallel }} -L Nightly --output-on-failure
+
+      - name: Run Parallel test pack
+        run: |
+          source modulesinit.sh
+          cd Chaste/build
+          nice -n ${{ env.niceness }} ctest -j ${{ env.parallel }} -L Parallel --output-on-failure
+
+      - name: Cleanup
+        if: always()
+        run: rm -rf ${{ env.modules_dir }}/src/*
