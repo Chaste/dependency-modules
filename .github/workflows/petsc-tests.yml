@@ -1,0 +1,123 @@
+name: petsc-tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      petsc_hdf5_ver:
+        description: 'PETSc + HDF5 version'
+        required: true
+        type: choice 
+        options: 
+          - '3.7.7_1.10.0-patch1/linux-gnu'
+          - '3.8.4_1.10.1/linux-gnu'
+          - '3.9.4_1.10.3/linux-gnu'
+          - '3.10.5_1.10.7/linux-gnu'
+          - '3.11.3_1.10.4/linux-gnu'
+          - '3.12.4_1.10.5/linux-gnu'
+          - '3.13.6_1.10.7/linux-gnu'
+          - '3.14.6_1.10.7/linux-gnu'
+          - '3.15.5_1.10.7/linux-gnu'
+          - '3.16.6_1.10.7/linux-gnu'
+          - '3.17.4_1.12.2/linux-gnu'
+        default: '1'
+          
+jobs:
+  build-and-test:
+    runs-on: [self-hosted]
+    timeout-minutes: 360
+    
+    defaults:
+      run:
+        # --login to source /etc/profile.d/modules.sh
+        shell: bash --login -e -o pipefail {0}
+        
+    steps:
+      - name: Set dependency versions
+        run: |
+          xsd_ver=4.0.0
+          xercesc_ver=3.2.3
+          sundials_ver=5.8.0
+          boost_ver=1.73.0
+          vtk_ver=6.3.0
+          echo "xsd_ver=${xsd_ver}" >> ${GITHUB_ENV}
+          echo "xercesc_ver=${xercesc_ver}" >> ${GITHUB_ENV}
+          echo "sundials_ver=${sundials_ver}" >> ${GITHUB_ENV}
+          echo "boost_ver=${boost_ver}" >> ${GITHUB_ENV}
+          echo "vtk_ver=${vtk_ver}" >> ${GITHUB_ENV}
+
+      - name: Set environment variables
+        run: |
+          MODULES_DIR="${MODULES_DIR:-${HOME}/modules}"
+          echo "MODULES_DIR=${MODULES_DIR}" >> ${GITHUB_ENV}
+          echo "CHASTE_TEST_OUTPUT=${HOME}/testoutput/$(date +'%Y%m%d%H%M%S')" >> ${GITHUB_ENV}
+          echo "NCPU=$(( $(nproc) < 16 ? $(nproc) : 16 ))" >> ${GITHUB_ENV}
+          echo "NICE=10" >> ${GITHUB_ENV}
+
+      - name: Make directories
+        run: |
+          mkdir -p ${{ env.MODULES_DIR }}/modulefiles
+          mkdir -p ${{ env.CHASTE_TEST_OUTPUT }}
+
+      - name: Create module loading script
+        run: |
+          echo "module purge" > modulesinit.sh
+          echo "module use ${{ env.MODULES_DIR }}/modulefiles" >> modulesinit.sh
+          echo "module load xsd/${{ env.xsd_ver }}" >> modulesinit.sh
+          echo "module load xercesc/${{ env.xercesc_ver }}" >> modulesinit.sh
+          echo "module load sundials/${{ env.sundials_ver }}" >> modulesinit.sh
+          echo "module load boost/${{ env.boost_ver }}" >> modulesinit.sh
+          echo "module load vtk/${{ env.vtk_ver }}" >> modulesinit.sh
+          echo "module load petsc_hdf5/${{ github.event.inputs.petsc_hdf5_ver }}" >> modulesinit.sh
+
+      - name: Checkout Chaste
+        uses: actions/checkout@v3
+        with:
+          repository: Chaste/Chaste
+          path: Chaste
+          submodules: recursive
+
+      - name: Configure Chaste
+        run: |
+          source modulesinit.sh
+          mkdir -p Chaste/build
+          cd Chaste/build
+          nice -n ${{ env.NICE }} cmake \
+            -DBoost_NO_BOOST_CMAKE=ON \
+            -DBoost_NO_SYSTEM_PATHS=ON \
+            -DBOOST_ROOT=${BOOST_ROOT} \
+            -DChaste_USE_CVODE=ON \
+            -DChaste_USE_VTK=ON \
+            -DCMAKE_PREFIX_PATH="${XERCESC_ROOT};${XSD_ROOT};${SUNDIALS_ROOT};${VTK_ROOT}" \
+            -DCMAKE_BUILD_TYPE=Release \
+            ..
+
+      - name: Compile Chaste build info
+        run: |
+          source modulesinit.sh
+          cd Chaste/build
+          nice -n ${{ env.NICE }} cmake --build . --parallel ${{ env.NCPU }} --target TestChasteBuildInfo
+          nice -n ${{ env.NICE }} ctest -V -R TestChasteBuildInfo --output-on-failure | tee buildinfo
+
+      - name: Compile Chaste all target
+        run: |
+          source modulesinit.sh
+          cd Chaste/build
+          nice -n ${{ env.NICE }} cmake --build . --parallel ${{ env.NCPU }} --target all
+
+      - name: Run Continuous test pack
+        run: |
+          source modulesinit.sh
+          cd Chaste/build
+          nice -n ${{ env.NICE }} ctest -j ${{ env.NCPU }} -L Continuous --output-on-failure
+
+      - name: Run Nightly test pack
+        run: |
+          source modulesinit.sh
+          cd Chaste/build
+          nice -n ${{ env.NICE }} ctest -j ${{ env.NCPU }} -L Nightly --output-on-failure
+
+      - name: Run Parallel test pack
+        run: |
+          source modulesinit.sh
+          cd Chaste/build
+          nice -n ${{ env.NICE }} ctest -j ${{ env.NCPU }} -L Parallel --output-on-failure
