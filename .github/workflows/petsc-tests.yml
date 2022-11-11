@@ -99,23 +99,11 @@ jobs:
           nice -n ${{ env.NICE }} cmake --build . --parallel ${{ env.NCPU }} --target TestChasteBuildInfo
           nice -n ${{ env.NICE }} ctest -V -R TestChasteBuildInfo --output-on-failure | tee buildinfo
 
-      - name: Compile Chaste all target
+      - name: Build Parallel test pack
         run: |
           source modulesinit.sh
           cd Chaste/build
-          nice -n ${{ env.NICE }} cmake --build . --parallel ${{ env.NCPU }} --target all
-
-      - name: Run Continuous test pack
-        run: |
-          source modulesinit.sh
-          cd Chaste/build
-          nice -n ${{ env.NICE }} ctest -j ${{ env.NCPU }} -L Continuous --output-on-failure
-
-      - name: Run Nightly test pack
-        run: |
-          source modulesinit.sh
-          cd Chaste/build
-          nice -n ${{ env.NICE }} ctest -j ${{ env.NCPU }} -L Nightly --output-on-failure
+          nice -n ${{ env.NICE }} cmake --build . --parallel ${{ env.NCPU }} --target Parallel
 
       - name: Run Parallel test pack
         run: |
