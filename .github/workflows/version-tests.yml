@@ -9,6 +9,12 @@ on:
         type: string
         default: 'develop'
 
+      test_suites:
+        description: 'Test suites'
+        required: true
+        type: string
+        default: 'Continuous,Parallel,Nightly'
+
       xsd_ver:
         description: 'XSD version'
         required: true
@@ -71,9 +77,44 @@ jobs:
         shell: bash --login -e -o pipefail {0}
         
     steps:
-      - name: Set Chaste branch and dependency versions
+      - name: Parse workflow inputs
         run: |
           chaste_branch=${{ github.event.inputs.chaste_branch }}
+          echo "chaste_branch=${chaste_branch}" >> ${GITHUB_ENV}
+
+          test_suites=($(echo "${{ github.event.inputs.test_suites }}" | tr '[:upper:]' '[:lower:]' | tr ',' '\n'))
+
+          run_continuous=0
+          run_parallel=0
+          run_nightly=0
+          run_weekly=0
+          
+          for suite in "${test_suites[@]}"; do
+            case $suite in
+              continuous)
+                run_continuous=1
+                ;;
+              parallel)
+                run_parallel=1
+                ;;
+              nightly)
+                run_nightly=1
+                ;;
+              weekly)
+                run_weekly=1
+                ;;
+              *)
+                echo "Unknown test suite: $suite" 1>&2
+                exit 1
+                ;;
+            esac
+          done
+
+          echo "run_continuous=${run_continuous}" >> ${GITHUB_ENV}
+          echo "run_parallel=${run_parallel}" >> ${GITHUB_ENV}
+          echo "run_nightly=${run_nightly}" >> ${GITHUB_ENV}
+          echo "run_weekly=${run_weekly}" >> ${GITHUB_ENV}
+
           xsd_ver=${{ github.event.inputs.xsd_ver }}
           xercesc_ver=${{ github.event.inputs.xercesc_ver }}
           sundials_ver=${{ github.event.inputs.sundials_ver }}
@@ -83,7 +124,6 @@ jobs:
           petsc_arch=${{ github.event.inputs.petsc_arch }}
           hdf5_ver=${{ github.event.inputs.hdf5_ver }}
 
-          echo "chaste_branch=${chaste_branch}" >> ${GITHUB_ENV}
           echo "xsd_ver=${xsd_ver}" >> ${GITHUB_ENV}
           echo "xercesc_ver=${xercesc_ver}" >> ${GITHUB_ENV}
           echo "sundials_ver=${sundials_ver}" >> ${GITHUB_ENV}
@@ -287,21 +327,31 @@ jobs:
 
       - name: Run Continuous test pack
         run: |
+          if: env.run_continuous == '1'
           source modulesinit.sh
           cd Chaste/build
           nice -n ${{ env.niceness }} ctest -j ${{ env.parallel }} -L Continuous --output-on-failure
 
+      - name: Run Parallel test pack
+        run: |
+          if: env.run_parallel == '1'
+          source modulesinit.sh
+          cd Chaste/build
+          nice -n ${{ env.niceness }} ctest -j ${{ env.parallel }} -L Parallel --output-on-failure
+
       - name: Run Nightly test pack
+        if: env.run_nightly == '1'
         run: |
           source modulesinit.sh
           cd Chaste/build
           nice -n ${{ env.niceness }} ctest -j ${{ env.parallel }} -L Nightly --output-on-failure
 
-      - name: Run Parallel test pack
+      - name: Run Weekly test pack
+        if: env.run_weekly == '1'
         run: |
           source modulesinit.sh
           cd Chaste/build
-          nice -n ${{ env.niceness }} ctest -j ${{ env.parallel }} -L Parallel --output-on-failure
+          nice -n ${{ env.niceness }} ctest -j ${{ env.parallel }} -L Weekly --output-on-failure
 
       - name: Cleanup
         if: always()
