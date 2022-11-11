@@ -89,6 +89,7 @@ jobs:
             -DChaste_USE_VTK=ON \
             -DCMAKE_PREFIX_PATH="${XERCESC_ROOT};${XSD_ROOT};${SUNDIALS_ROOT};${VTK_ROOT}" \
             -DCMAKE_BUILD_TYPE=Release \
+            -DChaste_NUM_CPUS_TEST=3 \
             ..
 
       - name: Compile Chaste build info
