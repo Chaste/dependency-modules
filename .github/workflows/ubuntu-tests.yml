@@ -102,6 +102,7 @@ jobs:
             -DBOOST_ROOT=${BOOST_ROOT} \
             -DCMAKE_PREFIX_PATH="${SUNDIALS_ROOT};${VTK_ROOT};${XERCESC_ROOT};${XSD_ROOT}" \
             -DCMAKE_BUILD_TYPE=Release \
+            -DChaste_NUM_CPUS_TEST=3 \
             ..
 
           cmake --build . --parallel $(nproc) --target TestChasteBuildInfo

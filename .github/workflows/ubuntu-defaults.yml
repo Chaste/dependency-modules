@@ -35,7 +35,11 @@ jobs:
 
       - name: configure chaste
         working-directory: Chaste/build
-        run: cmake -DCMAKE_BUILD_TYPE=Release ..
+        run: |
+          cmake \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DChaste_NUM_CPUS_TEST=3 \
+            ..
           
       - name: compile chaste build info
         working-directory: Chaste/build
