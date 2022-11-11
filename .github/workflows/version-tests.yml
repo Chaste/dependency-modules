@@ -277,6 +277,7 @@ jobs:
             -DChaste_USE_VTK=${use_vtk} \
             -DCMAKE_PREFIX_PATH="${XERCESC_ROOT};${XSD_ROOT};${SUNDIALS_ROOT};${VTK_ROOT}" \
             -DCMAKE_BUILD_TYPE=Release \
+            -DChaste_NUM_CPUS_TEST=3 \
             ..
 
       - name: Compile Chaste build info
@@ -326,28 +327,28 @@ jobs:
           nice -n ${{ env.niceness }} cmake --build . --parallel ${{ env.parallel }} --target all
 
       - name: Run Continuous test pack
+        if: ${{ env.run_continuous == '1' }}
         run: |
-          if: env.run_continuous == '1'
           source modulesinit.sh
           cd Chaste/build
           nice -n ${{ env.niceness }} ctest -j ${{ env.parallel }} -L Continuous --output-on-failure
 
       - name: Run Parallel test pack
+        if: ${{ env.run_parallel == '1' }}
         run: |
-          if: env.run_parallel == '1'
           source modulesinit.sh
           cd Chaste/build
           nice -n ${{ env.niceness }} ctest -j ${{ env.parallel }} -L Parallel --output-on-failure
 
       - name: Run Nightly test pack
-        if: env.run_nightly == '1'
+        if: ${{ env.run_nightly == '1' }}
         run: |
           source modulesinit.sh
           cd Chaste/build
           nice -n ${{ env.niceness }} ctest -j ${{ env.parallel }} -L Nightly --output-on-failure
 
       - name: Run Weekly test pack
-        if: env.run_weekly == '1'
+        if: ${{ env.run_weekly == '1' }}
         run: |
           source modulesinit.sh
           cd Chaste/build
