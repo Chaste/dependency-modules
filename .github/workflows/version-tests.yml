@@ -137,7 +137,7 @@ jobs:
         run: |
           modules_dir="${MODULES_DIR:-${HOME}/modules}"
           echo "modules_dir=${modules_dir}" >> ${GITHUB_ENV}
-          echo "parallel=$(( $(nproc) < 16 ? $(nproc) : 16 ))" >> ${GITHUB_ENV}
+          echo "parallel=$(( $(nproc) < 12 ? $(nproc) : 12 ))" >> ${GITHUB_ENV}
           echo "niceness=10" >> ${GITHUB_ENV}
           echo "CHASTE_TEST_OUTPUT=${HOME}/testoutput/$(date +'%Y%m%d%H%M%S')" >> ${GITHUB_ENV}
 
