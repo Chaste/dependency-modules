@@ -64,7 +64,7 @@ on:
         description: 'HDF5 version'
         required: true
         type: string 
-        default: '1.10.2'
+        default: '1.10.3'
 
 jobs:
   build-and-test:
