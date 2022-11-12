@@ -49,7 +49,7 @@ on:
         description: 'PETSc version'
         required: true
         type: string 
-        default: '3.9.4'
+        default: '3.8.4'
 
       petsc_arch:
         description: 'PETSc arch'
@@ -64,7 +64,7 @@ on:
         description: 'HDF5 version'
         required: true
         type: string 
-        default: '1.10.3'
+        default: '1.10.1'
 
 jobs:
   build-and-test:
