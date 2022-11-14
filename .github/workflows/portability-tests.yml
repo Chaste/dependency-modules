@@ -31,7 +31,7 @@ jobs:
         shell: bash --login -e -o pipefail {0}
         
     steps:
-      - name: set versions by weekday
+      - name: Set dependency versions by weekday
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             weekday=${{ github.event.inputs.weekday }}
@@ -132,7 +132,7 @@ jobs:
           echo "hdf5_ver=${hdf5_ver}" >> ${GITHUB_ENV}
           echo "petsc_arch=${petsc_arch}" >> ${GITHUB_ENV}
 
-      - name: set env variables
+      - name: Set environment variables
         run: |
           MODULES_DIR="${MODULES_DIR:-${HOME}/modules}"
           echo "MODULES_DIR=${MODULES_DIR}" >> ${GITHUB_ENV}
@@ -143,18 +143,18 @@ jobs:
           
           echo "NICE=10" >> ${GITHUB_ENV}
 
-      - name: make directories
+      - name: Make directories
         run: |
           mkdir -p ${{ env.MODULES_DIR }}/modulefiles
           mkdir -p ${{ env.CHASTE_TEST_OUTPUT }}
 
-      - name: create modules init script
+      - name: Create modules init script
         run: |
           echo "module purge" > modulesinit.sh
           echo "module use ${{ env.MODULES_DIR }}/modulefiles" >> modulesinit.sh
           chmod +x modulesinit.sh
 
-      - name: setup xsd
+      - name: Setup xsd
         run: |
           . ./modulesinit.sh
           err=0 && module test xsd/${{ env.xsd_ver }} || err=$?
@@ -165,7 +165,7 @@ jobs:
             module test xsd/${{ env.xsd_ver }}
           fi
 
-      - name: setup xercesc
+      - name: Setup xercesc
         run: |
           . ./modulesinit.sh
           err=0 && module test xercesc/${{ env.xercesc_ver }} || err=$?
@@ -177,7 +177,7 @@ jobs:
             module test xercesc/${{ env.xercesc_ver }}
           fi
 
-      - name: setup sundials
+      - name: Setup sundials
         run: |
           if [ -n "${{ env.sundials_ver }}" ]; then
             . ./modulesinit.sh
@@ -191,7 +191,7 @@ jobs:
             fi
           fi
 
-      - name: setup boost
+      - name: Setup boost
         run: |
           . ./modulesinit.sh
           err=0 && module test boost/${{ env.boost_ver }} || err=$?
@@ -203,7 +203,7 @@ jobs:
             module test boost/${{ env.boost_ver }}
           fi
 
-      - name: setup vtk
+      - name: Setup vtk
         run: |
           if [ -n "${{ env.vtk_ver }}" ]; then
             . ./modulesinit.sh
@@ -217,7 +217,7 @@ jobs:
             fi
           fi
 
-      - name: setup petsc_hdf5
+      - name: Setup petsc_hdf5
         run: |
           . ./modulesinit.sh
           err=0 && module test petsc_hdf5/${{ env.petsc_ver }}_${{ env.hdf5_ver }}/${{ env.petsc_arch }} || err=$?
@@ -231,7 +231,7 @@ jobs:
             module test petsc_hdf5/${{ env.petsc_ver }}_${{ env.hdf5_ver }}/${{ env.petsc_arch }}
           fi
 
-      - name: add versions to modules init script
+      - name: Add versions to modules init script
         run: |
           echo "module load xsd/${{ env.xsd_ver }}" >> modulesinit.sh
           
@@ -249,14 +249,14 @@ jobs:
           
           echo "module load petsc_hdf5/${{ env.petsc_ver }}_${{ env.hdf5_ver }}/${{ env.petsc_arch }}" >> modulesinit.sh
 
-      - name: checkout chaste
+      - name: Checkout Chaste
         uses: actions/checkout@v3
         with:
           repository: Chaste/Chaste
           path: Chaste
           submodules: recursive
 
-      - name: configure chaste
+      - name: Configure Chaste
         run: |
           . ./modulesinit.sh
           
@@ -282,17 +282,16 @@ jobs:
             -DChaste_USE_VTK=${use_vtk} \
             -DCMAKE_PREFIX_PATH="${XERCESC_ROOT};${XSD_ROOT};${SUNDIALS_ROOT};${VTK_ROOT}" \
             -DCMAKE_BUILD_TYPE=Release \
-            -DChaste_NUM_CPUS_TEST=3 \
             ..
 
-      - name: compile chaste build info
+      - name: Compile Chaste build info
         run: |
           . ./modulesinit.sh
           cd Chaste/build
           nice -n ${{ env.NICE }} cmake --build . --parallel ${{ env.NCPU }} --target TestChasteBuildInfo
           nice -n ${{ env.NICE }} ctest -V -R TestChasteBuildInfo --output-on-failure | tee buildinfo
 
-      - name: verify dependency versions
+      - name: Verify dependency versions
         run: |
           cd Chaste/build
           sed -i.bak 's/"//g' buildinfo  # removes quotes from old sundials versions
@@ -325,30 +324,66 @@ jobs:
           hdf5_ver="$(echo ${{ env.hdf5_ver }} | grep -o ${maj_min_rev})"
           grep "<HDF5>${hdf5_ver}</HDF5>" buildinfo
 
-      - name: build all
+      - name: Build Chaste all target
         run: |
           . ./modulesinit.sh
           cd Chaste/build
           nice -n ${{ env.NICE }} cmake --build . --parallel ${{ env.NCPU }} --target all
 
-      - name: run continuous test pack
+      - name: Run Continuous test pack
         run: |
           . ./modulesinit.sh
           cd Chaste/build
           nice -n ${{ env.NICE }} ctest -j ${{ env.NCPU }} -L Continuous --output-on-failure
 
-      - name: run nightly test pack
+      - name: Run Nightly test pack
         run: |
           . ./modulesinit.sh
           cd Chaste/build
           nice -n ${{ env.NICE }} ctest -j ${{ env.NCPU }} -L Nightly --output-on-failure
 
-      - name: run parallel test pack
+      - name: Reconfigure for Parallel test pack
+        run: |
+          . ./modulesinit.sh
+          
+          if [ -z "${{ env.sundials_ver }}" ]; then
+            use_cvode="OFF"
+          else
+            use_cvode="ON"
+          fi
+          
+          if [ -z "${{ env.vtk_ver }}" ]; then
+            use_vtk="OFF"
+          else
+            use_vtk="ON"
+          fi
+
+          mkdir -p Chaste/build
+          cd Chaste/build
+          rm -rf *
+          nice -n ${{ env.NICE }} cmake \
+            -DBoost_NO_BOOST_CMAKE=ON \
+            -DBoost_NO_SYSTEM_PATHS=ON \
+            -DBOOST_ROOT=${BOOST_ROOT} \
+            -DChaste_USE_CVODE=${use_cvode} \
+            -DChaste_USE_VTK=${use_vtk} \
+            -DCMAKE_PREFIX_PATH="${XERCESC_ROOT};${XSD_ROOT};${SUNDIALS_ROOT};${VTK_ROOT}" \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DChaste_NUM_CPUS_TEST=3 \
+            ..
+
+      - name: Build Parallel test pack
+        run: |
+          . ./modulesinit.sh
+          cd Chaste/build
+          nice -n ${{ env.NICE }} cmake --build . --parallel ${{ env.NCPU }} --target Parallel
+
+      - name: Run Parallel test pack
         run: |
           . ./modulesinit.sh
           cd Chaste/build
           nice -n ${{ env.NICE }} ctest -j ${{ env.NCPU }} -L Parallel --output-on-failure
 
-      - name: cleanup
+      - name: Cleanup
         if: always()
         run: rm -rf ${{ env.MODULES_DIR }}/src/*

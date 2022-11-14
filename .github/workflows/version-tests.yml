@@ -361,7 +361,7 @@ jobs:
           cd Chaste/build
           nice -n ${{ env.niceness }} ctest -j ${{ env.parallel }} -L Weekly --output-on-failure
 
-      - name: Reconfigure for Parallel Test Pack
+      - name: Reconfigure for Parallel test pack
         if: ${{ env.run_parallel == '1' }}
         run: |
           source modulesinit.sh
