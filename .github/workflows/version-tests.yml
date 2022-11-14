@@ -277,7 +277,6 @@ jobs:
             -DChaste_USE_VTK=${use_vtk} \
             -DCMAKE_PREFIX_PATH="${XERCESC_ROOT};${XSD_ROOT};${SUNDIALS_ROOT};${VTK_ROOT}" \
             -DCMAKE_BUILD_TYPE=Release \
-            -DChaste_NUM_CPUS_TEST=3 \
             ..
 
       - name: Compile Chaste build info
@@ -320,11 +319,12 @@ jobs:
           hdf5_ver="$(echo ${{ env.hdf5_ver }} | grep -o ${maj_min_rev})"
           grep "<HDF5>${hdf5_ver}</HDF5>" buildinfo
 
-      - name: Build Chaste all target
+      - name: Build Continuous test pack
+        if: ${{ env.run_continuous == '1' }}
         run: |
           source modulesinit.sh
           cd Chaste/build
-          nice -n ${{ env.niceness }} cmake --build . --parallel ${{ env.parallel }} --target all
+          nice -n ${{ env.niceness }} cmake --build . --parallel ${{ env.parallel }} --target Continuous
 
       - name: Run Continuous test pack
         if: ${{ env.run_continuous == '1' }}
@@ -333,12 +333,12 @@ jobs:
           cd Chaste/build
           nice -n ${{ env.niceness }} ctest -j ${{ env.parallel }} -L Continuous --output-on-failure
 
-      - name: Run Parallel test pack
-        if: ${{ env.run_parallel == '1' }}
+      - name: Build Nightly test pack
+        if: ${{ env.run_nightly == '1' }}
         run: |
           source modulesinit.sh
           cd Chaste/build
-          nice -n ${{ env.niceness }} ctest -j ${{ env.parallel }} -L Parallel --output-on-failure
+          nice -n ${{ env.niceness }} cmake --build . --parallel ${{ env.parallel }} --target Nightly
 
       - name: Run Nightly test pack
         if: ${{ env.run_nightly == '1' }}
@@ -347,12 +347,64 @@ jobs:
           cd Chaste/build
           nice -n ${{ env.niceness }} ctest -j ${{ env.parallel }} -L Nightly --output-on-failure
 
+      - name: Build Weekly test pack
+        if: ${{ env.run_weekly == '1' }}
+        run: |
+          source modulesinit.sh
+          cd Chaste/build
+          nice -n ${{ env.niceness }} cmake --build . --parallel ${{ env.parallel }} --target Weekly
+
       - name: Run Weekly test pack
         if: ${{ env.run_weekly == '1' }}
         run: |
           source modulesinit.sh
           cd Chaste/build
           nice -n ${{ env.niceness }} ctest -j ${{ env.parallel }} -L Weekly --output-on-failure
+
+      - name: Reconfigure for Parallel Test Pack
+        if: ${{ env.run_parallel == '1' }}
+        run: |
+          source modulesinit.sh
+
+          if [ -z "${{ env.sundials_ver }}" ]; then
+            use_cvode="OFF"
+          else
+            use_cvode="ON"
+          fi
+          
+          if [ -z "${{ env.vtk_ver }}" ]; then
+            use_vtk="OFF"
+          else
+            use_vtk="ON"
+          fi
+
+          mkdir -p Chaste/build
+          cd Chaste/build
+          rm -rf *
+          nice -n ${{ env.niceness }} cmake \
+            -DBoost_NO_BOOST_CMAKE=ON \
+            -DBoost_NO_SYSTEM_PATHS=ON \
+            -DBOOST_ROOT=${BOOST_ROOT} \
+            -DChaste_USE_CVODE=${use_cvode} \
+            -DChaste_USE_VTK=${use_vtk} \
+            -DCMAKE_PREFIX_PATH="${XERCESC_ROOT};${XSD_ROOT};${SUNDIALS_ROOT};${VTK_ROOT}" \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DChaste_NUM_CPUS_TEST=3 \
+            ..
+
+      - name: Build Parallel test pack
+        if: ${{ env.run_parallel == '1' }}
+        run: |
+          source modulesinit.sh
+          cd Chaste/build
+          nice -n ${{ env.niceness }} cmake --build . --parallel ${{ env.parallel }} --target Parallel
+
+      - name: Run Parallel test pack
+        if: ${{ env.run_parallel == '1' }}
+        run: |
+          source modulesinit.sh
+          cd Chaste/build
+          nice -n ${{ env.niceness }} ctest -j ${{ env.parallel }} -L Parallel --output-on-failure
 
       - name: Cleanup
         if: always()
