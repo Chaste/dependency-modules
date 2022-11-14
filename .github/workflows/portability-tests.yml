@@ -21,17 +21,26 @@ on:
         default: '1'
           
 jobs:
-  build-and-test:
-    runs-on: [self-hosted, ubuntu-focal]
-    timeout-minutes: 360
+  versions:
+    runs-on: [self-hosted]
+    timeout-minutes: 60
     
     defaults:
       run:
-        # --login to source /etc/profile.d/modules.sh
-        shell: bash --login -e -o pipefail {0}
+        shell: bash
+
+    outputs:
+      xsd_ver: ${{ steps.weekdays.outputs.xsd_ver }}
+      xercesc_ver: ${{ steps.weekdays.outputs.xercesc_ver }}
+      sundials_ver: ${{ steps.weekdays.outputs.sundials_ver }}
+      boost_ver: ${{ steps.weekdays.outputs.boost_ver }}
+      vtk_ver: ${{ steps.weekdays.outputs.vtk_ver }}
+      petsc_ver: ${{ steps.weekdays.outputs.petsc_ver }}
+      petsc_arch: ${{ steps.weekdays.outputs.petsc_arch }}
+      hdf5_ver: ${{ steps.weekdays.outputs.hdf5_ver }}
         
     steps:
-      - name: Set dependency versions by weekday
+      - id: weekdays
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             weekday=${{ github.event.inputs.weekday }}
@@ -42,80 +51,87 @@ jobs:
           case ${weekday} in
             1)
               # Mon: Oldest on Ubuntu 18.04 LTS
+              echo "Monday"
               xsd_ver=4.0.0
               xercesc_ver=3.2.0
               sundials_ver=2.7.0
               boost_ver=1.62.0
               vtk_ver=6.3.0
               petsc_ver=3.7.7
-              hdf5_ver=1.10.0-patch1
               petsc_arch=linux-gnu
+              hdf5_ver=1.10.0-patch1
               ;;
             2)
               # Tue
+              echo "Tuesday"
               xsd_ver=4.0.0
               xercesc_ver=3.2.1
               sundials_ver=3.1.2
               boost_ver=1.66.0
               vtk_ver=7.1.0
               petsc_ver=3.8.4
-              hdf5_ver=1.10.1
               petsc_arch=linux-gnu
+              hdf5_ver=1.10.1
               ;;
             3)
               # Wed: Minimal config - no Sundials or VTK
+              echo "Wednesday"
               xsd_ver=4.0.0
               xercesc_ver=3.2.2
               sundials_ver=
               boost_ver=1.67.0
               vtk_ver=
               petsc_ver=3.9.4
-              hdf5_ver=1.10.3
               petsc_arch=linux-gnu
+              hdf5_ver=1.10.3
               ;;
             4)
               # Thu
+              echo "Thursday"
               xsd_ver=4.0.0
               xercesc_ver=3.2.1
               sundials_ver=4.1.0
               boost_ver=1.71.0
               vtk_ver=8.1.0
               petsc_ver=3.11.3
-              hdf5_ver=1.10.4
               petsc_arch=linux-gnu
+              hdf5_ver=1.10.4
               ;;
             5)
               # Fri
+              echo "Friday"
               xsd_ver=4.0.0
               xercesc_ver=3.2.2
               sundials_ver=5.1.0
               boost_ver=1.73.0
               vtk_ver=8.2.0
               petsc_ver=3.12.4
-              hdf5_ver=1.10.5
               petsc_arch=linux-gnu
+              hdf5_ver=1.10.5
               ;;
             6)
               # Sat: Newest on Ubuntu 22.04 LTS
+              echo "Saturday"
               xsd_ver=4.0.0
               xercesc_ver=3.2.3
               sundials_ver=5.8.0
               boost_ver=1.74.0
               vtk_ver=9.1.0
               petsc_ver=3.15.5
-              hdf5_ver=1.10.7
               petsc_arch=linux-gnu
+              hdf5_ver=1.10.7
               ;;
             0)
               # Sun: Bleeding Edge
+              echo "Sunday"
               xsd_ver=4.0.0
               xercesc_ver=3.2.3
               sundials_ver=6.3.0
               boost_ver=1.80.0
               vtk_ver=9.1.0
               petsc_ver=3.17.4
-              hdf5_ver=1.12.2
               petsc_arch=linux-gnu
+              hdf5_ver=1.12.2
               ;;
             *)
               echo "Unknown weekday: ${weekday}"
@@ -123,267 +139,26 @@ jobs:
               ;;
           esac
           
-          echo "xsd_ver=${xsd_ver}" >> ${GITHUB_ENV}
-          echo "xercesc_ver=${xercesc_ver}" >> ${GITHUB_ENV}
-          echo "sundials_ver=${sundials_ver}" >> ${GITHUB_ENV}
-          echo "boost_ver=${boost_ver}" >> ${GITHUB_ENV}
-          echo "vtk_ver=${vtk_ver}" >> ${GITHUB_ENV}
-          echo "petsc_ver=${petsc_ver}" >> ${GITHUB_ENV}
-          echo "hdf5_ver=${hdf5_ver}" >> ${GITHUB_ENV}
-          echo "petsc_arch=${petsc_arch}" >> ${GITHUB_ENV}
+          echo "xsd_ver=${xsd_ver}" >> ${GITHUB_OUTPUT}
+          echo "xercesc_ver=${xercesc_ver}" >> ${GITHUB_OUTPUT}
+          echo "sundials_ver=${sundials_ver}" >> ${GITHUB_OUTPUT}
+          echo "boost_ver=${boost_ver}" >> ${GITHUB_OUTPUT}
+          echo "vtk_ver=${vtk_ver}" >> ${GITHUB_OUTPUT}
+          echo "petsc_ver=${petsc_ver}" >> ${GITHUB_OUTPUT}
+          echo "petsc_arch=${petsc_arch}" >> ${GITHUB_OUTPUT}
+          echo "hdf5_ver=${hdf5_ver}" >> ${GITHUB_OUTPUT}
 
-      - name: Set environment variables
-        run: |
-          MODULES_DIR="${MODULES_DIR:-${HOME}/modules}"
-          echo "MODULES_DIR=${MODULES_DIR}" >> ${GITHUB_ENV}
-          
-          echo "CHASTE_TEST_OUTPUT=${HOME}/testoutput/$(date +'%Y%m%d%H%M%S')" >> ${GITHUB_ENV}
-          
-          echo "NCPU=$(( $(nproc) < 16 ? $(nproc) : 16 ))" >> ${GITHUB_ENV}
-          
-          echo "NICE=10" >> ${GITHUB_ENV}
-
-      - name: Make directories
-        run: |
-          mkdir -p ${{ env.MODULES_DIR }}/modulefiles
-          mkdir -p ${{ env.CHASTE_TEST_OUTPUT }}
-
-      - name: Create modules init script
-        run: |
-          echo "module purge" > modulesinit.sh
-          echo "module use ${{ env.MODULES_DIR }}/modulefiles" >> modulesinit.sh
-          chmod +x modulesinit.sh
-
-      - name: Setup xsd
-        run: |
-          . ./modulesinit.sh
-          err=0 && module test xsd/${{ env.xsd_ver }} || err=$?
-          if [ $err -ne 0 ]; then
-            nice -n ${{ env.NICE }} install_xsd.sh \
-              --version=${{ env.xsd_ver }} \
-              --modules-dir=${{ env.MODULES_DIR }}
-            module test xsd/${{ env.xsd_ver }}
-          fi
-
-      - name: Setup xercesc
-        run: |
-          . ./modulesinit.sh
-          err=0 && module test xercesc/${{ env.xercesc_ver }} || err=$?
-          if [ $err -ne 0 ]; then
-            nice -n ${{ env.NICE }} install_xercesc.sh \
-              --version=${{ env.xercesc_ver }} \
-              --modules-dir=${{ env.MODULES_DIR }} \
-              --parallel=${{ env.NCPU }}
-            module test xercesc/${{ env.xercesc_ver }}
-          fi
-
-      - name: Setup sundials
-        run: |
-          if [ -n "${{ env.sundials_ver }}" ]; then
-            . ./modulesinit.sh
-            err=0 && module test sundials/${{ env.sundials_ver }} || err=$?
-            if [ $err -ne 0 ]; then
-              nice -n ${{ env.NICE }} install_sundials.sh \
-                --version=${{ env.sundials_ver }} \
-                --modules-dir=${{ env.MODULES_DIR }} \
-                --parallel=${{ env.NCPU }}
-              module test sundials/${{ env.sundials_ver }}
-            fi
-          fi
-
-      - name: Setup boost
-        run: |
-          . ./modulesinit.sh
-          err=0 && module test boost/${{ env.boost_ver }} || err=$?
-          if [ $err -ne 0 ]; then
-            nice -n ${{ env.NICE }} install_boost.sh \
-              --version=${{ env.boost_ver }} \
-              --modules-dir=${{ env.MODULES_DIR }} \
-              --parallel=${{ env.NCPU }}
-            module test boost/${{ env.boost_ver }}
-          fi
-
-      - name: Setup vtk
-        run: |
-          if [ -n "${{ env.vtk_ver }}" ]; then
-            . ./modulesinit.sh
-            err=0 && module test vtk/${{ env.vtk_ver }} || err=$?
-            if [ $err -ne 0 ]; then
-              nice -n ${{ env.NICE }} install_vtk.sh \
-                --version=${{ env.vtk_ver }} \
-                --modules-dir=${{ env.MODULES_DIR }} \
-                --parallel=${{ env.NCPU }}
-              module test vtk/${{ env.vtk_ver }}
-            fi
-          fi
-
-      - name: Setup petsc_hdf5
-        run: |
-          . ./modulesinit.sh
-          err=0 && module test petsc_hdf5/${{ env.petsc_ver }}_${{ env.hdf5_ver }}/${{ env.petsc_arch }} || err=$?
-          if [ $err -ne 0 ]; then
-            nice -n ${{ env.NICE }} install_petsc_hdf5.sh \
-              --petsc-version=${{ env.petsc_ver }} \
-              --hdf5-version=${{ env.hdf5_ver }} \
-              --petsc-arch=${{ env.petsc_arch }} \
-              --modules-dir=${{ env.MODULES_DIR }} \
-              --parallel=${{ env.NCPU }}
-            module test petsc_hdf5/${{ env.petsc_ver }}_${{ env.hdf5_ver }}/${{ env.petsc_arch }}
-          fi
-
-      - name: Add versions to modules init script
-        run: |
-          echo "module load xsd/${{ env.xsd_ver }}" >> modulesinit.sh
-          
-          echo "module load xercesc/${{ env.xercesc_ver }}" >> modulesinit.sh
-          
-          if [ -n "${{ env.sundials_ver }}" ]; then
-            echo "module load sundials/${{ env.sundials_ver }}" >> modulesinit.sh
-          fi
-          
-          echo "module load boost/${{ env.boost_ver }}" >> modulesinit.sh
-          
-          if [ -n "${{ env.vtk_ver }}" ]; then
-            echo "module load vtk/${{ env.vtk_ver }}" >> modulesinit.sh
-          fi
-          
-          echo "module load petsc_hdf5/${{ env.petsc_ver }}_${{ env.hdf5_ver }}/${{ env.petsc_arch }}" >> modulesinit.sh
-
-      - name: Checkout Chaste
-        uses: actions/checkout@v3
-        with:
-          repository: Chaste/Chaste
-          path: Chaste
-          submodules: recursive
-
-      - name: Configure Chaste
-        run: |
-          . ./modulesinit.sh
-          
-          if [ -z "${{ env.sundials_ver }}" ]; then
-            use_cvode="OFF"
-          else
-            use_cvode="ON"
-          fi
-          
-          if [ -z "${{ env.vtk_ver }}" ]; then
-            use_vtk="OFF"
-          else
-            use_vtk="ON"
-          fi
-
-          mkdir -p Chaste/build
-          cd Chaste/build
-          nice -n ${{ env.NICE }} cmake \
-            -DBoost_NO_BOOST_CMAKE=ON \
-            -DBoost_NO_SYSTEM_PATHS=ON \
-            -DBOOST_ROOT=${BOOST_ROOT} \
-            -DChaste_USE_CVODE=${use_cvode} \
-            -DChaste_USE_VTK=${use_vtk} \
-            -DCMAKE_PREFIX_PATH="${XERCESC_ROOT};${XSD_ROOT};${SUNDIALS_ROOT};${VTK_ROOT}" \
-            -DCMAKE_BUILD_TYPE=Release \
-            ..
-
-      - name: Compile Chaste build info
-        run: |
-          . ./modulesinit.sh
-          cd Chaste/build
-          nice -n ${{ env.NICE }} cmake --build . --parallel ${{ env.NCPU }} --target TestChasteBuildInfo
-          nice -n ${{ env.NICE }} ctest -V -R TestChasteBuildInfo --output-on-failure | tee buildinfo
-
-      - name: Verify dependency versions
-        run: |
-          cd Chaste/build
-          sed -i.bak 's/"//g' buildinfo  # removes quotes from old sundials versions
-
-          maj_min_rev='^[0-9]\+\.[0-9]\+\.[0-9]\+'
-          maj_min='^[0-9]\+\.[0-9]\+'
-
-          xsd_ver="$(echo ${{ env.xsd_ver }} | grep -o ${maj_min_rev})"
-          grep "<XSD>${xsd_ver}</XSD>" buildinfo
-          
-          xercesc_ver="$(echo ${{ env.xercesc_ver }} | grep -o ${maj_min_rev})"
-          grep "<Xerces>${xercesc_ver}</Xerces>" buildinfo
-          
-          if [ -n "${{ env.sundials_ver }}" ]; then
-            sundials_ver="$(echo ${{ env.sundials_ver }} | grep -o ${maj_min_rev})"
-            grep "<SUNDIALS>${sundials_ver}</SUNDIALS>" buildinfo
-          fi
-          
-          boost_ver="$(echo ${{ env.boost_ver }} | grep -o ${maj_min_rev})"
-          grep "<Boost>${boost_ver}</Boost>" buildinfo
-          
-          if [ -n "${{ env.vtk_ver }}" ]; then
-            vtk_ver="$(echo ${{ env.vtk_ver }} | grep -o ${maj_min})"
-            grep "<VTK>${vtk_ver}</VTK>" buildinfo
-          fi
-          
-          petsc_ver="$(echo ${{ env.petsc_ver }} | grep -o ${maj_min_rev})"
-          grep "<PETSc>${petsc_ver}</PETSc>" buildinfo
-          
-          hdf5_ver="$(echo ${{ env.hdf5_ver }} | grep -o ${maj_min_rev})"
-          grep "<HDF5>${hdf5_ver}</HDF5>" buildinfo
-
-      - name: Build Chaste all target
-        run: |
-          . ./modulesinit.sh
-          cd Chaste/build
-          nice -n ${{ env.NICE }} cmake --build . --parallel ${{ env.NCPU }} --target all
-
-      - name: Run Continuous test pack
-        run: |
-          . ./modulesinit.sh
-          cd Chaste/build
-          nice -n ${{ env.NICE }} ctest -j ${{ env.NCPU }} -L Continuous --output-on-failure
-
-      - name: Run Nightly test pack
-        run: |
-          . ./modulesinit.sh
-          cd Chaste/build
-          nice -n ${{ env.NICE }} ctest -j ${{ env.NCPU }} -L Nightly --output-on-failure
-
-      - name: Reconfigure for Parallel test pack
-        run: |
-          . ./modulesinit.sh
-          
-          if [ -z "${{ env.sundials_ver }}" ]; then
-            use_cvode="OFF"
-          else
-            use_cvode="ON"
-          fi
-          
-          if [ -z "${{ env.vtk_ver }}" ]; then
-            use_vtk="OFF"
-          else
-            use_vtk="ON"
-          fi
-
-          mkdir -p Chaste/build
-          cd Chaste/build
-          rm -rf *
-          nice -n ${{ env.NICE }} cmake \
-            -DBoost_NO_BOOST_CMAKE=ON \
-            -DBoost_NO_SYSTEM_PATHS=ON \
-            -DBOOST_ROOT=${BOOST_ROOT} \
-            -DChaste_USE_CVODE=${use_cvode} \
-            -DChaste_USE_VTK=${use_vtk} \
-            -DCMAKE_PREFIX_PATH="${XERCESC_ROOT};${XSD_ROOT};${SUNDIALS_ROOT};${VTK_ROOT}" \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DChaste_NUM_CPUS_TEST=3 \
-            ..
-
-      - name: Build Parallel test pack
-        run: |
-          . ./modulesinit.sh
-          cd Chaste/build
-          nice -n ${{ env.NICE }} cmake --build . --parallel ${{ env.NCPU }} --target Parallel
-
-      - name: Run Parallel test pack
-        run: |
-          . ./modulesinit.sh
-          cd Chaste/build
-          nice -n ${{ env.NICE }} ctest -j ${{ env.NCPU }} -L Parallel --output-on-failure
-
-      - name: Cleanup
-        if: always()
-        run: rm -rf ${{ env.MODULES_DIR }}/src/*
+  build-and-test:
+    needs: versions
+    uses: Chaste/dependency-modules/.github/workflows/version-tests.yml@main
+    with:
+      chaste_branch: develop
+      test_suites: 'Continuous,Nightly,Parallel'
+      xsd_ver: ${{ needs.versions.outputs.xsd_ver }}
+      xercesc_ver: ${{ needs.versions.outputs.xercesc_ver }}
+      sundials_ver: ${{ needs.versions.outputs.sundials_ver }}
+      boost_ver: ${{ needs.versions.outputs.boost_ver }}
+      vtk_ver: ${{ needs.versions.outputs.vtk_ver }}
+      petsc_ver: ${{ needs.versions.outputs.petsc_ver }}
+      petsc_arch: ${{ needs.versions.outputs.petsc_arch }}
+      hdf5_ver: ${{ needs.versions.outputs.hdf5_ver }}
