@@ -90,7 +90,7 @@ See the [Chaste Guides](https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/CmakeF
 
 `module avail` lists all installed modulefiles.
 
-`module search string` searches for modulefiles that contain `string`.
+`module avail string` searches for modulefiles that contain `string`.
 
 `module show modulefile` prints the environment changes prescribed by modulefile.
 

@@ -106,7 +106,7 @@ on:
         options:
           - 'linux-gnu'
           - 'linux-gnu-opt'
-        default: 'linux-gnu-opt'
+        default: 'linux-gnu'
         
 jobs:
   versions:
