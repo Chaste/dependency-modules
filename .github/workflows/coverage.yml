@@ -16,7 +16,7 @@ jobs:
         CXX: g++
         RUNNER_OFF: 1
       volumes:
-        - runner_volume:/runner_volume
+        - runner_volume:/home/runner
       options: --cpus 2
 
     defaults:
