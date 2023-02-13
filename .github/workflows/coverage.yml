@@ -43,7 +43,7 @@ jobs:
       - name: Create module loading script
         run: |
           echo "module purge" > modulesinit.sh
-          echo "module use ${HOME}/modules/modulefiles" >> modulesinit.sh
+          echo "module use /home/runner/modules/modulefiles" >> modulesinit.sh
           echo "module load xsd" >> modulesinit.sh
           echo "module load xercesc" >> modulesinit.sh
           echo "module load boost" >> modulesinit.sh
