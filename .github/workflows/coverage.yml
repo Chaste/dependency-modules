@@ -1,0 +1,86 @@
+name: Coverage
+
+on:
+  workflow_dispatch:
+
+jobs:
+  
+  build-and-test:
+
+    runs-on: ubuntu-22.04
+    container: chaste/runner:latest
+
+    defaults:
+      run:
+        # --login to source /etc/profile.d/modules.sh
+        shell: bash --login -e -o pipefail {0}
+        
+    env:
+      CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
+      CC: gcc
+      CXX: g++
+
+    steps:
+    - name: checkout repository
+      uses: actions/checkout@v3
+
+    - name: compiler version
+      run: |
+        ${CXX} --version
+
+    - name: make build and test directories
+      run: |
+        mkdir -p chaste-build-dir
+        mkdir -p ${CHASTE_TEST_OUTPUT}
+        
+    - name: Create module loading script
+      run: |
+        echo "module purge" > modulesinit.sh
+        echo "module use ${HOME}/modules/modulefiles" >> modulesinit.sh
+        echo "module load xsd" >> modulesinit.sh
+        echo "module load xercesc" >> modulesinit.sh
+        echo "module load boost" >> modulesinit.sh
+        echo "module load sundials" >> modulesinit.sh
+        echo "module load vtk" >> modulesinit.sh
+        echo "module load petsc_hdf5" >> modulesinit.sh
+      working-directory: chaste-build-dir
+
+    - name: cmake configure
+      run: |
+        source modulesinit.sh
+        cmake \
+          -DCMAKE_BUILD_TYPE=Debug \
+          -DChaste_COVERAGE_CPUS=2 \
+          -DBoost_NO_BOOST_CMAKE=ON \
+          -DBoost_NO_SYSTEM_PATHS=ON \
+          -DBOOST_ROOT=${BOOST_ROOT} \
+          -DCMAKE_PREFIX_PATH="${XERCESC_ROOT};${XSD_ROOT};${SUNDIALS_ROOT};${VTK_ROOT}" \
+          ..
+      working-directory: chaste-build-dir
+
+    - name: build test suites
+      run: |
+        source modulesinit.sh
+        cmake --build . --target Continuous Parallel --parallel 2
+      working-directory: chaste-build-dir
+
+    - name: run test suites
+      run: |
+        source modulesinit.sh
+        ctest -j2 -L Continuous --output-on-failure
+        ctest -L Parallel  --output-on-failure
+      working-directory: chaste-build-dir
+
+    - name: run coverage
+      run: |
+        source modulesinit.sh
+        lcov --config-file ../cmake/Config/lcovrc --directory . --capture --output-file coverage.info
+        lcov --config-file ../cmake/Config/lcovrc --remove coverage.info '/usr/*' '*/fortests/*' '*/test/*' '*/3rdparty/*' '*/global/src/random/*' 'Debug/*' 'Debug_*/*' '*/cxxtest/*' --output-file coverage.info
+      working-directory: chaste-build-dir
+
+#     - name: upload to codecov
+#       run: |
+#         curl -Os https://uploader.codecov.io/latest/linux/codecov
+#         chmod +x codecov
+#         ./codecov
+#       working-directory: chaste-build-dir
