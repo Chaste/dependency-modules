@@ -18,7 +18,7 @@ jobs:
       volumes:
         - runner_volume:/home/runner
       options: --cpus 2
-
+      
     defaults:
       run:
         # --login to source /etc/profile.d/modules.sh
@@ -27,7 +27,10 @@ jobs:
     steps:
       - name: checkout repository
         uses: actions/checkout@v3
-
+        with:
+          repository: Chaste/Chaste
+          submodules: recursive
+          
       - name: compiler version
         run: |
           ${CXX} --version
