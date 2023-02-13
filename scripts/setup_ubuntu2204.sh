@@ -30,6 +30,7 @@ apt-get install -y --no-install-recommends \
     hdf5-tools \
     cmake-curses-gui \
     libgoogle-perftools-dev \
+    lcov \
     doxygen \
     graphviz \
     gnuplot \
