@@ -39,6 +39,31 @@ RUN useradd -r -m -d ${DEFAULT_HOME} -s /bin/bash ${DEFAULT_USER} && \
     mkdir -p ${MODULES_DIR}/src && \
     mkdir -p ${MODULES_DIR}/opt && \
     mkdir -p ${MODULES_DIR}/modulefiles && \
+    install_xsd.sh \
+        --version=4.0.0 \
+        --modules-dir=${MODULES_DIR} && \
+    install_xercesc.sh \
+        --version=3.2.0 \
+        --parallel=$(nproc) \
+        --modules-dir=${MODULES_DIR} && \
+    install_sundials.sh \
+        --version=2.7.0 \
+        --parallel=$(nproc) \
+        --modules-dir=${MODULES_DIR} && \
+    install_boost.sh \
+        --version=1.62.0 \
+        --parallel=$(nproc) \
+        --modules-dir=${MODULES_DIR} && \
+    install_vtk.sh \
+        --version=6.3.0 \
+        --parallel=$(nproc) \
+        --modules-dir=${MODULES_DIR} && \
+    install_petsc_hdf5.sh \
+        --petsc-version=3.7.7 \
+        --petsc-arch=linux-gnu \
+        --hdf5-version=1.10.1 \
+        --parallel=$(nproc) \
+        --modules-dir=${MODULES_DIR} && \
     echo "module use ${MODULES_DIR}/modulefiles" >> ${DEFAULT_HOME}/.bashrc && \
     chown -R ${DEFAULT_USER}:${DEFAULT_USER} ${MODULES_DIR} && \
     apt-get -y clean && \
