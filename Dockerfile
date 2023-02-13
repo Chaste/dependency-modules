@@ -43,7 +43,7 @@ RUN useradd -r -m -d ${DEFAULT_HOME} -s /bin/bash ${DEFAULT_USER} && \
         --version=4.0.0 \
         --modules-dir=${MODULES_DIR} && \
     install_xercesc.sh \
-        --version=3.2.3 \
+        --version=3.2.4 \
         --parallel=$(nproc) \
         --modules-dir=${MODULES_DIR} && \
     install_sundials.sh \
