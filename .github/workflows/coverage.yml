@@ -34,7 +34,11 @@ jobs:
       - name: compiler version
         run: |
           ${CXX} --version
-
+          
+      - name: configure git top level directory
+        run: |
+          git config --global --add safe.directory $(pwd)
+          
       - name: make build and test directories
         run: |
           mkdir -p chaste-build-dir
