@@ -70,7 +70,8 @@ RUN useradd -r -m -d ${DEFAULT_HOME} -s /bin/bash ${DEFAULT_USER} && \
     rm -rf /var/cache/apt && \
     rm -rf /var/lib/apt/lists/* && \
     rm -rf /var/tmp/* && \
-    rm -rf /tmp/*
+    rm -rf /tmp/* && \
+    rm -rf ${MODULES_DIR}/src/*
 
 ENV TEXTTEST_HOME="/usr/local/bin/texttest"
 
