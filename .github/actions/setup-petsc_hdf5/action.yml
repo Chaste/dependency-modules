@@ -20,6 +20,8 @@ runs:
           ${{ env.MODULES_DIR }}/opt/petsc_hdf5/${{ inputs.petsc_ver }}_${{ inputs.hdf5_ver }}
           ${{ env.MODULES_DIR }}/modulefiles/petsc_hdf5/${{ inputs.petsc_ver }}_${{ inputs.hdf5_ver }}/${{ inputs.petsc_arch }}
         key: ${{ env.OS_VERSION }}-petsc_hdf5-${{ inputs.petsc_ver }}-${{ inputs.hdf5_ver }}-${{ inputs.petsc_arch }}-${{ hashFiles('scripts/install_petsc_hdf5.sh') }}
+        restore-keys: |
+          ${{ env.OS_VERSION }}-petsc_hdf5-${{ inputs.petsc_ver }}-${{ inputs.hdf5_ver }}-${{ inputs.petsc_arch }}-
     
     - name: build and install petsc_hdf5 module
       if: steps.cache-petsc_hdf5.outputs.cache-hit != 'true'
