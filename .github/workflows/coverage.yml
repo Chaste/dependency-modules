@@ -11,13 +11,14 @@ jobs:
     container:
       image: chaste/runner:latest
       env:
-        CHASTE_TEST_OUTPUT: /tmp/chaste-test-dir
-        CC: gcc
-        CXX: g++
         RUNNER_OFF: 1
       volumes:
         - runner_volume:/home/runner
-      options: --user=0 --cpus 2
+      options: --user 0 --cpus 2
+      
+    env:
+      CC: gcc
+      CXX: g++
       
     defaults:
       run:
@@ -29,20 +30,17 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: Chaste/Chaste
-          submodules: recursive
+          path: chaste
           
       - name: compiler version
         run: |
           ${CXX} --version
           
-      - name: configure git top level directory
-        run: |
-          git config --global --add safe.directory $(pwd)
-          
       - name: make build and test directories
         run: |
-          mkdir -p chaste-build-dir
-          mkdir -p ${CHASTE_TEST_OUTPUT}
+          mkdir -p chaste/chaste-build-dir
+          mkdir -p chaste/chaste-test-dir
+          echo "CHASTE_TEST_OUTPUT=$(pwd)/chaste/chaste-test-dir" >> ${GITHUB_ENV}
 
       - name: Create module loading script
         run: |
@@ -54,7 +52,7 @@ jobs:
           echo "module load sundials" >> modulesinit.sh
           echo "module load vtk" >> modulesinit.sh
           echo "module load petsc_hdf5" >> modulesinit.sh
-        working-directory: chaste-build-dir
+        working-directory: chaste/chaste-build-dir
 
       - name: cmake configure
         run: |
@@ -67,31 +65,31 @@ jobs:
             -DBOOST_ROOT=${BOOST_ROOT} \
             -DCMAKE_PREFIX_PATH="${XERCESC_ROOT};${XSD_ROOT};${SUNDIALS_ROOT};${VTK_ROOT}" \
             ..
-        working-directory: chaste-build-dir
+        working-directory: chaste/chaste-build-dir
 
       - name: build test suites
         run: |
           source modulesinit.sh
           cmake --build . --target Continuous Parallel --parallel 2
-        working-directory: chaste-build-dir
+        working-directory: chaste/chaste-build-dir
 
       - name: run test suites
         run: |
           source modulesinit.sh
           ctest -j2 -L Continuous --output-on-failure
           ctest -L Parallel  --output-on-failure
-        working-directory: chaste-build-dir
+        working-directory: chaste/chaste-build-dir
 
       - name: run coverage
         run: |
           source modulesinit.sh
           lcov --config-file ../cmake/Config/lcovrc --directory . --capture --output-file coverage.info
           lcov --config-file ../cmake/Config/lcovrc --remove coverage.info '/usr/*' '*/fortests/*' '*/test/*' '*/3rdparty/*' '*/global/src/random/*' 'Debug/*' 'Debug_*/*' '*/cxxtest/*' --output-file coverage.info
-        working-directory: chaste-build-dir
+        working-directory: chaste/chaste-build-dir
 
 #       - name: upload to codecov
 #         run: |
 #           curl -Os https://uploader.codecov.io/latest/linux/codecov
 #           chmod +x codecov
 #           ./codecov
-#         working-directory: chaste-build-dir
+#         working-directory: chaste/chaste-build-dir
