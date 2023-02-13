@@ -12,22 +12,22 @@ jobs:
         include:
           - os: ubuntu-20.04
             xsd_ver: 4.0.0
-            xercesc_ver: 3.2.3
-            sundials_ver: 6.0.0
+            xercesc_ver: 3.2.4
+            sundials_ver: 5.8.0
             boost_ver: 1.74.0
-            vtk_ver: 9.1.0
-            petsc_ver: 3.12.4
-            hdf5_ver: 1.10.4
+            vtk_ver: 7.1.1
+            petsc_ver: 3.15.5
+            hdf5_ver: 1.10.8
             petsc_arch: linux-gnu
 
-          - os: ubuntu-20.04
+          - os: ubuntu-22.04
             xsd_ver: 4.0.0
-            xercesc_ver: 3.2.0
-            sundials_ver: 4.1.0
-            boost_ver: 1.62.0
-            vtk_ver: 6.3.0
-            petsc_ver: 3.7.7
-            hdf5_ver: 1.10.0-patch1
+            xercesc_ver: 3.2.4
+            sundials_ver: 5.8.0
+            boost_ver: 1.74.0
+            vtk_ver: 7.1.1
+            petsc_ver: 3.15.5
+            hdf5_ver: 1.10.8
             petsc_arch: linux-gnu
 
       fail-fast: false
@@ -107,7 +107,9 @@ jobs:
           cmake --build . --parallel $(nproc) --target TestChasteBuildInfo
 
           ctest -V -R TestChasteBuildInfo --output-on-failure | tee buildinfo
-        shell: bash --login -e -o pipefail {0}  # login to source /etc/profile.d/modules.sh
+          
+        # login to source /etc/profile.d/modules.sh
+        shell: bash --login -e -o pipefail {0}
 
       - name: verify dependency versions
         working-directory: Chaste/build
