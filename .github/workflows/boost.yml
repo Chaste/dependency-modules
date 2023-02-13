@@ -9,7 +9,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-20.04]
+        os: [ubuntu-20.04, ubuntu-22.04]
       fail-fast: false
 
     runs-on: ${{ matrix.os }}
@@ -25,33 +25,3 @@ jobs:
         uses: ./.github/actions/setup-boost
         with:
           boost_ver: 1.74.0
-
-      - name: build and cache boost 1.71.0
-        uses: ./.github/actions/setup-boost
-        with:
-          boost_ver: 1.71.0
-
-      - name: build and cache boost 1.69.0
-        uses: ./.github/actions/setup-boost
-        with:
-          boost_ver: 1.69.0
-
-      - name: build and cache boost 1.67.0
-        uses: ./.github/actions/setup-boost
-        with:
-          boost_ver: 1.67.0
-
-      - name: build and cache boost 1.66.0
-        uses: ./.github/actions/setup-boost
-        with:
-          boost_ver: 1.66.0
-
-      - name: build and cache boost 1.64.0
-        uses: ./.github/actions/setup-boost
-        with:
-          boost_ver: 1.64.0
-
-      - name: build and cache boost 1.62.0
-        uses: ./.github/actions/setup-boost
-        with:
-          boost_ver: 1.62.0
