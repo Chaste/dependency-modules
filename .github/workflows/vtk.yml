@@ -9,7 +9,7 @@ jobs:
     
     strategy:
       matrix:
-        os: [ubuntu-20.04]
+        os: [ubuntu-20.04, ubuntu-22.04]
       fail-fast: false
     
     runs-on: ${{ matrix.os }}
@@ -21,32 +21,7 @@ jobs:
       - name: setup defaults
         uses: ./.github/actions/setup-defaults
 
-      - name: build and cache vtk 6.3.0
+      - name: build and cache vtk 7.1.1
         uses: ./.github/actions/setup-vtk
         with:
-          vtk_ver: 6.3.0
-
-      - name: build and cache vtk 7.1.0
-        uses: ./.github/actions/setup-vtk
-        with:
-          vtk_ver: 7.1.0
-
-      - name: build and cache vtk 8.1.0
-        uses: ./.github/actions/setup-vtk
-        with:
-          vtk_ver: 8.1.0
-
-      - name: build and cache vtk 8.2.0
-        uses: ./.github/actions/setup-vtk
-        with:
-          vtk_ver: 8.2.0
-
-      - name: build and cache vtk 9.0.0
-        uses: ./.github/actions/setup-vtk
-        with:
-          vtk_ver: 9.0.0
-
-      - name: build and cache vtk 9.1.0
-        uses: ./.github/actions/setup-vtk
-        with:
-          vtk_ver: 9.1.0
+          vtk_ver: 7.1.1
