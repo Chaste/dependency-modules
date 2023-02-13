@@ -9,7 +9,7 @@ jobs:
     
     strategy:
       matrix:
-        os: [ubuntu-20.04]
+        os: [ubuntu-20.04, ubuntu-22.04]
       fail-fast: false
     
     runs-on: ${{ matrix.os }}
@@ -21,72 +21,9 @@ jobs:
       - name: setup defaults
         uses: ./.github/actions/setup-defaults
 
-      - name: build and cache petsc 3.12.4 / hdf5 1.10.4 / linux-gnu
+      - name: build and cache petsc 3.15.5 / hdf5 1.10.8 / linux-gnu
         uses: ./.github/actions/setup-petsc_hdf5
         with:
-          petsc_ver: 3.12.4
-          hdf5_ver: 1.10.4
+          petsc_ver: 3.15.5
+          hdf5_ver: 1.10.8
           petsc_arch: linux-gnu
-
-      - name: build and cache petsc 3.12.4 / hdf5 1.10.4 / linux-gnu-opt
-        uses: ./.github/actions/setup-petsc_hdf5
-        with:
-          petsc_ver: 3.12.4
-          hdf5_ver: 1.10.4
-          petsc_arch: linux-gnu-opt
-
-      - name: build and cache petsc 3.11.3 / hdf5 1.10.5 / linux-gnu
-        uses: ./.github/actions/setup-petsc_hdf5
-        with:
-          petsc_ver: 3.11.3
-          hdf5_ver: 1.10.5
-          petsc_arch: linux-gnu
-
-      - name: build and cache petsc 3.11.3 / hdf5 1.10.5 / linux-gnu-opt
-        uses: ./.github/actions/setup-petsc_hdf5
-        with:
-          petsc_ver: 3.11.3
-          hdf5_ver: 1.10.5
-          petsc_arch: linux-gnu-opt
-
-      - name: build and cache petsc 3.10.5 / hdf5 1.10.4 / linux-gnu
-        uses: ./.github/actions/setup-petsc_hdf5
-        with:
-          petsc_ver: 3.10.5
-          hdf5_ver: 1.10.4
-          petsc_arch: linux-gnu
-
-      - name: build and cache petsc 3.10.5 hdf5 1.10.4 linux-gnu-opt
-        uses: ./.github/actions/setup-petsc_hdf5
-        with:
-          petsc_ver: 3.10.5
-          hdf5_ver: 1.10.4
-          petsc_arch: linux-gnu-opt
-
-      - name: build and cache petsc 3.9.4 / hdf5 1.10.3 / linux-gnu
-        uses: ./.github/actions/setup-petsc_hdf5
-        with:
-          petsc_ver: 3.9.4
-          hdf5_ver: 1.10.3
-          petsc_arch: linux-gnu
-
-      - name: build and cache petsc 3.9.4 / hdf5 1.10.3 / linux-gnu-opt
-        uses: ./.github/actions/setup-petsc_hdf5
-        with:
-          petsc_ver: 3.9.4
-          hdf5_ver: 1.10.3
-          petsc_arch: linux-gnu-opt
-
-      - name: build and cache petsc 3.7.7 hdf5 1.10.0 linux-gnu
-        uses: ./.github/actions/setup-petsc_hdf5
-        with:
-          petsc_ver: 3.7.7
-          hdf5_ver: 1.10.0-patch1
-          petsc_arch: linux-gnu
-
-      - name: build and cache petsc 3.7.7 / hdf5 1.10.0 / linux-gnu-opt
-        uses: ./.github/actions/setup-petsc_hdf5
-        with:
-          petsc_ver: 3.7.7
-          hdf5_ver: 1.10.0-patch1
-          petsc_arch: linux-gnu-opt
