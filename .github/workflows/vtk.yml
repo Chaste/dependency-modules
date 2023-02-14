@@ -21,7 +21,7 @@ jobs:
       - name: setup defaults
         uses: ./.github/actions/setup-defaults
 
-      - name: build and cache vtk 7.1.1
+      - name: build and cache vtk 8.2.0
         uses: ./.github/actions/setup-vtk
         with:
-          vtk_ver: 7.1.1
+          vtk_ver: 8.2.0

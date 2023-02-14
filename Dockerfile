@@ -55,7 +55,7 @@ RUN useradd -r -m -d ${DEFAULT_HOME} -s /bin/bash ${DEFAULT_USER} && \
         --parallel=$(nproc) \
         --modules-dir=${MODULES_DIR} && \
     install_vtk.sh \
-        --version=7.1.1 \
+        --version=8.2.0 \
         --parallel=$(nproc) \
         --modules-dir=${MODULES_DIR} && \
     install_petsc_hdf5.sh \

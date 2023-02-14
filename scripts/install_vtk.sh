@@ -83,7 +83,8 @@ cd ${src_dir}-build
 cmake \
     -DBUILD_SHARED_LIBS=ON \
     -DCMAKE_INSTALL_PREFIX=${install_dir} \
-    -DCMAKE_INSTALL_RPATH=${install_dir}/lib/vtk-${major}.${minor} ${src_dir} && \
+    -DCMAKE_INSTALL_RPATH=${install_dir}/lib/vtk-${major}.${minor} \
+    ${src_dir} && \
 make -j ${parallel} && \
 make install
 
