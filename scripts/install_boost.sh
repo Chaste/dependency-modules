@@ -61,11 +61,11 @@ tar -xjf boost_${ver_si_on}.tar.bz2
 
 src_dir="$(pwd)/boost_${ver_si_on}"
 
-# Patch for Python 3.10+ in Boost <= 1.74.x
+# Fix for Python 3.10+ in Boost <= 1.74.x
 # https://github.com/boostorg/python/commit/cbd2d9f033c61d29d0a1df14951f4ec91e7d05cd
 if [[ (${major} -eq 1) && (${minor} -le 74) ]]; then  # Boost <= 1.74.x
-    cd ${src_dir}/libs/python
-    patch -t -p1 < ${script_dir}/patches/boost_174-python310-fopen.patch
+    cd ${src_dir}/libs/python/src
+    sed -i.bak 's#_Py_fopen#fopen#g' exec.cpp
 fi
 
 # Patch for Python 3.7+ in Boost <= 1.66.x
