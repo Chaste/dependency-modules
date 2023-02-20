@@ -66,10 +66,6 @@ fi
 if [[ ${major} -eq 6 ]]; then  # VTK == 6.x.x
     cd ${src_dir}
     patch -t -p1 < ${script_dir}/patches/vtk6.patch
-
-    # Suppport for gcc-11: https://public.kitware.com/pipermail/vtkusers/2017-April/098448.html
-    sed -i.bak 's/string (REGEX MATCH "\[345\]/string (REGEX MATCH "\[0-9\]\*/g' ${src_dir}/CMake/vtkCompilerExtras.cmake
-    sed -i.bak 's/string(REGEX MATCH "\[345\]/string(REGEX MATCH "\[0-9\]*/g' ${src_dir}/CMake/GenerateExportHeader.cmake
 fi
 
 # VTK 7 patches: https://sources.debian.org/patches/vtk7/7.1.1%2Bdfsg2-10.2/
