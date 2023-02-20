@@ -14,11 +14,12 @@ jobs:
         RUNNER_OFF: 1
       volumes:
         - runner_volume:/home/runner
-      options: --user 0 --cpus 2
+      options: --cpus 2
       
     env:
       CC: gcc
       CXX: g++
+      BASE_DIR: /home/runner
       
     defaults:
       run:
@@ -30,7 +31,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: Chaste/Chaste
-          path: chaste
+          path: ${{ env.BASE_DIR }}/chaste
           
       - name: compiler version
         run: |
@@ -41,39 +42,40 @@ jobs:
           mkdir -p chaste/chaste-build-dir
           mkdir -p chaste/chaste-test-dir
           echo "CHASTE_TEST_OUTPUT=$(pwd)/chaste/chaste-test-dir" >> ${GITHUB_ENV}
+        working-directory: ${{ env.BASE_DIR }}/chaste
 
       - name: Create module loading script
         run: |
           echo "module purge" > modulesinit.sh
           echo "module use /home/runner/modules/modulefiles" >> modulesinit.sh
           echo "module load petsc_hdf5" >> modulesinit.sh
-        working-directory: chaste/chaste-build-dir
+        working-directory: ${{ env.BASE_DIR }}/chaste/chaste-build-dir
 
       - name: cmake configure
         run: |
           source modulesinit.sh
           cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_COVERAGE_CPUS=2 ..
-        working-directory: chaste/chaste-build-dir
+        working-directory: ${{ env.BASE_DIR }}/chaste/chaste-build-dir
 
       - name: build test suites
         run: |
           source modulesinit.sh
           cmake --build . --target Continuous Parallel --parallel 2
-        working-directory: chaste/chaste-build-dir
+        working-directory: ${{ env.BASE_DIR }}/chaste/chaste-build-dir
 
       - name: run test suites
         run: |
           source modulesinit.sh
           ctest -j2 -L Continuous --output-on-failure
           ctest -L Parallel  --output-on-failure
-        working-directory: chaste/chaste-build-dir
+        working-directory: ${{ env.BASE_DIR }}/chaste/chaste-build-dir
 
       - name: run coverage
         run: |
           source modulesinit.sh
           lcov --config-file ../cmake/Config/lcovrc --directory . --capture --output-file coverage.info
           lcov --config-file ../cmake/Config/lcovrc --remove coverage.info '/usr/*' '*/fortests/*' '*/test/*' '*/3rdparty/*' '*/global/src/random/*' 'Debug/*' 'Debug_*/*' '*/cxxtest/*' --output-file coverage.info
-        working-directory: chaste/chaste-build-dir
+        working-directory: ${{ env.BASE_DIR }}/chaste/chaste-build-dir
 
 #       - name: upload to codecov
 #         run: |
