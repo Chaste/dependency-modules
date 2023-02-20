@@ -2,32 +2,30 @@
 
 # https://sources.debian.org/patches/vtk7/7.1.1%2Bdfsg2-10.2/
 
-wget https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/10_allpatches.patch
-wget https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/20_soversion-sharedlib.patch
-wget https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/30_matplotlib.patch
-wget https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/40_use_system_sqlite.patch
-wget https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/50_use_system_utf8.patch
-wget https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/60_use_system_mpi4py.patch
-wget https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/70_fix_ftbfs_gcc49.patch
-wget https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/80_fix_arm_compilation.patch
-wget https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/100_javac-heap.patch
-wget https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/101_java_install_path.patch
-wget https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/105_unforce_embedded_glew.patch
-wget https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/106_install_doxygen_scripts_in_nodoc_build.patch
-wget https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/99-hdf5-1.10-compatibility
-wget https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/107_gl2ps_1.4.0.patch
-wget https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/108_Doxygen-use-mathjax.patch
-wget https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/109_java-jar-nonjavafiles.patch
-wget https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/110_python-371.patch
-wget https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/111_fix_perl.patch
-wget https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/112_riscv_support.patch
-wget https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/113_fix_python_equal.patch
-wget https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/115_support-gcc10.patch
-wget https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/mysq8_my_bool.patch
-wget https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/3edc0de2b04ae1e100c229e592d6b9fa94f2915a.patch
-wget https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/581d9eb874b2b80a3fb21c739a96fa6f955ffb5e.patch
-wget https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/gcc-11.patch
-wget https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/ffmpeg-5.patch
+wget -nc https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/10_allpatches.patch
+wget -nc https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/20_soversion-sharedlib.patch
+wget -nc https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/30_matplotlib.patch
+wget -nc https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/40_use_system_sqlite.patch
+wget -nc https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/60_use_system_mpi4py.patch
+wget -nc https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/70_fix_ftbfs_gcc49.patch
+wget -nc https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/80_fix_arm_compilation.patch
+wget -nc https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/100_javac-heap.patch
+wget -nc https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/101_java_install_path.patch
+wget -nc https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/105_unforce_embedded_glew.patch
+wget -nc https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/106_install_doxygen_scripts_in_nodoc_build.patch
+wget -nc https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/99-hdf5-1.10-compatibility
+wget -nc https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/108_Doxygen-use-mathjax.patch
+wget -nc https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/109_java-jar-nonjavafiles.patch
+wget -nc https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/110_python-371.patch
+wget -nc https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/111_fix_perl.patch
+wget -nc https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/112_riscv_support.patch
+wget -nc https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/113_fix_python_equal.patch
+wget -nc https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/115_support-gcc10.patch
+wget -nc https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/mysq8_my_bool.patch
+wget -nc https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/3edc0de2b04ae1e100c229e592d6b9fa94f2915a.patch
+wget -nc https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/581d9eb874b2b80a3fb21c739a96fa6f955ffb5e.patch
+wget -nc https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/gcc-11.patch
+wget -nc https://sources.debian.org/data/main/v/vtk7/7.1.1%2Bdfsg2-10.2/debian/patches/ffmpeg-5.patch
 
 combinediff 10_allpatches.patch 20_soversion-sharedlib.patch > tmp1.patch
 combinediff tmp1.patch 30_matplotlib.patch > tmp2.patch
@@ -53,4 +51,3 @@ combinediff tmp2.patch gcc-11.patch > tmp1.patch
 combinediff tmp1.patch ffmpeg-5.patch > vtk7.patch 
 
 rm tmp1.patch tmp2.patch
-

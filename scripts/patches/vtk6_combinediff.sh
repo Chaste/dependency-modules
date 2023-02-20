@@ -5,17 +5,12 @@
 wget -nc https://sources.debian.org/data/main/v/vtk6/6.3.0%2Bdfsg2-8.1/debian/patches/10_allpatches.patch
 wget -nc https://sources.debian.org/data/main/v/vtk6/6.3.0%2Bdfsg2-8.1/debian/patches/20_soversion-sharedlib.patch
 wget -nc https://sources.debian.org/data/main/v/vtk6/6.3.0%2Bdfsg2-8.1/debian/patches/30_matplotlib.patch
-wget -nc https://sources.debian.org/data/main/v/vtk6/6.3.0%2Bdfsg2-8.1/debian/patches/40_use_system_sqlite.patch
-wget -nc https://sources.debian.org/data/main/v/vtk6/6.3.0%2Bdfsg2-8.1/debian/patches/50_use_system_utf8.patch
-wget -nc https://sources.debian.org/data/main/v/vtk6/6.3.0%2Bdfsg2-8.1/debian/patches/60_use_system_mpi4py.patch
 wget -nc https://sources.debian.org/data/main/v/vtk6/6.3.0%2Bdfsg2-8.1/debian/patches/70_fix_ftbfs_gcc49.patch
-wget -nc https://sources.debian.org/data/main/v/vtk6/6.3.0%2Bdfsg2-8.1/debian/patches/80_fix_arm_compilation.patch
 wget -nc https://sources.debian.org/data/main/v/vtk6/6.3.0%2Bdfsg2-8.1/debian/patches/90_gdal-2.0.patch
 wget -nc https://sources.debian.org/data/main/v/vtk6/6.3.0%2Bdfsg2-8.1/debian/patches/95_ffmpeg_2.9.patch
 wget -nc https://sources.debian.org/data/main/v/vtk6/6.3.0%2Bdfsg2-8.1/debian/patches/97_fix_latex_doxygen.patch
 wget -nc https://sources.debian.org/data/main/v/vtk6/6.3.0%2Bdfsg2-8.1/debian/patches/100_javac-heap.patch
 wget -nc https://sources.debian.org/data/main/v/vtk6/6.3.0%2Bdfsg2-8.1/debian/patches/101_java_install_path.patch
-wget -nc https://sources.debian.org/data/main/v/vtk6/6.3.0%2Bdfsg2-8.1/debian/patches/104_fix_gcc_version_6.patch
 wget -nc https://sources.debian.org/data/main/v/vtk6/6.3.0%2Bdfsg2-8.1/debian/patches/105_unforce_embedded_glew.patch
 wget -nc https://sources.debian.org/data/main/v/vtk6/6.3.0%2Bdfsg2-8.1/debian/patches/106_install_doxygen_scripts_in_nodoc_build.patch
 wget -nc https://sources.debian.org/data/main/v/vtk6/6.3.0%2Bdfsg2-8.1/debian/patches/99-hdf5-1.10-compatibility
