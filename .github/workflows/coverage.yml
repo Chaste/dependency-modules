@@ -14,12 +14,11 @@ jobs:
         RUNNER_OFF: 1
       volumes:
         - runner_volume:/home/runner
-      options: --cpus 2
+      options: --user 0 --cpus 2
       
     env:
       CC: gcc
       CXX: g++
-      BASE_DIR: /home/runner
       
     defaults:
       run:
@@ -31,51 +30,56 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: Chaste/Chaste
-          path: ${{ env.BASE_DIR }}/chaste
+          path: chaste
           
       - name: compiler version
         run: |
           ${CXX} --version
-          
+        
       - name: make build and test directories
         run: |
           mkdir -p chaste/chaste-build-dir
           mkdir -p chaste/chaste-test-dir
           echo "CHASTE_TEST_OUTPUT=$(pwd)/chaste/chaste-test-dir" >> ${GITHUB_ENV}
-        working-directory: ${{ env.BASE_DIR }}/chaste
 
-      - name: Create module loading script
+      - name: set workspace privileges
         run: |
-          echo "module purge" > modulesinit.sh
-          echo "module use /home/runner/modules/modulefiles" >> modulesinit.sh
-          echo "module load petsc_hdf5" >> modulesinit.sh
-        working-directory: ${{ env.BASE_DIR }}/chaste/chaste-build-dir
+          cd ../..
+          chown -R runner:runner .
+          
+      - name: create init script
+        run: |
+          echo "su - runner" > init.sh
+          echo "module purge" >> init.sh
+          echo "module use /home/runner/modules/modulefiles" >> init.sh
+          echo "module load petsc_hdf5" >> init.sh
+        working-directory: chaste/chaste-build-dir
 
       - name: cmake configure
         run: |
-          source modulesinit.sh
+          source init.sh
           cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_COVERAGE_CPUS=2 ..
-        working-directory: ${{ env.BASE_DIR }}/chaste/chaste-build-dir
+        working-directory: chaste/chaste-build-dir
 
       - name: build test suites
         run: |
-          source modulesinit.sh
+          source init.sh
           cmake --build . --target Continuous Parallel --parallel 2
-        working-directory: ${{ env.BASE_DIR }}/chaste/chaste-build-dir
+        working-directory: chaste/chaste-build-dir
 
       - name: run test suites
         run: |
-          source modulesinit.sh
+          source init.sh
           ctest -j2 -L Continuous --output-on-failure
           ctest -L Parallel  --output-on-failure
-        working-directory: ${{ env.BASE_DIR }}/chaste/chaste-build-dir
+        working-directory: chaste/chaste-build-dir
 
       - name: run coverage
         run: |
-          source modulesinit.sh
+          source init.sh
           lcov --config-file ../cmake/Config/lcovrc --directory . --capture --output-file coverage.info
           lcov --config-file ../cmake/Config/lcovrc --remove coverage.info '/usr/*' '*/fortests/*' '*/test/*' '*/3rdparty/*' '*/global/src/random/*' 'Debug/*' 'Debug_*/*' '*/cxxtest/*' --output-file coverage.info
-        working-directory: ${{ env.BASE_DIR }}/chaste/chaste-build-dir
+        working-directory: chaste/chaste-build-dir
 
 #       - name: upload to codecov
 #         run: |
