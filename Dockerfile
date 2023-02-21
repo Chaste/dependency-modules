@@ -43,7 +43,7 @@ RUN useradd -r -m -d ${DEFAULT_HOME} -s /bin/bash ${DEFAULT_USER} && \
         --version=4.0.0 \
         --modules-dir=${MODULES_DIR} && \
     install_xercesc.sh \
-        --version=3.2.4 \
+        --version=3.2.3 \
         --parallel=$(nproc) \
         --modules-dir=${MODULES_DIR} && \
     install_sundials.sh \
@@ -51,15 +51,15 @@ RUN useradd -r -m -d ${DEFAULT_HOME} -s /bin/bash ${DEFAULT_USER} && \
         --parallel=$(nproc) \
         --modules-dir=${MODULES_DIR} && \
     install_boost.sh \
-        --version=1.74.0 \
+        --version=1.73.0 \
         --parallel=$(nproc) \
         --modules-dir=${MODULES_DIR} && \
     install_vtk.sh \
-        --version=7.1.1 \
+        --version=8.2.0 \
         --parallel=$(nproc) \
         --modules-dir=${MODULES_DIR} && \
     install_petsc_hdf5.sh \
-        --petsc-version=3.15.5 \
+        --petsc-version=3.8.4 \
         --petsc-arch=linux-gnu \
         --hdf5-version=1.10.8 \
         --parallel=$(nproc) \
