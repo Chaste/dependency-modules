@@ -6,6 +6,8 @@ usage()
     exit 1
 }
 
+script_dir="$(cd "$(dirname "$0")"; pwd)"
+
 # Parse arguments
 version=
 base_dir=
@@ -60,18 +62,22 @@ else  # VTK > 6.0.x
     tar -xzf v${version}.tar.gz -C ${src_dir} --strip-components=1
 fi
 
-# Patch for Python 3.7+ in VTK 7.0.x to 8.1.x
-if [[ ${major} -eq 7 || (${major} -eq 8 && ${minor} -le 1) ]]; then  # 7.0.x VTK <= 8.1.x
-    wget -O py37_api_change.patch https://gitlab.kitware.com/vtk/vtk/commit/706f1b397df09a27ab8981ab9464547028d0c322.patch
+# VTK 6 patches: https://sources.debian.org/patches/vtk6/6.3.0%2Bdfsg2-8.1/
+if [[ ${major} -eq 6 ]]; then  # VTK == 6.x.x
     cd ${src_dir}
-    patch -p1 < ../py37_api_change.patch
-    cd ..
+    patch -t -p1 < ${script_dir}/patches/vtk6.patch
 fi
 
-# Tweak for detecting gcc 6-11: https://public.kitware.com/pipermail/vtkusers/2017-April/098448.html
-if [[ ${major} -lt 7 || (${major} -eq 7 && ${minor} -eq 0) ]]; then  # VTK <= 7.0.x
-    sed -i.bak 's/string (REGEX MATCH "\[345\]/string (REGEX MATCH "(\[3-9\]\|1\[0-1\])/g' ${src_dir}/CMake/vtkCompilerExtras.cmake
-    sed -i.bak 's/string(REGEX MATCH "\[345\]/string(REGEX MATCH "(\[3-9\]\|1\[0-1\])/g' ${src_dir}/CMake/GenerateExportHeader.cmake
+# VTK 7 patches: https://sources.debian.org/patches/vtk7/7.1.1%2Bdfsg2-10.2/
+if [[ ${major} -eq 7 ]]; then  # VTK == 7.x.x
+    cd ${src_dir}
+    patch -t -p1 < ${script_dir}/patches/vtk7.patch
+fi
+
+# VTK 8 patches: https://sources.debian.org/patches/vtk7/7.1.1%2Bdfsg2-10.2/
+if [[ ${major} -eq 8 ]]; then  # VTK == 8.x.x
+    cd ${src_dir}
+    patch -t -p1 < ${script_dir}/patches/vtk8.patch
 fi
 
 # Build and install
@@ -83,7 +89,8 @@ cd ${src_dir}-build
 cmake \
     -DBUILD_SHARED_LIBS=ON \
     -DCMAKE_INSTALL_PREFIX=${install_dir} \
-    -DCMAKE_INSTALL_RPATH=${install_dir}/lib/vtk-${major}.${minor} ${src_dir} && \
+    -DCMAKE_INSTALL_RPATH=${install_dir}/lib/vtk-${major}.${minor} \
+    ${src_dir} && \
 make -j ${parallel} && \
 make install
 

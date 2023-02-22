@@ -9,7 +9,7 @@ jobs:
     
     strategy:
       matrix:
-        os: [ubuntu-20.04]
+        os: [ubuntu-20.04, ubuntu-22.04]
       fail-fast: false
     
     runs-on: ${{ matrix.os }}
@@ -21,27 +21,7 @@ jobs:
       - name: setup defaults
         uses: ./.github/actions/setup-defaults
 
-      - name: build and cache sundials 2.7.0
-        uses: ./.github/actions/setup-sundials
-        with:
-          sundials_ver: 2.7.0
-
-      - name: build and cache sundials 3.1.0
-        uses: ./.github/actions/setup-sundials
-        with:
-          sundials_ver: 3.1.0
-
-      - name: build and cache sundials 4.1.0
-        uses: ./.github/actions/setup-sundials
-        with:
-          sundials_ver: 4.1.0
-
       - name: build and cache sundials 5.8.0
         uses: ./.github/actions/setup-sundials
         with:
           sundials_ver: 5.8.0
-          
-      - name: build and cache sundials 6.0.0
-        uses: ./.github/actions/setup-sundials
-        with:
-          sundials_ver: 6.0.0

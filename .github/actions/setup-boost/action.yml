@@ -14,6 +14,8 @@ runs:
           ${{ env.MODULES_DIR }}/opt/boost/${{ inputs.boost_ver }}
           ${{ env.MODULES_DIR }}/modulefiles/boost/${{ inputs.boost_ver }}
         key: ${{ env.OS_VERSION }}-boost-${{ inputs.boost_ver }}-${{ hashFiles('scripts/install_boost.sh') }}
+        restore-keys: |
+          ${{ env.OS_VERSION }}-boost-${{ inputs.boost_ver }}-
     
     - name: install boost module
       if: steps.cache-boost.outputs.cache-hit != 'true'

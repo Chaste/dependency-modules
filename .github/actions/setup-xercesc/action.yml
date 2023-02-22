@@ -14,6 +14,8 @@ runs:
           ${{ env.MODULES_DIR }}/opt/xercesc/${{ inputs.xercesc_ver }}
           ${{ env.MODULES_DIR }}/modulefiles/xercesc/${{ inputs.xercesc_ver }}
         key: ${{ env.OS_VERSION }}-xercesc-${{ inputs.xercesc_ver }}-${{ hashFiles('scripts/install_xercesc.sh') }}
+        restore-keys: |
+          ${{ env.OS_VERSION }}-xercesc-${{ inputs.xercesc_ver }}-
     
     - name: build and install xercesc module
       if: steps.cache-xercesc.outputs.cache-hit != 'true'

@@ -14,6 +14,8 @@ runs:
           ${{ env.MODULES_DIR }}/opt/xsd/${{ inputs.xsd_ver }}
           ${{ env.MODULES_DIR }}/modulefiles/xsd/${{ inputs.xsd_ver }}
         key: ${{ env.OS_VERSION }}-xsd-${{ inputs.xsd_ver }}-${{ hashFiles('scripts/install_xsd.sh') }}
+        restore-keys: |
+          ${{ env.OS_VERSION }}-xsd-${{ inputs.xsd_ver }}-
     
     - name: install xsd module
       if: steps.cache-xsd.outputs.cache-hit != 'true'

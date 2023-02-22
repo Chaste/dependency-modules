@@ -20,7 +20,11 @@ echo "deb [signed-by=/usr/share/keyrings/chaste.asc] http://www.cs.ox.ac.uk/chas
 apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 422C4D99
 wget -O /usr/share/keyrings/chaste.asc https://www.cs.ox.ac.uk/chaste/ubuntu/Chaste%20Team.asc
 
+# Remove existing libunwind to resolve dependency version conflicts with libgoogle-perftools-dev:
+# https://bugs.launchpad.net/ubuntu/+source/llvm-toolchain-14/+bug/1989124
+
 apt-get update && \
+apt-get remove -y libunwind* && \
 apt-get install -y --no-install-recommends \
     chaste-dependencies \
     git \
