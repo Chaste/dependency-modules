@@ -55,18 +55,21 @@ jobs:
           
       - name: cmake configure
         run: |
-          su - runner -c "source init.sh; cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_COVERAGE_CPUS=2 .."
+          source init.sh
+          su -m runner -c "cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_COVERAGE_CPUS=2 .."
         working-directory: chaste/chaste-build-dir
 
       - name: build test suites
         run: |
-          su - runner -c "source init.sh; cmake --build . --target Continuous Parallel --parallel 2"
+          source init.sh
+          su -m runner -c "cmake --build . --target Continuous Parallel --parallel 2"
         working-directory: chaste/chaste-build-dir
 
       - name: run test suites
         run: |
-          su - runner -c "source init.sh; ctest -j2 -L Continuous --output-on-failure"
-          su - runner -c "source init.sh; ctest -L Parallel  --output-on-failure"
+          source init.sh
+          su -m runner -c "ctest -j2 -L Continuous --output-on-failure"
+          su -m runner -c "ctest -L Parallel  --output-on-failure"
         working-directory: chaste/chaste-build-dir
 
       - name: run coverage
