@@ -2,6 +2,14 @@ ARG BASE=focal
 
 FROM ubuntu:${BASE}
 
+ARG XSD=4.0.0
+ARG XERCESC=3.2.3
+ARG SUNDIALS=5.8.0
+ARG BOOST=1.73.0
+ARG VTK=7.1.1
+ARG PETSC=3.8.4
+ARG HDF5=1.10.8
+
 SHELL ["/bin/bash", "-e", "-o", "pipefail", "-c"]
 
 USER root
@@ -40,28 +48,28 @@ RUN useradd -r -m -d ${DEFAULT_HOME} -s /bin/bash ${DEFAULT_USER} && \
     mkdir -p ${MODULES_DIR}/opt && \
     mkdir -p ${MODULES_DIR}/modulefiles && \
     install_xsd.sh \
-        --version=4.0.0 \
+        --version=${XSD} \
         --modules-dir=${MODULES_DIR} && \
     install_xercesc.sh \
-        --version=3.2.3 \
+        --version=${XERCESC} \
         --parallel=$(nproc) \
         --modules-dir=${MODULES_DIR} && \
     install_sundials.sh \
-        --version=5.8.0 \
+        --version=${SUNDIALS} \
         --parallel=$(nproc) \
         --modules-dir=${MODULES_DIR} && \
     install_boost.sh \
-        --version=1.73.0 \
+        --version=${BOOST} \
         --parallel=$(nproc) \
         --modules-dir=${MODULES_DIR} && \
     install_vtk.sh \
-        --version=7.1.1 \
+        --version=${VTK} \
         --parallel=$(nproc) \
         --modules-dir=${MODULES_DIR} && \
     install_petsc_hdf5.sh \
-        --petsc-version=3.8.4 \
+        --petsc-version=${PETSC} \
         --petsc-arch=linux-gnu \
-        --hdf5-version=1.10.8 \
+        --hdf5-version=${HDF5} \
         --parallel=$(nproc) \
         --modules-dir=${MODULES_DIR} && \
     echo "module use ${MODULES_DIR}/modulefiles" >> ${DEFAULT_HOME}/.bashrc && \
