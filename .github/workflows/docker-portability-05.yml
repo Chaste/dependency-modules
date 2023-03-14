@@ -1,4 +1,4 @@
-name: docker-portability-01
+name: docker-portability-05
 
 on:
   workflow_dispatch:
@@ -13,16 +13,16 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - tag: chaste/runner:jammy.portability-01
+          - tag: chaste/runner:jammy.portability-05
             build-args: |
               BASE=jammy
               XSD=4.0.0
-              XERCESC=3.2.2
-              SUNDIALS=3.1.2
-              BOOST=1.67.0
-              VTK=6.3.0
-              PETSC=3.12.4
-              HDF5=1.10.4
+              XERCESC=3.2.4
+              SUNDIALS=6.0.0
+              BOOST=1.76.0
+              VTK=8.2.0
+              PETSC=3.15.5
+              HDF5=1.10.9
             
     steps:
       - name: Checkout
