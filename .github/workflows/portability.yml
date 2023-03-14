@@ -78,11 +78,12 @@ jobs:
       - name: cmake configure
         run: |
           source init.sh
+          export CMAKE_PREFIX_PATH="${XERCESC_ROOT}:${XSD_ROOT}:${SUNDIALS_ROOT}:${VTK_ROOT}"
+          echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" >> ${GITHUB_ENV}
           su -m runner -c "cmake \
             -DBoost_NO_BOOST_CMAKE=ON \
             -DBoost_NO_SYSTEM_PATHS=ON \
             -DBOOST_ROOT=${BOOST_ROOT} \
-            -DCMAKE_PREFIX_PATH=${XERCESC_ROOT};${XSD_ROOT};${SUNDIALS_ROOT};${VTK_ROOT} \
             -DCMAKE_BUILD_TYPE=Release \
             ${{ matrix.extra-build-args }} .."
         working-directory: chaste/chaste-build-dir
