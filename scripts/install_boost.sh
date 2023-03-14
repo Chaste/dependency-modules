@@ -77,9 +77,16 @@ fi
 
 # Patch for serialization in Boost <= 1.64.x
 # https://github.com/boostorg/serialization/commit/1d86261581230e2dc5d617a9b16287d326f3e229
-if [[ (${major} -eq 1) && (${minor} -eq 64) ]]; then  # Boost == 1.64.x
+if [[ (${major} -eq 1) && (${minor} -le 64) ]]; then  # Boost <= 1.64.x
     cd ${src_dir}
     patch -t -p2 < ${script_dir}/patches/boost_164-serialization-array-wrapper.patch
+fi
+
+# Patch for pthread in Boost <= 1.73.x
+# https://github.com/boostorg/thread/pull/297/commits/74fb0a26099bc51d717f5f154b37231ce7df3e98
+if [[ (${major} -eq 1) && (${minor} -le 73) ]]; then  # Boost <= 1.71.x
+    cd ${src_dir}
+    patch -t -p2 < ${script_dir}/patches/boost_171-pthread.patch
 fi
 
 # Build and install
