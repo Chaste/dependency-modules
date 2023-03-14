@@ -17,11 +17,11 @@ jobs:
             build-args: |
               BASE=jammy
               XSD=4.0.0
-              XERCESC=3.2.3
-              SUNDIALS=5.8.0
-              BOOST=1.74.0
+              XERCESC=3.2.2
+              SUNDIALS=3.2.1
+              BOOST=1.71.0
               VTK=7.1.1
-              PETSC=3.15.5
+              PETSC=3.12.4
               HDF5=1.10.7
             
     steps:
