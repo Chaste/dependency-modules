@@ -84,8 +84,7 @@ jobs:
             -DBOOST_ROOT=${BOOST_ROOT} \
             -DCMAKE_PREFIX_PATH="${XERCESC_ROOT};${XSD_ROOT};${SUNDIALS_ROOT};${VTK_ROOT}" \
             -DCMAKE_BUILD_TYPE=Release \
-            ${{ matrix.extra-build-args }} \
-            .."
+            ${{ matrix.extra-build-args }} .."
         working-directory: chaste/chaste-build-dir
 
       - name: build TestChasteBuildInfo
