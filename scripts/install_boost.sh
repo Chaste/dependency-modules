@@ -86,7 +86,7 @@ fi
 # https://github.com/boostorg/thread/pull/297/commits/74fb0a26099bc51d717f5f154b37231ce7df3e98
 if [[ (${major} -eq 1) && (${minor} -le 73) ]]; then  # Boost <= 1.71.x
     cd ${src_dir}
-    patch -t -p2 < ${script_dir}/patches/boost_171-pthread.patch
+    patch -t -p2 < ${script_dir}/patches/boost_173-pthread.patch
 fi
 
 # Build and install
