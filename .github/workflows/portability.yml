@@ -88,10 +88,11 @@ jobs:
             ${{ matrix.extra-build-args }} .."
         working-directory: chaste/chaste-build-dir
 
-      - name: build TestChasteBuildInfo
+      - name: run TestChasteBuildInfo
         run: |
           source init.sh
           su -m runner -c "cmake --build . --target TestChasteBuildInfo --parallel 2"
+          su -m runner -c "ctest -V -R TestChasteBuildInfo --output-on-failure"
         working-directory: chaste/chaste-build-dir
 
       - name: build Continuous
@@ -105,13 +106,7 @@ jobs:
           source init.sh
           su -m runner -c "cmake --build . --target Continuous --parallel 2"
         working-directory: chaste/chaste-build-dir
-
-      - name: run TestChasteBuildInfo
-        run: |
-          source init.sh
-          su -m runner -c "ctest -V -R TestChasteBuildInfo --output-on-failure"
-        working-directory: chaste/chaste-build-dir
-
+        
       - name: run Continuous
         run: |
           source init.sh
