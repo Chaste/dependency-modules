@@ -1,10 +1,12 @@
 name: Portability
 
 on:
+  schedule:
+    - cron: '22 22 * * 0'
+
   workflow_dispatch:
 
 jobs:
-  
   build-and-test:
     strategy:
       fail-fast: false
@@ -106,7 +108,7 @@ jobs:
           source init.sh
           su -m runner -c "cmake --build . --target Continuous --parallel 2"
         working-directory: chaste/chaste-build-dir
-        
+
       - name: run Continuous
         run: |
           source init.sh
