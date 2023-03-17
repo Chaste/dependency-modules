@@ -82,9 +82,9 @@ if [[ (${major} -eq 1) && (${minor} -le 64) ]]; then  # Boost <= 1.64.x
     patch -t -p2 < ${script_dir}/patches/boost_164-serialization-array-wrapper.patch
 fi
 
-# Patch for pthread in Boost <= 1.73.x
+# Patch for pthread in 1.69.x <= Boost <= 1.73.x
 # https://github.com/boostorg/thread/pull/297/commits/74fb0a26099bc51d717f5f154b37231ce7df3e98
-if [[ (${major} -eq 1) && (${minor} -le 73) ]]; then  # Boost <= 1.71.x
+if [[ (${major} -eq 1) && (${minor} -ge 69) && (${minor} -le 73) ]]; then  # 1.69.x <= Boost <= 1.73.x
     cd ${src_dir}
     patch -t -p2 < ${script_dir}/patches/boost_173-pthread.patch
 fi

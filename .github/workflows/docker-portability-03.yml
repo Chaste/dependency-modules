@@ -18,11 +18,11 @@ jobs:
               BASE=jammy
               XSD=4.0.0
               XERCESC=3.2.3
-              SUNDIALS=5.8.0
-              BOOST=1.74.0
+              SUNDIALS=4.1.0
+              BOOST=1.71.0
               VTK=7.1.1
-              PETSC=3.15.5
-              HDF5=1.10.7
+              PETSC=3.14.6
+              HDF5=1.10.6
             
     steps:
       - name: Checkout
