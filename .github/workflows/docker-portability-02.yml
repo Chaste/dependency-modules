@@ -19,10 +19,10 @@ jobs:
               XSD=4.0.0
               XERCESC=3.2.2
               SUNDIALS=3.2.1
-              BOOST=1.71.0
+              BOOST=1.69.0
               VTK=7.1.1
-              PETSC=3.12.4
-              HDF5=1.10.7
+              PETSC=3.13.6
+              HDF5=1.10.5
             
     steps:
       - name: Checkout
