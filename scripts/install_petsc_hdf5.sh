@@ -160,6 +160,13 @@ mkdir -p ${install_dir}
 
 tar -xzf $(basename ${URL_PETSC}) -C ${install_dir} --strip-components=1
 
+# Fix for isAlive() removal from Python 3.9+
+# https://bugs.python.org/issue37804
+if [[ (${petsc_major} -eq 3) && ((${petsc_minor} -eq 12) || (${petsc_minor} -eq 13)) ]]; then  # PETSc 3.12.x & 3.13.x
+    cd ${install_dir}
+    sed -i.bak 's/thread.isAlive()/thread.is_alive()/g' config/BuildSystem/script.py
+fi
+
 # Set Python version
 PYTHON=python3
 if [[ (${petsc_major} -lt 3) || ((${petsc_major} -eq 3) && (${petsc_minor} -lt 11)) ]]; then  # PETSc < 3.11.x
@@ -200,8 +207,6 @@ case ${petsc_arch} in
             --with-cc=gcc \
             --with-cxx=g++ \
             --with-fc=0 \
-            --COPTFLAGS=-Og \
-            --CXXOPTFLAGS=-Og \
             --with-x=false \
             --with-ssl=false \
             --download-f2cblaslapack=1 \
