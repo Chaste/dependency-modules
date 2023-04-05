@@ -13,7 +13,7 @@ on:
         description: 'Test suites'
         required: true
         type: string
-        default: 'Continuous,Nightly,Parallel'
+        default: 'Continuous,Nightly,Weekly'
 
       xsd_ver:
         description: 'XSD version'
@@ -37,19 +37,19 @@ on:
         description: 'Boost version'
         required: true
         type: string 
-        default: '1.73.0'
+        default: '1.74.0'
 
       vtk_ver:
         description: 'VTK version'
         required: false
         type: string 
-        default: '6.3.0'
+        default: '7.1.0'
 
       petsc_ver:
         description: 'PETSc version'
         required: true
         type: string 
-        default: '3.8.4'
+        default: '3.12.4'
 
       petsc_arch:
         description: 'PETSc arch'
@@ -61,7 +61,7 @@ on:
         description: 'HDF5 version'
         required: true
         type: string 
-        default: '1.10.1'
+        default: '1.10.5'
 
 jobs:
   build-and-test:
@@ -70,8 +70,7 @@ jobs:
     
     defaults:
       run:
-        # --login to source /etc/profile.d/modules.sh
-        shell: bash --login -e -o pipefail {0}
+        shell: bash
         
     steps:
       - name: Set environment
@@ -86,7 +85,6 @@ jobs:
           for suite in "${test_suites[@]}"; do
             case $suite in
               continuous) run_continuous=1;;
-              parallel) run_parallel=1;;
               nightly) run_nightly=1;;
               weekly) run_weekly=1;;
               *) echo "Unknown test suite: $suite" 1>&2; exit 1;;
@@ -94,7 +92,6 @@ jobs:
           done
 
           echo "run_continuous=${run_continuous}" >> ${GITHUB_ENV}
-          echo "run_parallel=${run_parallel}" >> ${GITHUB_ENV}
           echo "run_nightly=${run_nightly}" >> ${GITHUB_ENV}
           echo "run_weekly=${run_weekly}" >> ${GITHUB_ENV}
           
@@ -111,8 +108,9 @@ jobs:
 
       - name: Create module loading script
         run: |
-          echo "module purge" > modulesinit.sh
+          echo "source /etc/profile.d/modules.sh" > init.sh
           echo "module use ${{ env.modules_dir }}/modulefiles" >> modulesinit.sh
+          echo "module purge" >> modulesinit.sh
 
       - name: Setup xsd
         run: |
@@ -323,51 +321,6 @@ jobs:
           source modulesinit.sh
           cd Chaste/build
           nice -n ${{ env.niceness }} ctest -j ${{ env.parallel }} -L Weekly --output-on-failure
-
-      - name: Reconfigure Chaste for Parallel test pack
-        if: ${{ env.run_parallel == '1' }}
-        run: |
-          source modulesinit.sh
-
-          if [ -z "${{ inputs.sundials_ver }}" ]; then
-            use_cvode="OFF"
-          else
-            use_cvode="ON"
-          fi
-          
-          if [ -z "${{ inputs.vtk_ver }}" ]; then
-            use_vtk="OFF"
-          else
-            use_vtk="ON"
-          fi
-
-          mkdir -p Chaste/build
-          cd Chaste/build
-          rm -rf *
-          nice -n ${{ env.niceness }} cmake \
-            -DBoost_NO_BOOST_CMAKE=ON \
-            -DBoost_NO_SYSTEM_PATHS=ON \
-            -DBOOST_ROOT=${BOOST_ROOT} \
-            -DChaste_USE_CVODE=${use_cvode} \
-            -DChaste_USE_VTK=${use_vtk} \
-            -DCMAKE_PREFIX_PATH="${XERCESC_ROOT};${XSD_ROOT};${SUNDIALS_ROOT};${VTK_ROOT}" \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DChaste_NUM_CPUS_TEST=3 \
-            ..
-
-      - name: Build Parallel test pack
-        if: ${{ env.run_parallel == '1' }}
-        run: |
-          source modulesinit.sh
-          cd Chaste/build
-          nice -n ${{ env.niceness }} cmake --build . --parallel ${{ env.parallel }} --target Parallel
-
-      - name: Run Parallel test pack
-        if: ${{ env.run_parallel == '1' }}
-        run: |
-          source modulesinit.sh
-          cd Chaste/build
-          nice -n ${{ env.niceness }} ctest -j ${{ env.parallel }} -L Parallel --output-on-failure
 
       - name: Cleanup
         if: always()
