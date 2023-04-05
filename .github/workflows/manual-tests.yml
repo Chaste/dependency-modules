@@ -131,7 +131,7 @@ jobs:
 
   build-and-test:
     needs: versions
-    uses: Chaste/dependency-modules/.github/workflows/version-tests.yml@main
+    uses: ./.github/workflows/version-tests.yml
     with:
       chaste_branch: ${{ github.event.inputs.chaste_branch }}
       test_suites: ${{ github.event.inputs.test_suites }}
