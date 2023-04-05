@@ -13,7 +13,7 @@ on:
         description: 'Test suites'
         required: true
         type: string
-        default: 'Continuous,Nightly,Parallel'
+        default: 'Continuous,Nightly,Weekly'
 
       xsd_ver:
         description: 'XSD version'
