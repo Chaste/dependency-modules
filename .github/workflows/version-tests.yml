@@ -108,7 +108,7 @@ jobs:
 
       - name: Create module loading script
         run: |
-          echo "source /etc/profile.d/modules.sh" > init.sh
+          echo "source /etc/profile.d/modules.sh" > modulesinit.sh
           echo "module use ${{ env.modules_dir }}/modulefiles" >> modulesinit.sh
           echo "module purge" >> modulesinit.sh
 
