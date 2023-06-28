@@ -11,7 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - tag: chaste/runner:jammy.portability-05
+          - tags: chaste/runner:jammy.portability-05
             build-args: |
               BASE=jammy
               XSD=4.0.0
@@ -44,12 +44,15 @@ jobs:
           context: .
           pull: true
           load: true
-          tags: ${{ matrix.tag }}
+          tags: ${{ matrix.tags }}
           build-args: ${{ matrix.build-args }}
             
       - name: Test image
         run: |
-          docker run --rm --entrypoint /bin/bash ${{ matrix.tag }}
+          tags=( ${{ matrix.tags }} )
+          for tag in "${tags[@]}"; do
+            docker run --rm --entrypoint /bin/bash ${tag}
+          done
           
       - name: Build and push
         uses: docker/build-push-action@v4
@@ -57,5 +60,5 @@ jobs:
           context: .
           pull: true
           push: true
-          tags: ${{ matrix.tag }}
+          tags: ${{ matrix.tags }}
           build-args: ${{ matrix.build-args }}
