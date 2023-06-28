@@ -27,8 +27,14 @@ jobs:
     steps:
       - name: test matrix tags
         run: |
+          tags=( ${{ matrix.tags }} )
           echo "matrix.tags: ${{ matrix.tags }}"
-          echo "matrix.tags[0]: ${{ matrix.tags[0] }}"
+          echo "tags[0]: ${tags[0]}"
+          echo "tags[1]: ${tags[1]}"
+          echo "tags[*]: ${tags[*]}"
+          for tag in "${tags[@]}" do
+            echo "loop: ${tag}"
+          done
           
       - name: Checkout
         uses: actions/checkout@v3
