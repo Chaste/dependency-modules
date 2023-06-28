@@ -25,6 +25,11 @@ jobs:
               HDF5=1.10.4
             
     steps:
+      - name: test matrix tags
+        run: |
+          echo "matrix.tags: ${{ matrix.tags }}"
+          echo "matrix.tags[0]: ${{ matrix.tags[0] }}"
+          
       - name: Checkout
         uses: actions/checkout@v3
         
@@ -51,7 +56,7 @@ jobs:
             
       - name: Test image
         run: |
-          docker run --rm --entrypoint /bin/bash ${{ matrix.tags }}
+          docker run --rm --entrypoint /bin/bash ${{ matrix.tags[0] }}
           
       - name: Build and push
         uses: docker/build-push-action@v4
