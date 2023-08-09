@@ -88,8 +88,11 @@ mkdir -p ${src_dir}-build
 cd ${src_dir}-build
 cmake \
     -DBUILD_SHARED_LIBS=ON \
+    -DBUILD_EXAMPLES=OFF \
+    -DBUILD_TESTING=OFF \
     -DBUILD_DOCUMENTATION=OFF \
     -DVTK_INSTALL_NO_DOCUMENTATION=ON \
+    -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=${install_dir} \
     -DCMAKE_INSTALL_RPATH=${install_dir}/lib/vtk-${major}.${minor} \
     ${src_dir} && \
