@@ -61,7 +61,7 @@ hdf5_version_arr=(${hdf5_version//\./ })
 hdf5_major=${hdf5_version_arr[0]}
 hdf5_minor=${hdf5_version_arr[1]}
 
-# Unsupported versions: https://chaste.cs.ox.ac.uk/trac/wiki/InstallGuides/DependencyVersions
+# Unsupported versions: https://github.com/Chaste/dependency-modules/wiki
 if [[ (${petsc_major} -lt 3) || ((${petsc_major} -eq 3) && (${petsc_minor} -lt 7)) ]]; then  # PETSc < 3.7.x
     echo "$(basename $0): PETSc versions < 3.7 not supported"
     exit 1

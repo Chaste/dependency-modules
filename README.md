@@ -72,7 +72,7 @@ module load petsc_hdf5/3.12.4_1.10.4/linux-gnu
 
 ### 5. Build Chaste
 
-See the [Chaste Guides](https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/CmakeFirstRun) for detailed instructions on building Chaste.
+See the [Chaste Guides](https://chaste.github.io/docs/installguides/ubuntu-package/) for detailed instructions on building Chaste.
 
 ## Useful commands
 

@@ -39,7 +39,7 @@ version_arr=(${version//\./ })
 major=${version_arr[0]}
 minor=${version_arr[1]}
 
-# Unsupported versions: https://chaste.cs.ox.ac.uk/trac/wiki/InstallGuides/DependencyVersions
+# Unsupported versions: https://github.com/Chaste/dependency-modules/wiki
 if [[ (${major} -lt 3) || ((${major} -eq 3) && (${minor} -lt 2)) ]]; then  # Xerces-C < 3.2.x
     echo "$(basename $0): Xerces-C versions < 3.2 not supported"
     exit 1

@@ -15,7 +15,7 @@
 
 export DEBIAN_FRONTEND=noninteractive
 
-# https://chaste.cs.ox.ac.uk/trac/wiki/InstallGuides/UbuntuPackage
+# https://chaste.github.io/docs/installguides/ubuntu-package/
 echo "deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu jammy/" > /etc/apt/sources.list.d/chaste.list
 apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 422C4D99
 wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
