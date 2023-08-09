@@ -20,11 +20,7 @@ echo "deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ub
 apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 422C4D99
 wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
 
-# Remove existing libunwind to resolve dependency version conflicts with libgoogle-perftools-dev:
-# https://bugs.launchpad.net/ubuntu/+source/llvm-toolchain-14/+bug/1989124
-
 apt-get update && \
-apt-get remove -y libunwind* && \
 apt-get install -y --no-install-recommends \
     chaste-dependencies \
     git \
@@ -33,7 +29,6 @@ apt-get install -y --no-install-recommends \
     libfltk1.1 \
     hdf5-tools \
     cmake-curses-gui \
-    libgoogle-perftools-dev \
     lcov \
     doxygen \
     graphviz \
@@ -45,6 +40,10 @@ apt-get install -y --no-install-recommends \
     python2.7 \
     libffi-dev \
     environment-modules
+
+# libgoogle-perftools-dev: libunwind dependency version required conflicts
+# with the pre-installed version on github ubuntu-22.04 runners
+# https://bugs.launchpad.net/ubuntu/+source/llvm-toolchain-14/+bug/1989124
 
 # https://bugs.launchpad.net/ubuntu/+source/vtk7/+bug/1878103
 # https://github.com/Chaste/chaste-docker/blob/4dd5a4819716c3defa0bfb5145bfa902bf07ecf4/Dockerfile#L89
