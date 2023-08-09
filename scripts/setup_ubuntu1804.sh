@@ -13,12 +13,12 @@
 #     libfltk1.1, hdf5-tools, cmake-curses-gui
 # Suggests: libgoogle-perftools-dev, doxygen, graphviz, eclipse-cdt,
 #     eclipse-egit, libsvn-java, subversion, git-svn, gnuplot, paraview
-# APT-Sources: http://www.cs.ox.ac.uk/chaste/ubuntu bionic/ Packages
+# APT-Sources: https://chaste.github.io/ubuntu bionic/ Packages
 
 export DEBIAN_FRONTEND=noninteractive
 
 # https://chaste.cs.ox.ac.uk/trac/wiki/InstallGuides/UbuntuPackage
-echo "deb http://www.cs.ox.ac.uk/chaste/ubuntu bionic/" > /etc/apt/sources.list.d/chaste.list
+echo "deb https://chaste.github.io/ubuntu bionic/" > /etc/apt/sources.list.d/chaste.list
 apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 422C4D99
 
 apt-get update && \

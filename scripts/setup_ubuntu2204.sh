@@ -11,14 +11,14 @@
 #     libpetsc-real3.12-dbg, libfltk1.1, hdf5-tools, cmake-curses-gui
 # Suggests: libgoogle-perftools-dev, doxygen, graphviz, subversion, git-svn,
 #     gnuplot, paraview
-# APT-Sources: http://www.cs.ox.ac.uk/chaste/ubuntu jammy/ Packages
+# APT-Sources: https://chaste.github.io/ubuntu jammy/ Packages
 
 export DEBIAN_FRONTEND=noninteractive
 
 # https://chaste.cs.ox.ac.uk/trac/wiki/InstallGuides/UbuntuPackage
-echo "deb [signed-by=/usr/share/keyrings/chaste.asc] http://www.cs.ox.ac.uk/chaste/ubuntu jammy/" > /etc/apt/sources.list.d/chaste.list
+echo "deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu jammy/" > /etc/apt/sources.list.d/chaste.list
 apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 422C4D99
-wget -O /usr/share/keyrings/chaste.asc https://www.cs.ox.ac.uk/chaste/ubuntu/Chaste%20Team.asc
+wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
 
 # Remove existing libunwind to resolve dependency version conflicts with libgoogle-perftools-dev:
 # https://bugs.launchpad.net/ubuntu/+source/llvm-toolchain-14/+bug/1989124
