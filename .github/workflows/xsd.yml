@@ -2,17 +2,27 @@ name: xsd
 
 on:
   workflow_dispatch:
+    inputs:
+      xsd_ver:
+        description: 'XSD version'
+        required: true
+        type: string
+        default: '4.0.0'
+
+      os:
+        description: 'OS'
+        required: true
+        type: choice
+        options:
+          - 'ubuntu-20.04'
+          - 'ubuntu-22.04'
+        default: 'ubuntu-22.04'
 
 jobs:
   setup:
-    name: install and cache xsd versions
+    name: install and cache xsd
     
-    strategy:
-      matrix:
-        os: [ubuntu-20.04, ubuntu-22.04]
-      fail-fast: false
-    
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ github.event.inputs.os }}
       
     steps:
       - name: checkout
@@ -24,4 +34,4 @@ jobs:
       - name: install and cache xsd 4.0.0
         uses: ./.github/actions/setup-xsd
         with:
-          xsd_ver: 4.0.0
+          xsd_ver: ${{ github.event.inputs.xsd_ver }}

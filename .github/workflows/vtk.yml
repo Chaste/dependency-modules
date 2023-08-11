@@ -20,7 +20,7 @@ on:
 
 jobs:
   setup:
-    name: build and cache vtk versions
+    name: build and cache vtk
     
     runs-on: ${{ github.event.inputs.os }}
       

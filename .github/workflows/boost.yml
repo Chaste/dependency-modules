@@ -2,17 +2,27 @@ name: boost
 
 on:
   workflow_dispatch:
+    inputs:
+      boost_ver:
+        description: 'Boost version'
+        required: true
+        type: string
+        default: '1.74.0'
+
+      os:
+        description: 'OS'
+        required: true
+        type: choice
+        options:
+          - 'ubuntu-20.04'
+          - 'ubuntu-22.04'
+        default: 'ubuntu-22.04'
 
 jobs:
   setup:
-    name: build and cache boost versions
-
-    strategy:
-      matrix:
-        os: [ubuntu-20.04, ubuntu-22.04]
-      fail-fast: false
-
-    runs-on: ${{ matrix.os }}
+    name: build and cache boost
+    
+    runs-on: ${{ github.event.inputs.os }}
 
     steps:
       - name: checkout
@@ -21,7 +31,7 @@ jobs:
       - name: setup defaults
         uses: ./.github/actions/setup-defaults
 
-      - name: build and cache boost 1.74.0
+      - name: build and cache boost
         uses: ./.github/actions/setup-boost
         with:
-          boost_ver: 1.74.0
+          boost_ver: ${{ github.event.inputs.boost_ver }}
