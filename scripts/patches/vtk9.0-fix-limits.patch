@@ -1,5 +1,5 @@
 --- a/Common/Core/vtkGenericDataArrayLookupHelper.h
-+++ b.mod/Common/Core/vtkGenericDataArrayLookupHelper.h
++++ b/Common/Core/vtkGenericDataArrayLookupHelper.h
 @@ -25,6 +25,7 @@
  #include "vtkIdList.h"
  #include <algorithm>
@@ -9,7 +9,7 @@
  #include <vector>
  
 --- a/Common/DataModel/vtkPiecewiseFunction.cxx
-+++ b.mod/Common/DataModel/vtkPiecewiseFunction.cxx
++++ b/Common/DataModel/vtkPiecewiseFunction.cxx
 @@ -22,6 +22,7 @@
  #include <cassert>
  #include <cmath>
@@ -19,7 +19,7 @@
  #include <vector>
  
 --- a/Filters/HyperTree/vtkHyperTreeGridThreshold.cxx
-+++ b.mod/Filters/HyperTree/vtkHyperTreeGridThreshold.cxx
++++ b/Filters/HyperTree/vtkHyperTreeGridThreshold.cxx
 @@ -28,6 +28,7 @@
  #include "vtkHyperTreeGridNonOrientedCursor.h"
  
@@ -29,7 +29,7 @@
  vtkStandardNewMacro(vtkHyperTreeGridThreshold);
  
 --- a/Rendering/Core/vtkColorTransferFunction.cxx
-+++ b.mod/Rendering/Core/vtkColorTransferFunction.cxx
++++ b/Rendering/Core/vtkColorTransferFunction.cxx
 @@ -21,6 +21,7 @@
  #include <algorithm>
  #include <cmath>
