@@ -33,6 +33,6 @@ combinediff tmp1.patch 115_support-gcc10.patch > tmp2.patch
 combinediff tmp2.patch mysq8_my_bool.patch > tmp1.patch 
 combinediff tmp1.patch 3edc0de2b04ae1e100c229e592d6b9fa94f2915a.patch > tmp2.patch 
 combinediff tmp2.patch 581d9eb874b2b80a3fb21c739a96fa6f955ffb5e.patch > tmp1.patch 
-combinediff tmp1.patch vtk8-gcc-11-exodus.patch > vtk8.patch
+combinediff tmp1.patch vtk8-gcc-11-exodus.patch > vtk8.2.patch
 
 rm tmp1.patch tmp2.patch

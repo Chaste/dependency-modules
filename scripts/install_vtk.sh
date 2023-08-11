@@ -63,21 +63,21 @@ else  # VTK > 6.0.x
 fi
 
 # VTK 6 patches: https://sources.debian.org/patches/vtk6/6.3.0%2Bdfsg2-8.1/
-if [[ ${major} -eq 6 ]]; then  # VTK == 6.x.x
+if [[ ${major} -eq 6 && ${minor} -eq 3 ]]; then  # VTK == 6.3.x
     cd ${src_dir}
-    patch -t -p1 < ${script_dir}/patches/vtk6.patch
+    patch -t -p1 < ${script_dir}/patches/vtk6.3.patch
 fi
 
 # VTK 7 patches: https://sources.debian.org/patches/vtk7/7.1.1%2Bdfsg2-10.2/
-if [[ ${major} -eq 7 ]]; then  # VTK == 7.x.x
+if [[ ${major} -eq 7 && ${minor} -eq 1 ]]; then  # VTK == 7.1.x
     cd ${src_dir}
-    patch -t -p1 < ${script_dir}/patches/vtk7.patch
+    patch -t -p1 < ${script_dir}/patches/vtk7.1.patch
 fi
 
 # VTK 8 patches: https://sources.debian.org/patches/vtk7/7.1.1%2Bdfsg2-10.2/
-if [[ ${major} -eq 8 ]]; then  # VTK == 8.x.x
+if [[ ${major} -eq 8 && ${minor} -eq 2 ]]; then  # VTK == 8.2.x
     cd ${src_dir}
-    patch -t -p1 < ${script_dir}/patches/vtk8.patch
+    patch -t -p1 < ${script_dir}/patches/vtk8.2.patch
 fi
 
 # Build and install
