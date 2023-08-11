@@ -2,26 +2,36 @@ name: sundials
 
 on:
   workflow_dispatch:
+    inputs:
+      sundials_ver:
+        description: 'SUNDIALS version'
+        required: true
+        type: string
+        default: '5.8.0'
+
+      os:
+        description: 'OS'
+        required: true
+        type: choice
+        options:
+          - 'ubuntu-20.04'
+          - 'ubuntu-22.04'
+        default: 'ubuntu-22.04'
 
 jobs:
   setup:
-    name: build and cache sundials versions
+    name: build and cache sundials
     
-    strategy:
-      matrix:
-        os: [ubuntu-20.04, ubuntu-22.04]
-      fail-fast: false
-    
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ github.event.inputs.os }}
     
     steps:
       - name: checkout
         uses: actions/checkout@v3
 
-      - name: setup defaults
+      - name: setup os
         uses: ./.github/actions/setup-defaults
 
-      - name: build and cache sundials 5.8.0
+      - name: build and cache
         uses: ./.github/actions/setup-sundials
         with:
-          sundials_ver: 5.8.0
+          sundials_ver: ${{ github.event.inputs.sundials_ver }}

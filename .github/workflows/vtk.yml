@@ -2,26 +2,36 @@ name: vtk
 
 on:
   workflow_dispatch:
+    inputs:
+      vtk_ver:
+        description: 'VTK version'
+        required: true
+        type: string
+        default: '9.2.6'
+
+      os:
+        description: 'OS'
+        required: true
+        type: choice
+        options:
+          - 'ubuntu-20.04'
+          - 'ubuntu-22.04'
+        default: 'ubuntu-22.04'
 
 jobs:
   setup:
-    name: build and cache vtk versions
+    name: build and cache vtk
     
-    strategy:
-      matrix:
-        os: [ubuntu-20.04, ubuntu-22.04]
-      fail-fast: false
-    
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ github.event.inputs.os }}
       
     steps:
       - name: checkout
         uses: actions/checkout@v3
 
-      - name: setup defaults
+      - name: setup os
         uses: ./.github/actions/setup-defaults
 
-      - name: build and cache vtk 7.1.1
+      - name: build and cache
         uses: ./.github/actions/setup-vtk
         with:
-          vtk_ver: 7.1.1
+          vtk_ver: ${{ github.event.inputs.vtk_ver }}

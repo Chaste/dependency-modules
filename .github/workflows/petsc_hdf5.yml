@@ -2,28 +2,53 @@ name: petsc_hdf5
 
 on:
   workflow_dispatch:
+    inputs:
+      petsc_ver:
+        description: 'PETSc version'
+        required: true
+        type: string
+        default: '3.15.5'
+
+      petsc_arch:
+        description: 'PETSc arch'
+        required: true
+        type: choice
+        options:
+          - 'linux-gnu'
+          - 'linux-gnu-opt'
+        default: 'linux-gnu'
+
+      hdf5_ver:
+        description: 'HDF5 version'
+        required: true
+        type: string
+        default: '1.10.8'
+
+      os:
+        description: 'OS'
+        required: true
+        type: choice
+        options:
+          - 'ubuntu-20.04'
+          - 'ubuntu-22.04'
+        default: 'ubuntu-22.04'
 
 jobs:
   setup:
-    name: build and cache petsc_hdf5 versions
+    name: build and cache petsc_hdf5
     
-    strategy:
-      matrix:
-        os: [ubuntu-20.04, ubuntu-22.04]
-      fail-fast: false
-    
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ github.event.inputs.os }}
       
     steps:
       - name: checkout
         uses: actions/checkout@v3
 
-      - name: setup defaults
+      - name: setup os
         uses: ./.github/actions/setup-defaults
 
-      - name: build and cache petsc 3.15.5 / hdf5 1.10.8 / linux-gnu
+      - name: build and cache
         uses: ./.github/actions/setup-petsc_hdf5
         with:
-          petsc_ver: 3.15.5
-          hdf5_ver: 1.10.8
-          petsc_arch: linux-gnu
+          petsc_ver: ${{ github.event.inputs.petsc_ver }}
+          petsc_arch: ${{ github.event.inputs.petsc_arch }}
+          hdf5_ver: ${{ github.event.inputs.hdf5_ver }}

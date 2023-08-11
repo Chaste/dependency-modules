@@ -40,5 +40,5 @@ combinediff tmp1.patch 120_fix_ftbfs_qtpainter.patch > tmp2.patch
 combinediff tmp2.patch 3edc0de2b04ae1e100c229e592d6b9fa94f2915a.patch > tmp1.patch 
 combinediff tmp1.patch 581d9eb874b2b80a3fb21c739a96fa6f955ffb5e.patch > tmp2.patch 
 combinediff tmp2.patch new-freetype.patch > tmp1.patch
-combinediff tmp1.patch vtk6-gcc11-support.patch > vtk6.patch
+combinediff tmp1.patch vtk6-gcc11-support.patch > vtk6.3.patch
 rm tmp1.patch tmp2.patch
