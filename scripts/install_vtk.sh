@@ -62,22 +62,28 @@ else  # VTK > 6.0.x
     tar -xzf v${version}.tar.gz -C ${src_dir} --strip-components=1
 fi
 
-# VTK 6 patches: https://sources.debian.org/patches/vtk6/6.3.0%2Bdfsg2-8.1/
+# VTK 6.3.x patches: https://sources.debian.org/patches/vtk6/6.3.0%2Bdfsg2-8.1/
 if [[ ${major} -eq 6 && ${minor} -eq 3 ]]; then  # VTK == 6.3.x
     cd ${src_dir}
     patch -t -p1 < ${script_dir}/patches/vtk6.3.patch
 fi
 
-# VTK 7 patches: https://sources.debian.org/patches/vtk7/7.1.1%2Bdfsg2-10.2/
+# VTK 7.1.x patches: https://sources.debian.org/patches/vtk7/7.1.1%2Bdfsg2-10.2/
 if [[ ${major} -eq 7 && ${minor} -eq 1 ]]; then  # VTK == 7.1.x
     cd ${src_dir}
     patch -t -p1 < ${script_dir}/patches/vtk7.1.patch
 fi
 
-# VTK 8 patches: https://sources.debian.org/patches/vtk7/7.1.1%2Bdfsg2-10.2/
+# VTK 8.2.x patches: https://sources.debian.org/patches/vtk7/7.1.1%2Bdfsg2-10.2/
 if [[ ${major} -eq 8 && ${minor} -eq 2 ]]; then  # VTK == 8.2.x
     cd ${src_dir}
     patch -t -p1 < ${script_dir}/patches/vtk8.2.patch
+fi
+
+# VTK 9.0.x patches: https://sources.debian.org/patches/vtk9/9.0.1%2Bdfsg1-8/
+if [[ ${major} -eq 9 && ${minor} -eq 0 ]]; then  # VTK == 9.0.x
+    cd ${src_dir}
+    patch -t -p1 < ${script_dir}/patches/vtk9.0-fix-limits.patch
 fi
 
 # Build and install
