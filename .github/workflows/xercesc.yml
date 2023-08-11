@@ -28,10 +28,10 @@ jobs:
       - name: checkout
         uses: actions/checkout@v3
 
-      - name: setup defaults
+      - name: setup os
         uses: ./.github/actions/setup-defaults
 
-      - name: build and cache xercesc
+      - name: build and cache
         uses: ./.github/actions/setup-xercesc
         with:
           xercesc_ver: ${{ github.event.inputs.xercesc_ver }}

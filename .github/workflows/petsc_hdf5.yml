@@ -43,10 +43,10 @@ jobs:
       - name: checkout
         uses: actions/checkout@v3
 
-      - name: setup defaults
+      - name: setup os
         uses: ./.github/actions/setup-defaults
 
-      - name: build and cache petsc + hdf5
+      - name: build and cache
         uses: ./.github/actions/setup-petsc_hdf5
         with:
           petsc_ver: ${{ github.event.inputs.petsc_ver }}

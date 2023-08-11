@@ -28,10 +28,10 @@ jobs:
       - name: checkout
         uses: actions/checkout@v3
 
-      - name: setup defaults
+      - name: setup os
         uses: ./.github/actions/setup-defaults
           
-      - name: install and cache xsd 4.0.0
+      - name: install and cache
         uses: ./.github/actions/setup-xsd
         with:
           xsd_ver: ${{ github.event.inputs.xsd_ver }}
