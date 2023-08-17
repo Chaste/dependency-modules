@@ -197,7 +197,7 @@ case ${petsc_arch} in
             --download-metis=1 \
             --download-hypre=${download_hypre} \
             --with-shared-libraries && \
-        make all test
+        make -j ${parallel} all
         ;;
 
     linux-gnu-opt)
@@ -217,7 +217,7 @@ case ${petsc_arch} in
             --download-hypre=${download_hypre} \
             --with-shared-libraries \
             --with-debugging=0 && \
-        make all test
+        make -j ${parallel} all
         ;;
     *)
         ;;
