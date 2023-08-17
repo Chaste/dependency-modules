@@ -35,6 +35,8 @@ apt-get install -y --no-install-recommends \
 
 # Install VTK dependencies
 apt-get install -y --no-install-recommends \
+  freeglut3 \
+  freeglut3-dev \
   libavcodec-dev \
   libavcodec58 \
   libavformat-dev \
