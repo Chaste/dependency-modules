@@ -30,6 +30,18 @@ apt-get install -y --no-install-recommends \
     python3-pip \
     python3-venv
 
+# Install OpenGL for VTK
+# https://discourse.vtk.org/t/trouble-installing-vtk-on-ubuntu/5148
+apt-get install -y --no-install-recommends \
+  freeglut3 \
+  freeglut3-dev \
+  libgl1-mesa-dev \
+  libgl1-mesa-glx \
+  libglew1.5 \
+  libglew1.5-dev \
+  libglu1-mesa \
+  libglu1-mesa-dev
+
 update-alternatives --install /usr/local/bin/python python /usr/bin/python3 10
 update-alternatives --install /usr/local/bin/pip pip /usr/bin/pip3 10
 
