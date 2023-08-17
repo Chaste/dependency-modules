@@ -13,9 +13,9 @@
 #     gnuplot, paraview
 # APT-Sources: https://chaste.github.io/ubuntu jammy/ Packages
 
-export DEBIAN_FRONTEND=noninteractive
-
 # https://chaste.github.io/docs/installguides/ubuntu-package/
+
+export DEBIAN_FRONTEND=noninteractive
 
 apt-get update && \
 apt-get install -y --no-install-recommends \
@@ -24,6 +24,7 @@ apt-get install -y --no-install-recommends \
   g++ \
   git \
   lcov \
+  make \
   python2.7 \
   python3 \
   python3-dev \
