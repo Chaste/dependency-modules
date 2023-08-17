@@ -2,130 +2,176 @@ name: ubuntu-tests
 
 on:
   workflow_dispatch:
+    inputs:
+      chaste_branch:
+        description: 'Chaste branch'
+        required: true
+        type: string
+        default: 'develop'
+
+      boost_ver:
+        description: 'Boost version'
+        required: true
+        type: string
+        default: '1.74.0'
+
+      hdf5_ver:
+        description: 'HDF5 version'
+        required: true
+        type: string
+        default: '1.10.8'
+
+      petsc_ver:
+        description: 'PETSc version'
+        required: true
+        type: string
+        default: '3.15.5'
+
+      petsc_arch:
+        description: 'PETSc arch'
+        required: true
+        type: choice
+        options:
+          - 'linux-gnu'
+          - 'linux-gnu-opt'
+        default: 'linux-gnu'
+
+      sundials_ver:
+        description: 'SUNDIALS version'
+        required: true
+        type: string
+        default: '5.8.0'
+
+      vtk_ver:
+        description: 'VTK version'
+        required: true
+        type: string
+        default: '9.2.6'
+
+      xercesc_ver:
+        description: 'XercesC version'
+        required: true
+        type: string
+        default: '3.2.4'
+
+      xsd_ver:
+        description: 'XSD version'
+        required: true
+        type: string
+        default: '4.0.0'
+
+      os:
+        description: 'OS'
+        required: true
+        type: choice
+        options:
+          - 'ubuntu-20.04'
+          - 'ubuntu-22.04'
+        default: 'ubuntu-22.04'
 
 jobs:
   setup:
     name: test modules on ubuntu
 
-    strategy:
-      matrix:
-        include:
-          - os: ubuntu-20.04
-            xsd_ver: 4.0.0
-            xercesc_ver: 3.2.4
-            sundials_ver: 5.8.0
-            boost_ver: 1.74.0
-            vtk_ver: 7.1.1
-            petsc_ver: 3.15.5
-            hdf5_ver: 1.10.8
-            petsc_arch: linux-gnu
-
-          - os: ubuntu-22.04
-            xsd_ver: 4.0.0
-            xercesc_ver: 3.2.4
-            sundials_ver: 5.8.0
-            boost_ver: 1.74.0
-            vtk_ver: 7.1.1
-            petsc_ver: 3.15.5
-            hdf5_ver: 1.10.8
-            petsc_arch: linux-gnu
-
-      fail-fast: false
-
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ github.event.inputs.os }}
 
     steps:
       - name: checkout
         uses: actions/checkout@v3
 
-      - name: setup defaults
+      - name: setup os
         uses: ./.github/actions/setup-defaults
 
       - name: install and cache xsd module
         uses: ./.github/actions/setup-xsd
         with:
-          xsd_ver: ${{ matrix.xsd_ver }}
-
-      - name: build and cache xercesc module
-        uses: ./.github/actions/setup-xercesc
-        with:
-          xercesc_ver: ${{ matrix.xercesc_ver }}
+          xsd_ver: ${{ github.event.inputs.xsd_ver }}
 
       - name: build and cache sundials module
         uses: ./.github/actions/setup-sundials
         with:
-          sundials_ver: ${{ matrix.sundials_ver }}
+          sundials_ver: ${{ github.event.inputs.sundials_ver }}
+
+      - name: build and cache xercesc module
+        uses: ./.github/actions/setup-xercesc
+        with:
+          xercesc_ver: ${{ github.event.inputs.xercesc_ver }}
 
       - name: build and cache boost module
         uses: ./.github/actions/setup-boost
         with:
-          boost_ver: ${{ matrix.boost_ver }}
+          boost_ver: ${{ github.event.inputs.boost_ver }}
 
       - name: build and cache vtk module
         uses: ./.github/actions/setup-vtk
         with:
-          vtk_ver: ${{ matrix.vtk_ver }}
+          vtk_ver: ${{ github.event.inputs.vtk_ver }}
 
       - name: build and cache petsc_hdf5 module
         uses: ./.github/actions/setup-petsc_hdf5
         with:
-          petsc_ver: ${{ matrix.petsc_ver }}
-          hdf5_ver: ${{ matrix.hdf5_ver }}
-          petsc_arch: ${{ matrix.petsc_arch }}
+          hdf5_ver: ${{ github.event.inputs.hdf5_ver }}
+          petsc_ver: ${{ github.event.inputs.petsc_ver }}
+          petsc_arch: ${{ github.event.inputs.petsc_arch }}
 
       - name: checkout chaste
         uses: actions/checkout@v3
         with:
           repository: Chaste/Chaste
           path: Chaste
+          ref: ${{ github.event.inputs.chaste_branch }}
           submodules: recursive
 
       - name: make build and test directories
         run: |
-          mkdir -p Chaste/build
-          mkdir -p ${CHASTE_TEST_OUTPUT}
+          mkdir -p chaste-build-dir
+          mkdir -p chaste-test-dir
+          echo "CHASTE_TEST_OUTPUT=$(pwd)/chaste-test-dir" >> ${GITHUB_ENV}
 
-      - name: compile chaste build info
-        working-directory: Chaste/build
+      - name: create module init script
         run: |
-          module purge
-          module load xsd/${{ matrix.xsd_ver }}
-          module load xercesc/${{ matrix.xercesc_ver }}
-          module load sundials/${{ matrix.sundials_ver }}
-          module load boost/${{ matrix.boost_ver }}
-          module load vtk/${{ matrix.vtk_ver }}
-          module load petsc_hdf5/${{ matrix.petsc_ver }}_${{ matrix.hdf5_ver }}/${{ matrix.petsc_arch }}
+          echo "source /etc/profile.d/modules.sh" > init.sh
+          echo "module use /home/runner/modules/modulefiles" >> init.sh
+          echo "module purge" >> init.sh
+          echo "module load boost" >> init.sh
+          echo "module load petsc_hdf5" >> init.sh
+          echo "module load sundials" >> init.sh
+          echo "module load vtk" >> init.sh
+          echo "module load xercesc" >> init.sh
+          echo "module load xsd" >> init.sh
+        working-directory: chaste-build-dir
 
-          cmake \
+      - name: cmake configure
+        run: |
+          source init.sh
+          cmake .. \
             -DBoost_NO_BOOST_CMAKE=ON \
             -DBoost_NO_SYSTEM_PATHS=ON \
             -DBOOST_ROOT=${BOOST_ROOT} \
-            -DCMAKE_PREFIX_PATH="${SUNDIALS_ROOT};${VTK_ROOT};${XERCESC_ROOT};${XSD_ROOT}" \
-            -DCMAKE_BUILD_TYPE=Release \
-            ..
+            -DCMAKE_BUILD_TYPE=Release
+        working-directory: chaste-build-dir
 
+      - name: compile build info
+        run: |
+          source init.sh
           cmake --build . --parallel $(nproc) --target TestChasteBuildInfo
-
           ctest -V -R TestChasteBuildInfo --output-on-failure | tee buildinfo
+        working-directory: chaste-build-dir
           
-        # login to source /etc/profile.d/modules.sh
-        shell: bash --login -e -o pipefail {0}
-
       - name: verify dependency versions
-        working-directory: Chaste/build
         run: |
           sed -i.bak 's/"//g' buildinfo  # removes quotes from old sundials versions
 
           maj_min_rev='^[0-9]\+\.[0-9]\+\.[0-9]\+'
           maj_min='^[0-9]\+\.[0-9]\+'
 
-          xsd_ver="$(echo ${{ matrix.xsd_ver }} | grep -o ${maj_min_rev})"
-          xercesc_ver="$(echo ${{ matrix.xercesc_ver }} | grep -o ${maj_min_rev})"
-          sundials_ver="$(echo ${{ matrix.sundials_ver }} | grep -o ${maj_min_rev})"
-          boost_ver="$(echo ${{ matrix.boost_ver }} | grep -o ${maj_min_rev})"
-          vtk_ver="$(echo ${{ matrix.vtk_ver }} | grep -o ${maj_min})"
-          petsc_ver="$(echo ${{ matrix.petsc_ver }} | grep -o ${maj_min_rev})"
-          hdf5_ver="$(echo ${{ matrix.hdf5_ver }} | grep -o ${maj_min_rev})"
+          xsd_ver="$(echo ${{ github.event.inputs.xsd_ver }} | grep -o ${maj_min_rev})"
+          xercesc_ver="$(echo ${{ github.event.inputs.xercesc_ver }} | grep -o ${maj_min_rev})"
+          sundials_ver="$(echo ${{ github.event.inputs.sundials_ver }} | grep -o ${maj_min_rev})"
+          boost_ver="$(echo ${{ github.event.inputs.boost_ver }} | grep -o ${maj_min_rev})"
+          vtk_ver="$(echo ${{ github.event.inputs.vtk_ver }} | grep -o ${maj_min})"
+          petsc_ver="$(echo ${{ github.event.inputs.petsc_ver }} | grep -o ${maj_min_rev})"
+          hdf5_ver="$(echo ${{ github.event.inputs.hdf5_ver }} | grep -o ${maj_min_rev})"
 
           grep "<XSD>${xsd_ver}</XSD>" buildinfo
           grep "<Xerces>${xercesc_ver}</Xerces>" buildinfo
@@ -134,4 +180,4 @@ jobs:
           grep "<VTK>${vtk_ver}</VTK>" buildinfo
           grep "<PETSc>${petsc_ver}</PETSc>" buildinfo
           grep "<HDF5>${hdf5_ver}</HDF5>" buildinfo
-        shell: bash
+        working-directory: chaste-build-dir
