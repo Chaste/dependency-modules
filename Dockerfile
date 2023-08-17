@@ -1,13 +1,13 @@
-ARG BASE=focal
+ARG BASE=jammy
 
 FROM ubuntu:${BASE}
 
 ARG XSD=4.0.0
-ARG XERCESC=3.2.3
+ARG XERCESC=3.2.4
 ARG SUNDIALS=5.8.0
-ARG BOOST=1.73.0
-ARG VTK=7.1.1
-ARG PETSC=3.8.4
+ARG BOOST=1.74.0
+ARG VTK=8.2.0
+ARG PETSC=3.15.5
 ARG HDF5=1.10.8
 
 SHELL ["/bin/bash", "-e", "-o", "pipefail", "-c"]
@@ -36,9 +36,7 @@ RUN useradd -r -m -d ${DEFAULT_HOME} -s /bin/bash ${DEFAULT_USER} && \
         wget \
         curl \
         rsync \
-        jq \
-        nano \
-        vim && \
+        jq && \
     . /etc/os-release && \
     os_num="$(echo ${VERSION_ID} | sed 's/\.//')" && \
     setup_ubuntu${os_num}.sh && \
@@ -54,8 +52,6 @@ RUN useradd -r -m -d ${DEFAULT_HOME} -s /bin/bash ${DEFAULT_USER} && \
     rm -rf /var/lib/apt/lists/* && \
     rm -rf /var/tmp/* && \
     rm -rf /tmp/*
-
-ENV TEXTTEST_HOME="/usr/local/bin/texttest"
 
 USER ${DEFAULT_USER}:${DEFAULT_USER}
 WORKDIR ${DEFAULT_HOME}
