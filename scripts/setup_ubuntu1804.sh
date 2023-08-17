@@ -15,45 +15,43 @@
 #     eclipse-egit, libsvn-java, subversion, git-svn, gnuplot, paraview
 # APT-Sources: https://chaste.github.io/ubuntu bionic/ Packages
 
-export DEBIAN_FRONTEND=noninteractive
-
 # https://chaste.github.io/docs/installguides/ubuntu-package/
-echo "deb https://chaste.github.io/ubuntu bionic/" > /etc/apt/sources.list.d/chaste.list
-apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 422C4D99
+
+export DEBIAN_FRONTEND=noninteractive
 
 apt-get update && \
 apt-get install -y --no-install-recommends \
-    chaste-dependencies \
-    git \
-    valgrind \
-    libpetsc3.7.7-dbg \
-    libfltk1.1 \
-    hdf5-tools \
-    cmake-curses-gui \
-    libgoogle-perftools-dev \
-    lcov \
-    doxygen \
-    graphviz \
-    gnuplot \
-    paraview \
-    mencoder \
-    python3 \
-    python3-venv \
-    python3-dev \
-    python3-pip \
-    python2.7 \
-    libffi-dev \
-    tcl \
-    environment-modules
+  cmake \
+  doxygen \
+  environment-modules \
+  g++ \
+  git \
+  lcov \
+  make \
+  python2.7 \
+  python3 \
+  python3-dev \
+  python3-pip \
+  python3-venv \
+  tcl
 
-# https://bugs.launchpad.net/ubuntu/+source/vtk7/+bug/1878103
-# https://github.com/Chaste/chaste-docker/blob/4dd5a4819716c3defa0bfb5145bfa902bf07ecf4/Dockerfile#L89
-update-alternatives --install /usr/bin/vtk vtk /usr/bin/vtk7 10
+# Install OpenGL for VTK
+# https://discourse.vtk.org/t/trouble-installing-vtk-on-ubuntu/5148
+apt-get install -y --no-install-recommends \
+  freeglut3 \
+  freeglut3-dev \
+  libgl1-mesa-dev \
+  libgl1-mesa-glx \
+  libglew2.0 \
+  libglew-dev \
+  libglu1-mesa \
+  libglu1-mesa-dev
 
+# Set default `python` to Python 3
 update-alternatives --install /usr/local/bin/python python /usr/bin/python3 10
 update-alternatives --install /usr/local/bin/pip pip /usr/bin/pip3 10
 
+# Python 2 is needed to configure PETSc < 3.11.x
 update-alternatives --install /usr/local/bin/python2 python2 /usr/bin/python2.7 5
 
 pip install --upgrade pip
-pip install texttest

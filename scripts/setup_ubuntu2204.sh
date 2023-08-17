@@ -20,6 +20,7 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get update && \
 apt-get install -y --no-install-recommends \
   cmake \
+  doxygen \
   environment-modules \
   g++ \
   git \
@@ -43,9 +44,11 @@ apt-get install -y --no-install-recommends \
   libglu1-mesa \
   libglu1-mesa-dev
 
+# Set default `python` to Python 3
 update-alternatives --install /usr/local/bin/python python /usr/bin/python3 10
 update-alternatives --install /usr/local/bin/pip pip /usr/bin/pip3 10
 
+# Python 2 is needed to configure PETSc < 3.11.x
 update-alternatives --install /usr/local/bin/python2 python2 /usr/bin/python2.7 5
 
 pip install --upgrade pip
