@@ -48,6 +48,8 @@ apt-get install -y --no-install-recommends \
   libeigen3-dev \
   libexpat-dev \
   libexpat1 \
+  libfmt-dev \
+  libfmt8 \
   libfontconfig1 \
   libfreetype6 \
   libfreetype6-dev \
@@ -100,6 +102,8 @@ apt-get install -y --no-install-recommends \
   libutfcpp-dev \
   libx11-6 \
   libx11-dev \
+  libxcursor-dev \
+  libxcursor1 \
   libxft-dev \
   libxml2 \
   libxml2-dev \
