@@ -24,6 +24,7 @@ apt-get install -y --no-install-recommends \
   environment-modules \
   g++ \
   git \
+  graphviz \
   lcov \
   make \
   python2.7 \
