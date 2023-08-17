@@ -93,14 +93,22 @@ mkdir -p ${install_dir}
 mkdir -p ${src_dir}-build
 cd ${src_dir}-build
 cmake \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=${install_dir} \
+    -DCMAKE_INSTALL_RPATH=${install_dir}/lib/vtk-${major}.${minor} \
     -DBUILD_SHARED_LIBS=ON \
     -DBUILD_EXAMPLES=OFF \
     -DBUILD_TESTING=OFF \
     -DBUILD_DOCUMENTATION=OFF \
     -DVTK_INSTALL_NO_DOCUMENTATION=ON \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=${install_dir} \
-    -DCMAKE_INSTALL_RPATH=${install_dir}/lib/vtk-${major}.${minor} \
+    -DVTK_USE_SYSTEM_EXPAT=ON \
+    -DVTK_USE_SYSTEM_FREETYPE=ON \
+    -DVTK_USE_SYSTEM_JPEG=ON \
+    -DVTK_USE_SYSTEM_JSONCPP=ON \
+    -DVTK_USE_SYSTEM_LIBXML2=ON \
+    -DVTK_USE_SYSTEM_PNG=ON \
+    -DVTK_USE_SYSTEM_TIFF=ON \
+    -DVTK_USE_SYSTEM_ZLIB=ON \
     ${src_dir} && \
 make -j ${parallel} && \
 make install
