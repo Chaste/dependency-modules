@@ -144,11 +144,12 @@ jobs:
       - name: cmake configure
         run: |
           source init.sh
-          cmake .. \
+          cmake \
             -DBoost_NO_BOOST_CMAKE=ON \
             -DBoost_NO_SYSTEM_PATHS=ON \
             -DBOOST_ROOT=${BOOST_ROOT} \
-            -DCMAKE_BUILD_TYPE=Release
+            -DCMAKE_BUILD_TYPE=Release \
+            ../Chaste
         working-directory: chaste-build-dir
 
       - name: compile build info
@@ -162,16 +163,16 @@ jobs:
         run: |
           sed -i.bak 's/"//g' buildinfo  # removes quotes from old sundials versions
 
-          maj_min_rev='^[0-9]\+\.[0-9]\+\.[0-9]\+'
-          maj_min='^[0-9]\+\.[0-9]\+'
+          major_minor_patch='^[0-9]\+\.[0-9]\+\.[0-9]\+'
+          major_minor='^[0-9]\+\.[0-9]\+'
 
-          xsd_ver="$(echo ${{ github.event.inputs.xsd_ver }} | grep -o ${maj_min_rev})"
-          xercesc_ver="$(echo ${{ github.event.inputs.xercesc_ver }} | grep -o ${maj_min_rev})"
-          sundials_ver="$(echo ${{ github.event.inputs.sundials_ver }} | grep -o ${maj_min_rev})"
-          boost_ver="$(echo ${{ github.event.inputs.boost_ver }} | grep -o ${maj_min_rev})"
-          vtk_ver="$(echo ${{ github.event.inputs.vtk_ver }} | grep -o ${maj_min})"
-          petsc_ver="$(echo ${{ github.event.inputs.petsc_ver }} | grep -o ${maj_min_rev})"
-          hdf5_ver="$(echo ${{ github.event.inputs.hdf5_ver }} | grep -o ${maj_min_rev})"
+          boost_ver="$(echo ${{ github.event.inputs.boost_ver }} | grep -o ${major_minor_patch})"
+          hdf5_ver="$(echo ${{ github.event.inputs.hdf5_ver }} | grep -o ${major_minor_patch})"
+          petsc_ver="$(echo ${{ github.event.inputs.petsc_ver }} | grep -o ${major_minor_patch})"
+          sundials_ver="$(echo ${{ github.event.inputs.sundials_ver }} | grep -o ${major_minor_patch})"
+          vtk_ver="$(echo ${{ github.event.inputs.vtk_ver }} | grep -o ${major_minor})"
+          xercesc_ver="$(echo ${{ github.event.inputs.xercesc_ver }} | grep -o ${major_minor_patch})"
+          xsd_ver="$(echo ${{ github.event.inputs.xsd_ver }} | grep -o ${major_minor_patch})"
 
           grep "<XSD>${xsd_ver}</XSD>" buildinfo
           grep "<Xerces>${xercesc_ver}</Xerces>" buildinfo
@@ -180,4 +181,10 @@ jobs:
           grep "<VTK>${vtk_ver}</VTK>" buildinfo
           grep "<PETSc>${petsc_ver}</PETSc>" buildinfo
           grep "<HDF5>${hdf5_ver}</HDF5>" buildinfo
+        working-directory: chaste-build-dir
+
+      - name: build all
+        run: |
+          source init.sh
+          cmake --build . --parallel $(nproc) --target all
         working-directory: chaste-build-dir
