@@ -19,16 +19,16 @@ export DEBIAN_FRONTEND=noninteractive
 
 apt-get update && \
 apt-get install -y --no-install-recommends \
-    cmake \
-    environment-modules \
-    g++ \
-    git \
-    lcov \
-    python2.7 \
-    python3 \
-    python3-dev \
-    python3-pip \
-    python3-venv
+  cmake \
+  environment-modules \
+  g++ \
+  git \
+  lcov \
+  python2.7 \
+  python3 \
+  python3-dev \
+  python3-pip \
+  python3-venv
 
 # Install OpenGL for VTK
 # https://discourse.vtk.org/t/trouble-installing-vtk-on-ubuntu/5148
@@ -37,8 +37,8 @@ apt-get install -y --no-install-recommends \
   freeglut3-dev \
   libgl1-mesa-dev \
   libgl1-mesa-glx \
-  libglew1.5 \
-  libglew1.5-dev \
+  libglew2.2 \
+  libglew-dev \
   libglu1-mesa \
   libglu1-mesa-dev
 
