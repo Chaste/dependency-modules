@@ -152,7 +152,7 @@ case ${petsc_arch} in
             --download-metis=1 \
             --download-parmetis=1 \
             --with-make-np=${parallel} && \
-        make -j ${parallel} all
+        make all
         ;;
 
     linux-gnu-opt)
@@ -172,7 +172,7 @@ case ${petsc_arch} in
             --download-metis=1 \
             --download-parmetis=1 \
             --with-make-np=${parallel} && \
-        make -j ${parallel} all
+        make all
         ;;
     *)
         ;;
