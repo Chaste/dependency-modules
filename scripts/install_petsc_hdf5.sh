@@ -2,8 +2,8 @@
 
 usage()
 {
-    echo 'Usage: '"$(basename $0)"' --petsc-version=version --hdf5-version=version [--mpich-version=version]'
-    echo '        --petsc-arch={linux-gnu|linux-gnu-opt} --modules-dir=path [--parallel=value]'
+    echo 'Usage: '"$(basename $0)"' --petsc-version=version --petsc-arch={linux-gnu|linux-gnu-opt}'
+    echo '        --hdf5-version=version --modules-dir=path [--parallel=value]'
     exit 1
 }
 
@@ -11,7 +11,6 @@ usage()
 petsc_version=
 petsc_arch=
 hdf5_version=
-mpich_version=
 base_dir=
 parallel=
 
@@ -25,9 +24,6 @@ for option; do
             ;;
         --hdf5-version=*)
             hdf5_version=$(expr "x$option" : "x--hdf5-version=\(.*\)")
-            ;;
-        --mpich-version=*)
-            mpich_version=$(expr "x$option" : "x--mpich-version=\(.*\)")
             ;;
         --modules-dir=*)
             base_dir=$(expr "x$option" : "x--modules-dir=\(.*\)")
@@ -72,10 +68,6 @@ if [[ (${hdf5_major} -lt 1) || ((${hdf5_major} -eq 1) && (${hdf5_minor} -lt 10))
     exit 1
 fi
 
-# Preferred MPICH versions
-URL_MPICH_3_3=https://www.mpich.org/static/downloads/3.3/mpich-3.3.tar.gz
-URL_MPICH_3_4=https://www.mpich.org/static/downloads/3.4a3/mpich-3.4a3.tar.gz
-
 # Fixes for broken Hypre links in some PETSc versions
 URL_HYPRE_2_11=https://github.com/hypre-space/hypre/archive/refs/tags/v2.11.1.tar.gz
 URL_HYPRE_2_12=https://github.com/hypre-space/hypre/archive/refs/tags/v2.12.0.tar.gz
@@ -91,64 +83,26 @@ URL_HDF5=https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-${hdf5_major}.${hdf
 wget -nc ${URL_HDF5}
 download_hdf5=$(pwd)/$(basename ${URL_HDF5})
 
-download_mpich=1
-if [ -n "${mpich_version}" ]; then
-    URL_MPICH=https://www.mpich.org/static/downloads/${mpich_version}/mpich-${mpich_version}.tar.gz
-    wget -nc ${URL_MPICH}
-    download_mpich=$(pwd)/$(basename ${URL_MPICH})
-fi
-
 download_hypre=1
 if [[ (${petsc_major} -eq 3) && (${petsc_minor} -eq 7) ]]; then  # PETSc 3.7.x
-    if [ -z "${mpich_version}" ]; then
-        wget -nc ${URL_MPICH_3_3}
-        download_mpich=$(pwd)/$(basename ${URL_MPICH_3_3})
-    fi
-    
     wget -nc ${URL_HYPRE_2_11}  # Fixes broken hypre link in this version
     download_hypre=$(pwd)/$(basename ${URL_HYPRE_2_11})
 
 elif [[ (${petsc_major} -eq 3) && (${petsc_minor} -eq 8) ]]; then  # PETSc 3.8.x
-    if [ -z "${mpich_version}" ]; then
-        wget -nc ${URL_MPICH_3_3}
-        download_mpich=$(pwd)/$(basename ${URL_MPICH_3_3})
-    fi
-    
     wget -nc ${URL_HYPRE_2_12}  # Fixes broken hypre link in this version
     download_hypre=$(pwd)/$(basename ${URL_HYPRE_2_12})
 
 elif [[ (${petsc_major} -eq 3) && (${petsc_minor} -eq 9) ]]; then  # PETSc 3.9.x
-    if [ -z "${mpich_version}" ]; then
-        wget -nc ${URL_MPICH_3_3}
-        download_mpich=$(pwd)/$(basename ${URL_MPICH_3_3})
-    fi
-    
     wget -nc ${URL_HYPRE_2_14}  # Fixes broken hypre link in this version
     download_hypre=$(pwd)/$(basename ${URL_HYPRE_2_14})
 
 elif [[ (${petsc_major} -eq 3) && (${petsc_minor} -eq 10) ]]; then  # PETSc 3.10.x
-    if [ -z "${mpich_version}" ]; then
-        wget -nc ${URL_MPICH_3_3}
-        download_mpich=$(pwd)/$(basename ${URL_MPICH_3_3})
-    fi
-    
     wget -nc ${URL_HYPRE_2_14}  # Fixes broken hypre link in this version
     download_hypre=$(pwd)/$(basename ${URL_HYPRE_2_14})
     
 elif [[ (${petsc_major} -eq 3) && (${petsc_minor} -eq 11) ]]; then  # PETSc 3.11.x
-    if [ -z "${mpich_version}" ]; then
-        wget -nc ${URL_MPICH_3_3}
-        download_mpich=$(pwd)/$(basename ${URL_MPICH_3_3})
-    fi
-    
     wget -nc ${URL_HYPRE_2_15}  # Fixes broken hypre link in this version
     download_hypre=$(pwd)/$(basename ${URL_HYPRE_2_15})
-
-elif [[ (${petsc_major} -eq 3) && (${petsc_minor} -eq 12) ]]; then  # PETSc 3.12.x
-    if [ -z "${mpich_version}" ]; then
-        wget -nc ${URL_MPICH_3_4}
-        download_mpich=$(pwd)/$(basename ${URL_MPICH_3_4})
-    fi
 fi
 
 # Download and extract PETSc
@@ -182,41 +136,42 @@ case ${petsc_arch} in
     linux-gnu)
         export PETSC_ARCH=linux-gnu
         ${PYTHON} ./configure \
-            --with-make-np=${parallel} \
-            --with-cc=gcc \
-            --with-cxx=g++ \
+            --with-mpi=1 \
+            --with-cc=mpicc \
+            --with-cxx=mpicxx \
             --with-fc=0 \
+            --with-debugging=1 \
             --COPTFLAGS=-Og \
             --CXXOPTFLAGS=-Og \
-            --with-x=false \
+            --with-shared-libraries \
             --with-ssl=false \
+            --with-x=false \
             --download-f2cblaslapack=1 \
-            --download-mpich=${download_mpich} \
             --download-hdf5=${download_hdf5} \
-            --download-parmetis=1 \
-            --download-metis=1 \
             --download-hypre=${download_hypre} \
-            --with-shared-libraries && \
+            --download-metis=1 \
+            --download-parmetis=1 \
+            --with-make-np=${parallel} && \
         make -j ${parallel} all
         ;;
 
     linux-gnu-opt)
         export PETSC_ARCH=linux-gnu-opt
         ${PYTHON} ./configure \
-            --with-make-np=${parallel} \
-            --with-cc=gcc \
-            --with-cxx=g++ \
+            --with-mpi=1 \
+            --with-cc=mpicc \
+            --with-cxx=mpicxx \
             --with-fc=0 \
-            --with-x=false \
-            --with-ssl=false \
-            --download-f2cblaslapack=1 \
-            --download-mpich=${download_mpich} \
-            --download-hdf5=${download_hdf5} \
-            --download-parmetis=1 \
-            --download-metis=1 \
-            --download-hypre=${download_hypre} \
+            --with-debugging=0 \
             --with-shared-libraries \
-            --with-debugging=0 && \
+            --with-ssl=false \
+            --with-x=false \
+            --download-f2cblaslapack=1 \
+            --download-hdf5=${download_hdf5} \
+            --download-hypre=${download_hypre} \
+            --download-metis=1 \
+            --download-parmetis=1 \
+            --with-make-np=${parallel} && \
         make -j ${parallel} all
         ;;
     *)
