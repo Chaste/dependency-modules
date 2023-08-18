@@ -14,13 +14,11 @@ SHELL ["/bin/bash", "-e", "-o", "pipefail", "-c"]
 
 USER root
 
-ENV DEFAULT_USER="runner"
-ENV DEFAULT_HOME="/home/${DEFAULT_USER}"
-
-ENV RUNNER_DIR="${DEFAULT_HOME}/actions-runner"
-ENV RUNNER_WORK_DIR="${DEFAULT_HOME}/_work"
-
-ENV MODULES_DIR="${DEFAULT_HOME}/modules"
+ENV DEFAULT_USER="runner" \
+    DEFAULT_HOME="/home/runner" \
+    RUNNER_DIR="/home/runner/actions-runner" \
+    RUNNER_WORK_DIR="/home/runner/_work" \
+    MODULES_DIR="/home/runner/modules"
 
 COPY scripts/ /usr/local/bin/
 
@@ -30,11 +28,6 @@ RUN useradd -r -m -d ${DEFAULT_HOME} -s /bin/bash ${DEFAULT_USER} && \
     setup_ubuntu${os_id}.sh && \
     runner_install.sh --install_dir="/tmp/tmp-runner" && \
     /tmp/tmp-runner/bin/installdependencies.sh && \
-    mkdir -p ${MODULES_DIR}/src && \
-    mkdir -p ${MODULES_DIR}/opt && \
-    mkdir -p ${MODULES_DIR}/modulefiles && \
-    echo "module use ${MODULES_DIR}/modulefiles" >> ${DEFAULT_HOME}/.bashrc && \
-    chown -R ${DEFAULT_USER}:${DEFAULT_USER} ${MODULES_DIR} && \
     apt-get -y clean && \
     rm -rf /var/cache/apt && \
     rm -rf /var/lib/apt/lists/* && \
@@ -45,7 +38,9 @@ USER ${DEFAULT_USER}:${DEFAULT_USER}
 WORKDIR ${DEFAULT_HOME}
 
 RUN source /etc/profile.d/modules.sh && \
+    mkdir -p ${MODULES_DIR}/modulefiles && \
     module use ${MODULES_DIR}/modulefiles && \
+    echo "module use ${MODULES_DIR}/modulefiles" >> ${DEFAULT_HOME}/.bashrc && \
     install_xsd.sh \
         --version=${XSD} \
         --modules-dir=${MODULES_DIR} && \
@@ -77,7 +72,7 @@ RUN source /etc/profile.d/modules.sh && \
         --parallel=$(nproc) \
         --modules-dir=${MODULES_DIR} && \
     module test petsc_hdf5/${PETSC}_${HDF5}/linux-gnu && \
-    rm -rf ${MODULES_DIR}/src/* && \
-    rm -rf /tmp/*
+    rm -rf /tmp/* && \
+    rm -rf ${MODULES_DIR}/src
 
 ENTRYPOINT ["docker-entrypoint.sh"]
