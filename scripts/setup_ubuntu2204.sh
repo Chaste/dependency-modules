@@ -17,14 +17,26 @@
 
 export DEBIAN_FRONTEND=noninteractive
 
+# General dependencies
 apt-get update && \
+apt-get install -y --no-install-recommends \
+  apt-transport-https \
+  apt-utils \
+  ca-certificates \
+  curl \
+  environment-modules \
+  gnupg \
+  jq \
+  openssl \
+  rsync \
+  wget
+
+# Chaste dependencies
 apt-get install -y --no-install-recommends \
   cmake \
   doxygen \
-  environment-modules \
   g++ \
   git \
-  graphviz \
   lcov \
   make \
   python2.7 \
@@ -33,7 +45,7 @@ apt-get install -y --no-install-recommends \
   python3-pip \
   python3-venv
 
-# Install VTK dependencies
+# VTK dependencies
 apt-get install -y --no-install-recommends \
   freeglut3 \
   freeglut3-dev \

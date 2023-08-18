@@ -25,21 +25,9 @@ ENV MODULES_DIR="${DEFAULT_HOME}/modules"
 COPY scripts/ /usr/local/bin/
 
 RUN useradd -r -m -d ${DEFAULT_HOME} -s /bin/bash ${DEFAULT_USER} && \
-    export DEBIAN_FRONTEND=noninteractive && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends \
-        apt-utils \
-        apt-transport-https \
-        ca-certificates \
-        gnupg \
-        openssl \
-        wget \
-        curl \
-        rsync \
-        jq && \
     . /etc/os-release && \
-    os_num="$(echo ${VERSION_ID} | sed 's/\.//')" && \
-    setup_ubuntu${os_num}.sh && \
+    os_id="$(echo ${VERSION_ID} | sed 's/\.//')" && \
+    setup_ubuntu${os_id}.sh && \
     runner_install.sh --install_dir="/tmp/tmp-runner" && \
     /tmp/tmp-runner/bin/installdependencies.sh && \
     mkdir -p ${MODULES_DIR}/src && \

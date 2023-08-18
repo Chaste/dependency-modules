@@ -19,11 +19,25 @@
 
 export DEBIAN_FRONTEND=noninteractive
 
+# General dependencies
 apt-get update && \
+apt-get install -y --no-install-recommends \
+  apt-transport-https \
+  apt-utils \
+  ca-certificates \
+  curl \
+  environment-modules \
+  gnupg \
+  jq \
+  openssl \
+  rsync \
+  tcl \
+  wget
+
+# Chaste dependencies
 apt-get install -y --no-install-recommends \
   cmake \
   doxygen \
-  environment-modules \
   g++ \
   git \
   lcov \
@@ -32,20 +46,90 @@ apt-get install -y --no-install-recommends \
   python3 \
   python3-dev \
   python3-pip \
-  python3-venv \
-  tcl
+  python3-venv
 
-# Install OpenGL for VTK
-# https://discourse.vtk.org/t/trouble-installing-vtk-on-ubuntu/5148
+# VTK dependencies
 apt-get install -y --no-install-recommends \
   freeglut3 \
   freeglut3-dev \
-  libgl1-mesa-dev \
-  libgl1-mesa-glx \
-  libglew2.0 \
+  libavcodec-dev \
+  libavcodec58 \
+  libavformat-dev \
+  libavformat58 \
+  libavutil-dev \
+  libavutil56 \
+  libdouble-conversion-dev \
+  libdouble-conversion3 \
+  libeigen3-dev \
+  libexpat-dev \
+  libexpat1 \
+  libfmt-dev \
+  libfmt8 \
+  libfontconfig1 \
+  libfreetype6 \
+  libfreetype6-dev \
+  libgdal-dev \
+  libgdal30 \
+  libgl-dev \
+  libgl1 \
+  libgl2ps-dev \
+  libgl2ps1.4 \
   libglew-dev \
-  libglu1-mesa \
-  libglu1-mesa-dev
+  libglew2.2 \
+  libglu-dev \
+  libglu1-mesa-dev \
+  libglx0 \
+  libjpeg-dev \
+  libjpeg8 \
+  libjsoncpp-dev \
+  libjsoncpp25 \
+  liblz4-1 \
+  liblz4-dev \
+  liblzma5 \
+  libmysqlclient-dev \
+  libmysqlclient21 \
+  libnetcdf-c++4 \
+  libnetcdf-cxx-legacy-dev \
+  libnetcdf-dev \
+  libnetcdf19 \
+  libodbc2 \
+  libogg-dev \
+  libogg0 \
+  libopengl0 \
+  libpng-dev \
+  libpng16-16 \
+  libpq-dev \
+  libpq5 \
+  libproj-dev \
+  libproj22 \
+  libsqlite3-0 \
+  libsqlite3-dev \
+  libswscale-dev \
+  libswscale5 \
+  libtbb-dev \
+  libtbb12 \
+  libtcl8.6 \
+  libtheora-dev \
+  libtheora0 \
+  libtiff-dev \
+  libtiff5 \
+  libtk8.6 \
+  libutfcpp-dev \
+  libx11-6 \
+  libx11-dev \
+  libxcursor-dev \
+  libxcursor1 \
+  libxft-dev \
+  libxml2 \
+  libxml2-dev \
+  libxss-dev \
+  libxt-dev \
+  libxt6 \
+  tcl-dev \
+  tk-dev \
+  x11proto-core-dev \
+  zlib1g \
+  zlib1g-dev
 
 # Set default `python` to Python 3
 update-alternatives --install /usr/local/bin/python python /usr/bin/python3 10
