@@ -127,6 +127,7 @@ apt-get install -y --no-install-recommends \
   libxss-dev \
   libxt-dev \
   libxt6 \
+  sqlite3 \
   tcl-dev \
   tk-dev \
   x11proto-core-dev \
