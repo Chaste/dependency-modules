@@ -38,6 +38,8 @@ apt-get install -y --no-install-recommends \
   g++ \
   git \
   lcov \
+  libmpich12 \
+  libmpich-dev \
   make \
   python2.7 \
   python3 \
@@ -58,7 +60,7 @@ apt-get install -y --no-install-recommends \
   libdouble-conversion-dev \
   libdouble-conversion3 \
   libeigen3-dev \
-  libexpat-dev \
+  libexpat1-dev \
   libexpat1 \
   libfmt-dev \
   libfmt8 \
@@ -67,13 +69,13 @@ apt-get install -y --no-install-recommends \
   libfreetype6-dev \
   libgdal-dev \
   libgdal30 \
-  libgl-dev \
-  libgl1 \
+  libgl1-mesa-dev \
+  libgl1-mesa-glx \
   libgl2ps-dev \
   libgl2ps1.4 \
   libglew-dev \
   libglew2.2 \
-  libglu-dev \
+  libglu1-mesa \
   libglu1-mesa-dev \
   libglx0 \
   libjpeg-dev \
