@@ -1,0 +1,4 @@
+name: image-tests
+
+on:
+  workflow_dispatch:
