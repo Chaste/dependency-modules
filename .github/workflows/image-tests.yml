@@ -27,7 +27,11 @@ jobs:
       volumes:
         - runner_volume:/home/runner
       options: --user 0 --cpus 2
-      
+
+    defaults:
+      run:
+        shell: bash
+        
     steps:
       - name: checkout chaste
         uses: actions/checkout@v3
