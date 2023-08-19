@@ -33,14 +33,13 @@ apt-get install -y --no-install-recommends \
 
 # Chaste dependencies
 apt-get install -y --no-install-recommends \
+  build-essential \
   cmake \
   doxygen \
-  g++ \
   git \
   lcov \
   libmpich12 \
   libmpich-dev \
-  make \
   python2.7 \
   python3 \
   python3-dev \
