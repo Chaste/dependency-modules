@@ -28,18 +28,24 @@ jobs:
         - runner_volume:/home/runner
       options: --user 0 --cpus 2
 
+    env:
+      CC: gcc
+      CXX: g++
+
     defaults:
       run:
         shell: bash
         
     steps:
+      - name: compiler version
+        run: ${CXX} --version
+
       - name: checkout chaste
         uses: actions/checkout@v3
         with:
           repository: Chaste/Chaste
           path: Chaste
           ref: ${{ github.event.inputs.chaste_branch }}
-          submodules: recursive
           
       - name: make build and test directories
         run: |
