@@ -1,0 +1,102 @@
+name: image-tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      chaste_branch:
+        description: 'Chaste branch'
+        required: true
+        type: string
+        default: 'develop'
+
+      image:
+        description: 'Runner image'
+        required: true
+        type: string
+        default: 'test'
+
+jobs:
+  build-and-test:
+
+    runs-on: ubuntu-latest
+
+    container:
+      image: "chaste/runner:${{ github.event.inputs.image }}"
+      env:
+        RUNNER_OFF: 1
+      volumes:
+        - runner_volume:/home/runner
+      options: --user 0 --cpus 2
+      
+    steps:
+      - name: checkout chaste
+        uses: actions/checkout@v3
+        with:
+          repository: Chaste/Chaste
+          path: Chaste
+          ref: ${{ github.event.inputs.chaste_branch }}
+          submodules: recursive
+          
+      - name: make build and test directories
+        run: |
+          mkdir -p chaste-build-dir
+          mkdir -p chaste-test-dir
+          echo "CHASTE_TEST_OUTPUT=$(pwd)/chaste-test-dir" >> ${GITHUB_ENV}
+
+      - name: create module init script
+        run: |
+          echo "source /etc/profile.d/modules.sh" > init.sh
+          echo "module use /home/runner/modules/modulefiles" >> init.sh
+          echo "module purge" >> init.sh
+          echo "module load boost" >> init.sh
+          echo "module load petsc_hdf5" >> init.sh
+          echo "module load sundials" >> init.sh
+          echo "module load vtk" >> init.sh
+          echo "module load xercesc" >> init.sh
+          echo "module load xsd" >> init.sh
+        working-directory: chaste-build-dir
+
+      - name: set runner user privileges
+        run: chown -R runner:runner .
+          
+      - name: cmake configure
+        run: |
+          source init.sh
+          su -m runner -c "cmake \
+            -DBoost_NO_BOOST_CMAKE=ON \
+            -DBoost_NO_SYSTEM_PATHS=ON \
+            -DBOOST_ROOT=${BOOST_ROOT} \
+            -DCMAKE_BUILD_TYPE=Release \
+            ../Chaste"
+        working-directory: chaste-build-dir
+
+      - name: compile build info
+        run: |
+          source init.sh
+          su -m runner -c "cmake --build . --target TestChasteBuildInfo --parallel $(nproc)"
+          su -m runner -c "ctest -V -R TestChasteBuildInfo --output-on-failure"
+        working-directory: chaste-build-dir
+
+      - name: build continuous test pack
+        run: |
+          source init.sh
+          su -m runner -c "cmake --build . --target Continuous --parallel $(nproc)"
+        working-directory: chaste-build-dir
+
+      - name: build nightly test pack
+        run: |
+          source init.sh
+          su -m runner -c "cmake --build . --target Nightly --parallel $(nproc)"
+        working-directory: chaste-build-dir
+
+      - name: run continuous test pack
+        run: |
+          source init.sh
+          su -m runner -c "ctest -j $(nproc) -L Continuous --output-on-failure"
+        working-directory: chaste-build-dir
+
+      - name: run nightly test pack
+        run: |
+          source init.sh
+          su -m runner -c "ctest -j $(nproc) -L Nightly --output-on-failure"
+        working-directory: chaste-build-dir
