@@ -183,8 +183,26 @@ jobs:
           grep "<HDF5>${hdf5_ver}</HDF5>" buildinfo
         working-directory: chaste-build-dir
 
-      - name: build all
+      - name: build continuous test pack
         run: |
           source init.sh
-          cmake --build . --parallel $(nproc) --target all
+          cmake --build . --target Continuous --parallel $(nproc)
+        working-directory: chaste-build-dir
+
+      - name: build nightly test pack
+        run: |
+          source init.sh
+          cmake --build . --target Nightly --parallel $(nproc)
+        working-directory: chaste-build-dir
+
+      - name: run continuous test pack
+        run: |
+          source init.sh
+          ctest -j $(nproc) -L Continuous --output-on-failure
+        working-directory: chaste-build-dir
+
+      - name: run nightly test pack
+        run: |
+          source init.sh
+          ctest -j $(nproc) -L Nightly --output-on-failure
         working-directory: chaste-build-dir
