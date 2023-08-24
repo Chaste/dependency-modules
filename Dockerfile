@@ -23,8 +23,7 @@ ENV DEFAULT_USER="runner" \
 COPY scripts/ /usr/local/bin/
 
 RUN useradd -r -m -d ${DEFAULT_HOME} -s /bin/bash ${DEFAULT_USER} && \
-    . /etc/os-release && \
-    os_id="$(echo ${VERSION_ID} | sed 's/\.//')" && \
+    os_id="$(. /etc/os-release && echo ${VERSION_ID} | sed 's/\.//')" && \
     setup_ubuntu${os_id}.sh && \
     runner_install.sh --install_dir="/tmp/tmp-runner" && \
     /tmp/tmp-runner/bin/installdependencies.sh && \
