@@ -65,6 +65,8 @@ proc ModulesHelp { } {
 module-whatis "This adds the environment variables for boost ${version}"
 
 setenv          BOOST_ROOT           /usr
+setenv          BOOST_INCLUDEDIR     /usr/include/boost
+setenv          BOOST_LIBRARYDIR     /usr/lib/x86_64-linux-gnu
 
 prepend-path    LIBRARY_PATH         /usr/lib/x86_64-linux-gnu
 prepend-path    LD_LIBRARY_PATH      /usr/lib/x86_64-linux-gnu
