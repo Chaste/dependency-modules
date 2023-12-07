@@ -32,6 +32,56 @@ for option; do
 done
 
 if [ -z "${version}" ]; then usage; fi
+
+# Modulefile pointing to system version
+if [ "$version" = "system" ]; then
+version=$(dpkg -s libboost-dev | grep 'Version:' | cut -d' ' -f2 | cut -d. -f1,2,3)
+
+mkdir -p ${base_dir}/modulefiles/boost && cd  ${base_dir}/modulefiles/boost
+
+cat <<EOF > ${version}
+#%Module1.0#####################################################################
+###
+## boost ${version} modulefile
+##
+proc ModulesTest { } {
+    set paths "[getenv BOOST_ROOT]
+               [getenv BOOST_ROOT]/lib
+               [getenv BOOST_ROOT]/include"
+
+    foreach path \$paths {
+        if { ![file exists \$path] } {
+            puts stderr "ERROR: Does not exist: \$path"
+            return 0
+        }
+    }
+    return 1
+}
+
+proc ModulesHelp { } {
+    puts stderr "\tThis adds the environment variables for boost ${version}\n"
+}
+
+module-whatis "This adds the environment variables for boost ${version}"
+
+setenv          BOOST_ROOT           /usr
+
+prepend-path    LIBRARY_PATH         /usr/lib/x86_64-linux-gnu
+prepend-path    LD_LIBRARY_PATH      /usr/lib/x86_64-linux-gnu
+prepend-path    LD_RUN_PATH          /usr/lib/x86_64-linux-gnu
+
+prepend-path    INCLUDE              /usr/include/boost
+prepend-path    C_INCLUDE_PATH       /usr/include/boost
+prepend-path    CPLUS_INCLUDE_PATH   /usr/include/boost
+
+prepend-path    CMAKE_PREFIX_PATH    /usr
+
+conflict boost
+EOF
+
+exit 0
+fi
+
 if [ -z "${base_dir}" ]; then usage; fi
 
 parallel="${parallel:-$(nproc)}"
