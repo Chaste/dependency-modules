@@ -80,7 +80,6 @@ prepend-path    CMAKE_PREFIX_PATH    /usr
 
 conflict boost
 EOF
-
 exit 0
 fi
 
