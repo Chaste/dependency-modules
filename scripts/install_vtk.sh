@@ -32,6 +32,64 @@ for option; do
 done
 
 if [ -z "${version}" ]; then usage; fi
+
+# Modulefile pointing to system version
+if [ "$version" = "system" ]; then
+    version=""
+    for i in 6 7 8 9
+    do
+        version=$(dpkg -s "libvtk${i}-dev" | grep 'Version:' | cut -d' ' -f2 | cut -d. -f1,2,3 | cut -d+ -f1)
+        if [ -n "${version}" ]; then break; fi
+    done
+
+if [ -z "${version}" ]; then echo "Unknown VTK version"; fi; exit 1
+major=$(echo $version | cut -d. -f1)
+minor=$(echo $version | cut -d. -f2)
+
+mkdir -p ${base_dir}/modulefiles/vtk && cd  ${base_dir}/modulefiles/vtk
+cat <<EOF > ${version}
+#%Module1.0#####################################################################
+###
+## vtk ${version} modulefile
+##
+proc ModulesTest { } {
+    set paths "[getenv VTK_ROOT]
+               [getenv VTK_ROOT]/include/vtk-${major}.${minor}
+               [getenv VTK_ROOT]/lib"
+
+    foreach path \$paths {
+        if { ![file exists \$path] } {
+            puts stderr "ERROR: Does not exist: \$path"
+            return 0
+        }
+    }
+    return 1
+}
+
+proc ModulesHelp { } {
+    puts stderr "\tThis adds the environment variables for vtk ${version}\n"
+}
+
+module-whatis "This adds the environment variables for vtk ${version}"
+
+setenv          VTK_ROOT             /usr
+
+prepend-path    LIBRARY_PATH         /usr/lib/x86_64-linux-gnu
+prepend-path    LD_LIBRARY_PATH      /usr/lib/x86_64-linux-gnu
+prepend-path    LD_RUN_PATH          /usr/lib/x86_64-linux-gnu
+
+prepend-path    INCLUDE              /usr/include/vtk-${major}.${minor}
+prepend-path    C_INCLUDE_PATH       /usr/include/vtk-${major}.${minor}
+prepend-path    CPLUS_INCLUDE_PATH   /usr/include/vtk-${major}.${minor}
+
+prepend-path    CMAKE_PREFIX_PATH    /usr
+
+conflict vtk
+EOF
+
+exit 0
+fi
+
 if [ -z "${base_dir}" ]; then usage; fi
 
 parallel="${parallel:-$(nproc)}"
