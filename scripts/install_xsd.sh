@@ -39,9 +39,8 @@ if [ "$version" = "system" ]; then
 ## xsd ${version} modulefile
 ##
 proc ModulesTest { } {
-    set paths "[getenv XSD_ROOT]
-               [getenv XSD_ROOT]/bin
-               [getenv XSD_ROOT]/libxsd"
+    set paths "/usr/bin/xsdcxx
+               /usr/include/xsd"
 
     foreach path \$paths {
         if { ![file exists \$path] } {

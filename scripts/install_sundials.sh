@@ -45,9 +45,8 @@ if [ "$version" = "system" ]; then
 ## sundials ${version} modulefile
 ##
 proc ModulesTest { } {
-    set paths "[getenv SUNDIALS_ROOT]
-               [getenv SUNDIALS_ROOT]/include
-               [getenv SUNDIALS_ROOT]/lib"
+    set paths "/usr/include/sundials
+               /usr/lib/x86_64-linux-gnu/libsundials_cvode.so"
 
     foreach path \$paths {
         if { ![file exists \$path] } {

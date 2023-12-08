@@ -47,9 +47,8 @@ if [ "$version" = "system" ]; then
 ## boost ${version} modulefile
 ##
 proc ModulesTest { } {
-    set paths "[getenv BOOST_ROOT]
-               [getenv BOOST_ROOT]/lib
-               [getenv BOOST_ROOT]/include"
+    set paths "/usr/include/boost
+               /usr/lib/x86_64-linux-gnu/libboost_serialization.so"
 
     foreach path \$paths {
         if { ![file exists \$path] } {
