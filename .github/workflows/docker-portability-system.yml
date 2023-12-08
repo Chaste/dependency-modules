@@ -1,7 +1,13 @@
-name: docker-portability-mantic
+name: docker-portability-system
 
 on:
   workflow_dispatch:
+    inputs:
+      ubuntu_release:
+        description: 'Ubuntu release'
+        required: true
+        type: string
+        default: 'mantic'
 
 jobs:
   docker:
@@ -12,9 +18,9 @@ jobs:
       matrix:
         include:
           - tags: |
-              chaste/runner:mantic.portability-dev
+              chaste/runner:${{ github.event.inputs.ubuntu_release }}.portability-system
             build-args: |
-              BASE=mantic
+              BASE=${{ github.event.inputs.ubuntu_release }}
               XSD=system
               XERCESC=system
               SUNDIALS=system
