@@ -32,14 +32,16 @@ for option; do
 done
 
 if [ -z "${version}" ]; then usage; fi
+if [ -z "${base_dir}" ]; then usage; fi
+
+parallel="${parallel:-$(nproc)}"
 
 # Modulefile pointing to system version
 if [ "$version" = "system" ]; then
-version=$(dpkg -s libboost-dev | grep 'Version:' | cut -d' ' -f2 | cut -d. -f1,2,3)
+    version=$(dpkg -s libboost-dev | grep 'Version:' | cut -d' ' -f2 | cut -d. -f1,2,3)
 
-mkdir -p ${base_dir}/modulefiles/boost && cd  ${base_dir}/modulefiles/boost
-
-cat <<EOF > ${version}
+    mkdir -p ${base_dir}/modulefiles/boost && cd  ${base_dir}/modulefiles/boost
+    cat <<EOF > ${version}
 #%Module1.0#####################################################################
 ###
 ## boost ${version} modulefile
@@ -80,12 +82,8 @@ prepend-path    CMAKE_PREFIX_PATH    /usr
 
 conflict boost
 EOF
-exit 0
+    exit 0
 fi
-
-if [ -z "${base_dir}" ]; then usage; fi
-
-parallel="${parallel:-$(nproc)}"
 
 version_arr=(${version//\./ })
 major=${version_arr[0]}

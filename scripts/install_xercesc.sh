@@ -36,10 +36,10 @@ parallel="${parallel:-$(nproc)}"
 
 # Modulefile pointing to system version
 if [ "$version" = "system" ]; then
-version=$(dpkg -s libxerces-c-dev | grep 'Version:' | cut -d' ' -f2 | cut -d. -f1,2,3 | cut -d+ -f1)
-
-mkdir -p ${base_dir}/modulefiles/xercesc && cd  ${base_dir}/modulefiles/xercesc
-cat <<EOF > ${version}
+    version=$(dpkg -s libxerces-c-dev | grep 'Version:' | cut -d' ' -f2 | cut -d. -f1,2,3 | cut -d+ -f1)
+    
+    mkdir -p ${base_dir}/modulefiles/xercesc && cd  ${base_dir}/modulefiles/xercesc
+    cat <<EOF > ${version}
 #%Module1.0#####################################################################
 ###
 ## xercesc ${version} modulefile
@@ -80,8 +80,7 @@ prepend-path    CMAKE_PREFIX_PATH    /usr
 
 conflict xercesc
 EOF
-
-exit 0
+    exit 0
 fi
 
 ver_si_on=${version//\./_}  # Converts 3.1.1 to 3_1_1

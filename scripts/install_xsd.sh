@@ -30,10 +30,10 @@ if [ -z "${base_dir}" ]; then usage; fi
 
 # Modulefile pointing to system version
 if [ "$version" = "system" ]; then
-version=$(dpkg -s xsdcxx | grep 'Version:' | cut -d' ' -f2 | cut -d. -f1,2,3 | cut -d- -f1)
-
-mkdir -p ${base_dir}/modulefiles/xsd && cd  ${base_dir}/modulefiles/xsd
-cat <<EOF > ${version}
+    version=$(dpkg -s xsdcxx | grep 'Version:' | cut -d' ' -f2 | cut -d. -f1,2,3 | cut -d- -f1)
+    
+    mkdir -p ${base_dir}/modulefiles/xsd && cd  ${base_dir}/modulefiles/xsd
+    cat <<EOF > ${version}
 #%Module1.0#####################################################################
 ###
 ## xsd ${version} modulefile
@@ -70,8 +70,7 @@ prepend-path    CMAKE_PREFIX_PATH    /usr
 
 conflict xsd
 EOF
-
-exit 0
+    exit 0
 fi
 
 version_arr=(${version//\./ })

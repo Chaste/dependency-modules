@@ -49,18 +49,21 @@ if [ -z "${base_dir}" ]; then usage; fi
 parallel="${parallel:-$(nproc)}"
 
 if [[ ! (${petsc_arch} = 'linux-gnu' 
-      || ${petsc_arch} = 'linux-gnu-opt') ]]; then
+      || ${petsc_arch} = 'linux-gnu-opt'
+      || ${petsc_arch} = 'system') ]]; then
     usage
 fi
 
 # Modulefile pointing to system version
-if [[ ("$petsc_version" = "system") || ("$hdf5_version" = "system") || ("$petsc_arch" = "system") ]]; then
-petsc_version=$(dpkg -s libpetsc-real-dev | grep 'Version:' | cut -d' ' -f2 | cut -d. -f1,2,3 | cut -d+ -f1)
-hdf5_version=$(dpkg -s libhdf5-openmpi-dev | grep 'Version:' | cut -d' ' -f2 | cut -d. -f1,2,3 | cut -d+ -f1)
+if [[ ("$petsc_version" = "system") 
+   || ("$hdf5_version" = "system") 
+   || ("$petsc_arch" = "system") ]]; then
+    petsc_version=$(dpkg -s libpetsc-real-dev | grep 'Version:' | cut -d' ' -f2 | cut -d. -f1,2,3 | cut -d+ -f1)
+    hdf5_version=$(dpkg -s libhdf5-openmpi-dev | grep 'Version:' | cut -d' ' -f2 | cut -d. -f1,2,3 | cut -d+ -f1)
 
-mkdir -p ${base_dir}/modulefiles/petsc_hdf5/${petsc_version}_${hdf5_version}
-cd  ${base_dir}/modulefiles/petsc_hdf5/${petsc_version}_${hdf5_version}
-cat <<EOF > ${petsc_arch}
+    mkdir -p ${base_dir}/modulefiles/petsc_hdf5/${petsc_version}_${hdf5_version}
+    cd  ${base_dir}/modulefiles/petsc_hdf5/${petsc_version}_${hdf5_version}
+    cat <<EOF > ${petsc_arch}
 #%Module1.0#####################################################################
 ###
 ## petsc_hdf5 ${petsc_version}_${hdf5_version}/${petsc_arch} modulefile
@@ -121,8 +124,7 @@ conflict petsc
 conflict hdf5
 conflict petsc_hdf5
 EOF
-
-exit 0
+    exit 0
 fi
 
 petsc_version_arr=(${petsc_version//\./ })

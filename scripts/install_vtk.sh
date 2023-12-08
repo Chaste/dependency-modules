@@ -32,22 +32,26 @@ for option; do
 done
 
 if [ -z "${version}" ]; then usage; fi
+if [ -z "${base_dir}" ]; then usage; fi
+
+parallel="${parallel:-$(nproc)}"
 
 # Modulefile pointing to system version
 if [ "$version" = "system" ]; then
     version=""
-    for i in 6 7 8 9
+    for i in 9 8 7 6
     do
         version=$(dpkg -s "libvtk${i}-dev" | grep 'Version:' | cut -d' ' -f2 | cut -d. -f1,2,3 | cut -d+ -f1)
         if [ -n "${version}" ]; then break; fi
     done
 
-if [ -z "${version}" ]; then echo "Unknown VTK version"; fi; exit 1
-major=$(echo $version | cut -d. -f1)
-minor=$(echo $version | cut -d. -f2)
+    if [ -z "${version}" ]; then echo "Unknown VTK system version"; exit 1; fi
+    
+    major=$(echo $version | cut -d. -f1)
+    minor=$(echo $version | cut -d. -f2)
 
-mkdir -p ${base_dir}/modulefiles/vtk && cd  ${base_dir}/modulefiles/vtk
-cat <<EOF > ${version}
+    mkdir -p ${base_dir}/modulefiles/vtk && cd  ${base_dir}/modulefiles/vtk
+    cat <<EOF > ${version}
 #%Module1.0#####################################################################
 ###
 ## vtk ${version} modulefile
@@ -86,13 +90,8 @@ prepend-path    CMAKE_PREFIX_PATH    /usr
 
 conflict vtk
 EOF
-
-exit 0
+    exit 0
 fi
-
-if [ -z "${base_dir}" ]; then usage; fi
-
-parallel="${parallel:-$(nproc)}"
 
 version_arr=(${version//\./ })
 major=${version_arr[0]}

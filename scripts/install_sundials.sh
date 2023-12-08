@@ -30,14 +30,16 @@ for option; do
 done
 
 if [ -z "${version}" ]; then usage; fi
+if [ -z "${base_dir}" ]; then usage; fi
+
+parallel="${parallel:-$(nproc)}"
 
 # Modulefile pointing to system version
 if [ "$version" = "system" ]; then
-version=$(dpkg -s libsundials-dev | grep 'Version:' | cut -d' ' -f2 | cut -d. -f1,2,3 | cut -d+ -f1)
+    version=$(dpkg -s libsundials-dev | grep 'Version:' | cut -d' ' -f2 | cut -d. -f1,2,3 | cut -d+ -f1)
 
-mkdir -p ${base_dir}/modulefiles/sundials && cd  ${base_dir}/modulefiles/sundials
-
-cat <<EOF > ${version}
+    mkdir -p ${base_dir}/modulefiles/sundials && cd  ${base_dir}/modulefiles/sundials
+    cat <<EOF > ${version}
 #%Module1.0#####################################################################
 ###
 ## sundials ${version} modulefile
@@ -76,12 +78,8 @@ prepend-path    CMAKE_PREFIX_PATH    /usr
 
 conflict sundials
 EOF
-exit 0
+    exit 0
 fi
-
-if [ -z "${base_dir}" ]; then usage; fi
-
-parallel="${parallel:-$(nproc)}"
 
 version_arr=(${version//\./ })
 major=${version_arr[0]}
