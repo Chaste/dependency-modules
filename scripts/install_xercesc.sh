@@ -36,10 +36,9 @@ parallel="${parallel:-$(nproc)}"
 
 # Modulefile pointing to system version
 if [ "$version" = "system" ]; then
-version=$(dpkg -s libxerces-c-dev | grep 'Version:' | cut -d' ' -f2 | cut -d. -f1,2)
+version=$(dpkg -s libxerces-c-dev | grep 'Version:' | cut -d' ' -f2 | cut -d. -f1,2,3 | cut -d+ -f1)
 
-mkdir -p ${base_dir}/modulefiles/xercesc
-cd  ${base_dir}/modulefiles/xercesc
+mkdir -p ${base_dir}/modulefiles/xercesc && cd  ${base_dir}/modulefiles/xercesc
 cat <<EOF > ${version}
 #%Module1.0#####################################################################
 ###
