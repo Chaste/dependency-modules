@@ -34,6 +34,53 @@ if [ -z "${base_dir}" ]; then usage; fi
 
 parallel="${parallel:-$(nproc)}"
 
+# Modulefile pointing to system version
+if [ "$version" = "system" ]; then
+    version=$(dpkg -s libsundials-dev | grep 'Version:' | cut -d' ' -f2 | cut -d. -f1,2,3 | cut -d+ -f1)
+
+    mkdir -p ${base_dir}/modulefiles/sundials && cd  ${base_dir}/modulefiles/sundials
+    cat <<EOF > ${version}
+#%Module1.0#####################################################################
+###
+## sundials ${version} modulefile
+##
+proc ModulesTest { } {
+    set paths "[getenv SUNDIALS_ROOT]
+               [getenv SUNDIALS_ROOT]/include
+               [getenv SUNDIALS_ROOT]/lib"
+
+    foreach path \$paths {
+        if { ![file exists \$path] } {
+            puts stderr "ERROR: Does not exist: \$path"
+            return 0
+        }
+    }
+    return 1
+}
+
+proc ModulesHelp { } {
+    puts stderr "\tThis adds the environment variables for sundials ${version}\n"
+}
+
+module-whatis "This adds the environment variables for sundials ${version}"
+
+setenv          SUNDIALS_ROOT        /usr
+
+prepend-path    LIBRARY_PATH         /usr/lib/x86_64-linux-gnu
+prepend-path    LD_LIBRARY_PATH      /usr/lib/x86_64-linux-gnu
+prepend-path    LD_RUN_PATH          /usr/lib/x86_64-linux-gnu
+
+prepend-path    INCLUDE              /usr/include/sundials
+prepend-path    C_INCLUDE_PATH       /usr/include/sundials
+prepend-path    CPLUS_INCLUDE_PATH   /usr/include/sundials
+
+prepend-path    CMAKE_PREFIX_PATH    /usr
+
+conflict sundials
+EOF
+    exit 0
+fi
+
 version_arr=(${version//\./ })
 major=${version_arr[0]}
 minor=${version_arr[1]}
