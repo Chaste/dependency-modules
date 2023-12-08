@@ -34,6 +34,57 @@ if [ -z "${base_dir}" ]; then usage; fi
 
 parallel="${parallel:-$(nproc)}"
 
+# Modulefile pointing to system version
+if [ "$version" = "system" ]; then
+version=$(dpkg -s libxerces-c-dev | grep 'Version:' | cut -d' ' -f2 | cut -d. -f1,2)
+
+mkdir -p ${base_dir}/modulefiles/xercesc
+cd  ${base_dir}/modulefiles/xercesc
+cat <<EOF > ${version}
+#%Module1.0#####################################################################
+###
+## xercesc ${version} modulefile
+##
+proc ModulesTest { } {
+    set paths "[getenv XERCESC_ROOT]
+               [getenv XERCESC_INCLUDE]
+               [getenv XERCESC_LIBRARY]"
+
+    foreach path \$paths {
+        if { ![file exists \$path] } {
+            puts stderr "ERROR: Does not exist: \$path"
+            return 0
+        }
+    }
+    return 1
+}
+
+proc ModulesHelp { } {
+    puts stderr "\tThis adds the environment variables for xercesc ${version}\n"
+}
+
+module-whatis "This adds the environment variables for xercesc ${version}"
+
+setenv          XERCESC_ROOT         /usr
+setenv          XERCESC_INCLUDE      usr/include/xercesc
+setenv          XERCESC_LIBRARY      /usr/lib/x86_64-linux-gnu
+
+prepend-path    LIBRARY_PATH         /usr/lib/x86_64-linux-gnu
+prepend-path    LD_LIBRARY_PATH      /usr/lib/x86_64-linux-gnu
+prepend-path    LD_RUN_PATH          /usr/lib/x86_64-linux-gnu
+
+prepend-path    INCLUDE              usr/include/xercesc
+prepend-path    C_INCLUDE_PATH       usr/include/xercesc
+prepend-path    CPLUS_INCLUDE_PATH   usr/include/xercesc
+
+prepend-path    CMAKE_PREFIX_PATH    /usr
+
+conflict xercesc
+EOF
+
+exit 0
+fi
+
 ver_si_on=${version//\./_}  # Converts 3.1.1 to 3_1_1
 version_arr=(${version//\./ })
 major=${version_arr[0]}

@@ -33,7 +33,7 @@ if [ -z "${version}" ]; then usage; fi
 
 # Modulefile pointing to system version
 if [ "$version" = "system" ]; then
-version=$(dpkg -s libsundials-dev | grep 'Version:' | cut -d' ' -f2 | cut -d. -f1,2)
+version=$(dpkg -s libsundials-dev | grep 'Version:' | cut -d' ' -f2 | cut -d. -f1,2,3 | cut -d+ -f1)
 
 mkdir -p ${base_dir}/modulefiles/sundials && cd  ${base_dir}/modulefiles/sundials
 
