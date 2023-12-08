@@ -91,36 +91,8 @@ proc ModulesHelp { } {
 
 module-whatis "This adds the environment variables for petsc ${petsc_version} and hdf5 ${hdf5_version}, with PETSC_ARCH=${petsc_arch}"
 
-setenv          PETSC_DIR            ""
-setenv          PETSC_ARCH           ""
-
-prepend-path    PATH                 /usr/bin
-
-prepend-path    LIBRARY_PATH         /usr/lib/x86_64-linux-gnu
-prepend-path    LD_LIBRARY_PATH      /usr/lib/x86_64-linux-gnu
-prepend-path    LD_RUN_PATH          /usr/lib/x86_64-linux-gnu
-
-prepend-path    INCLUDE              /usr/include/petsc
-prepend-path    C_INCLUDE_PATH       /usr/include/petsc
-prepend-path    CPLUS_INCLUDE_PATH   /usr/include/petsc
-
-prepend-path    CMAKE_PREFIX_PATH    /usr
-
 setenv          HDF5_ROOT            /usr
-
-prepend-path    INCLUDE              /usr/include/hdf5
-prepend-path    C_INCLUDE_PATH       /usr/include/hdf5
-prepend-path    CPLUS_INCLUDE_PATH   /usr/include/hdf5
-
 setenv          PARMETIS_ROOT        /usr
-
-prepend-path    INCLUDE              /usr/include
-prepend-path    C_INCLUDE_PATH       /usr/include
-prepend-path    CPLUS_INCLUDE_PATH   /usr/include
-
-prepend-path    LIBRARY_PATH         /usr/lib
-prepend-path    LD_LIBRARY_PATH      /usr/lib
-prepend-path    LD_RUN_PATH          /usr/lib
 
 conflict petsc
 conflict hdf5

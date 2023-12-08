@@ -67,16 +67,6 @@ setenv          XERCESC_ROOT         /usr
 setenv          XERCESC_INCLUDE      /usr/include/xercesc
 setenv          XERCESC_LIBRARY      /usr/lib/x86_64-linux-gnu
 
-prepend-path    LIBRARY_PATH         /usr/lib/x86_64-linux-gnu
-prepend-path    LD_LIBRARY_PATH      /usr/lib/x86_64-linux-gnu
-prepend-path    LD_RUN_PATH          /usr/lib/x86_64-linux-gnu
-
-prepend-path    INCLUDE              /usr/include/xercesc
-prepend-path    C_INCLUDE_PATH       /usr/include/xercesc
-prepend-path    CPLUS_INCLUDE_PATH   /usr/include/xercesc
-
-prepend-path    CMAKE_PREFIX_PATH    /usr
-
 conflict xercesc
 EOF
     exit 0

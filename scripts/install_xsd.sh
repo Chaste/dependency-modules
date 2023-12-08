@@ -59,14 +59,6 @@ module-whatis "This adds the environment variables for xsd ${version}"
 
 setenv          XSD_ROOT             /usr
 
-prepend-path    PATH                 /usr/bin
-
-prepend-path    INCLUDE              /usr/include/xsd
-prepend-path    C_INCLUDE_PATH       /usr/include/xsd
-prepend-path    CPLUS_INCLUDE_PATH   /usr/include/xsd
-
-prepend-path    CMAKE_PREFIX_PATH    /usr
-
 conflict xsd
 EOF
     exit 0

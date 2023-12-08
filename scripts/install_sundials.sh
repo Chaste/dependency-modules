@@ -65,16 +65,6 @@ module-whatis "This adds the environment variables for sundials ${version}"
 
 setenv          SUNDIALS_ROOT        /usr
 
-prepend-path    LIBRARY_PATH         /usr/lib/x86_64-linux-gnu
-prepend-path    LD_LIBRARY_PATH      /usr/lib/x86_64-linux-gnu
-prepend-path    LD_RUN_PATH          /usr/lib/x86_64-linux-gnu
-
-prepend-path    INCLUDE              /usr/include/sundials
-prepend-path    C_INCLUDE_PATH       /usr/include/sundials
-prepend-path    CPLUS_INCLUDE_PATH   /usr/include/sundials
-
-prepend-path    CMAKE_PREFIX_PATH    /usr
-
 conflict sundials
 EOF
     exit 0

@@ -78,16 +78,6 @@ module-whatis "This adds the environment variables for vtk ${version}"
 
 setenv          VTK_ROOT             /usr
 
-prepend-path    LIBRARY_PATH         /usr/lib/x86_64-linux-gnu
-prepend-path    LD_LIBRARY_PATH      /usr/lib/x86_64-linux-gnu
-prepend-path    LD_RUN_PATH          /usr/lib/x86_64-linux-gnu
-
-prepend-path    INCLUDE              /usr/include/vtk-${major}.${minor}
-prepend-path    C_INCLUDE_PATH       /usr/include/vtk-${major}.${minor}
-prepend-path    CPLUS_INCLUDE_PATH   /usr/include/vtk-${major}.${minor}
-
-prepend-path    CMAKE_PREFIX_PATH    /usr
-
 conflict vtk
 EOF
     exit 0
