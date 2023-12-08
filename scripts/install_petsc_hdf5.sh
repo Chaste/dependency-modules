@@ -69,14 +69,12 @@ if [[ ("$petsc_version" = "system")
 ## petsc_hdf5 ${petsc_version}_${hdf5_version}/${petsc_arch} modulefile
 ##
 proc ModulesTest { } {
-    set paths "[getenv PETSC_DIR]
-               [getenv PETSC_DIR]/[getenv PETSC_ARCH]
-               [getenv PETSC_DIR]/[getenv PETSC_ARCH]/bin
-               [getenv PETSC_DIR]/[getenv PETSC_ARCH]/bin/h5pcc
-               [getenv PETSC_DIR]/[getenv PETSC_ARCH]/include
-               [getenv PETSC_DIR]/[getenv PETSC_ARCH]/lib
-               [getenv PETSC_DIR]/[getenv PETSC_ARCH]/lib/libhdf5.so
-               [getenv PETSC_DIR]/[getenv PETSC_ARCH]/lib/libpetsc.so"
+    set paths "/usr/bin/h5pcc
+               /usr/include/hdf5
+               /usr/lib/x86_64-linux-gnu/hdf5
+               /usr/include/petsc
+               /usr/lib/x86_64-linux-gnu/libpetsc.so
+               /usr/lib/libparmetis.so"
 
     foreach path \$paths {
         if { ![file exists \$path] } {
@@ -93,32 +91,8 @@ proc ModulesHelp { } {
 
 module-whatis "This adds the environment variables for petsc ${petsc_version} and hdf5 ${hdf5_version}, with PETSC_ARCH=${petsc_arch}"
 
-setenv          PETSC_DIR            ""
-setenv          PETSC_ARCH           ""
-
-prepend-path    PATH                 /usr/bin
-
-prepend-path    LIBRARY_PATH         /usr/lib/x86_64-linux-gnu
-prepend-path    LD_LIBRARY_PATH      /usr/lib/x86_64-linux-gnu
-prepend-path    LD_RUN_PATH          /usr/lib/x86_64-linux-gnu
-
-prepend-path    INCLUDE              /usr/include/petsc
-prepend-path    C_INCLUDE_PATH       /usr/include/petsc
-prepend-path    CPLUS_INCLUDE_PATH   /usr/include/petsc
-
-prepend-path    CMAKE_PREFIX_PATH    /usr/
-
-setenv          HDF5_ROOT            /usr/
-
-prepend-path    INCLUDE              /usr/include/hdf5
-prepend-path    C_INCLUDE_PATH       /usr/include/hdf5
-prepend-path    CPLUS_INCLUDE_PATH   /usr/include/hdf5
-
-setenv          PARMETIS_ROOT        /usr/
-
-prepend-path    INCLUDE              /usr/include
-prepend-path    C_INCLUDE_PATH       /usr/include
-prepend-path    CPLUS_INCLUDE_PATH   /usr/include
+setenv          HDF5_ROOT            /usr
+setenv          PARMETIS_ROOT        /usr
 
 conflict petsc
 conflict hdf5

@@ -39,9 +39,8 @@ if [ "$version" = "system" ]; then
 ## xsd ${version} modulefile
 ##
 proc ModulesTest { } {
-    set paths "[getenv XSD_ROOT]
-               [getenv XSD_ROOT]/bin
-               [getenv XSD_ROOT]/libxsd"
+    set paths "/usr/bin/xsdcxx
+               /usr/include/xsd"
 
     foreach path \$paths {
         if { ![file exists \$path] } {
@@ -59,14 +58,6 @@ proc ModulesHelp { } {
 module-whatis "This adds the environment variables for xsd ${version}"
 
 setenv          XSD_ROOT             /usr
-
-prepend-path    PATH                 /usr/bin
-
-prepend-path    INCLUDE              /usr/include/xsd
-prepend-path    C_INCLUDE_PATH       /usr/include/xsd
-prepend-path    CPLUS_INCLUDE_PATH   /usr/include/xsd
-
-prepend-path    CMAKE_PREFIX_PATH    /usr
 
 conflict xsd
 EOF
