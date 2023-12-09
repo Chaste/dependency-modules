@@ -57,9 +57,8 @@ if [ "$version" = "system" ]; then
 ## vtk ${version} modulefile
 ##
 proc ModulesTest { } {
-    set paths "[getenv VTK_ROOT]
-               [getenv VTK_ROOT]/include/vtk-${major}.${minor}
-               [getenv VTK_ROOT]/lib"
+    set paths "/usr/include/vtk-${major}.${minor}
+               /usr/lib/x86_64-linux-gnu/libvtkCommonCore-${major}.${minor}.so"
 
     foreach path \$paths {
         if { ![file exists \$path] } {
@@ -75,8 +74,6 @@ proc ModulesHelp { } {
 }
 
 module-whatis "This adds the environment variables for vtk ${version}"
-
-setenv          VTK_ROOT             /usr
 
 conflict vtk
 EOF

@@ -63,7 +63,6 @@ proc ModulesHelp { } {
 
 module-whatis "This adds the environment variables for xercesc ${version}"
 
-setenv          XERCESC_ROOT         /usr
 setenv          XERCESC_INCLUDE      /usr/include/xercesc
 setenv          XERCESC_LIBRARY      /usr/lib/x86_64-linux-gnu
 

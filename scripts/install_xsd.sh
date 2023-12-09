@@ -57,8 +57,6 @@ proc ModulesHelp { } {
 
 module-whatis "This adds the environment variables for xsd ${version}"
 
-setenv          XSD_ROOT             /usr
-
 conflict xsd
 EOF
     exit 0

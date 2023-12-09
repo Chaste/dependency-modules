@@ -63,8 +63,6 @@ proc ModulesHelp { } {
 
 module-whatis "This adds the environment variables for sundials ${version}"
 
-setenv          SUNDIALS_ROOT        /usr
-
 conflict sundials
 EOF
     exit 0
