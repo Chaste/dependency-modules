@@ -69,6 +69,9 @@ setenv          BOOST_ROOT           /usr
 setenv          BOOST_INCLUDEDIR     /usr/include/boost
 setenv          BOOST_LIBRARYDIR     /usr/lib/x86_64-linux-gnu
 
+setenv          Boost_NO_BOOST_CMAKE     OFF
+setenv          Boost_NO_SYSTEM_PATHS    OFF
+
 conflict boost
 EOF
     exit 0
@@ -174,6 +177,9 @@ prepend-path    C_INCLUDE_PATH       ${install_dir}/include
 prepend-path    CPLUS_INCLUDE_PATH   ${install_dir}/include
 
 prepend-path    CMAKE_PREFIX_PATH    ${install_dir}
+
+setenv          Boost_NO_BOOST_CMAKE     ON
+setenv          Boost_NO_SYSTEM_PATHS    ON
 
 conflict boost
 EOF
