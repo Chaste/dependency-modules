@@ -231,12 +231,8 @@ jobs:
           mkdir -p Chaste/build
           cd Chaste/build
           nice -n ${{ env.niceness }} cmake \
-            -DBoost_NO_BOOST_CMAKE=ON \
-            -DBoost_NO_SYSTEM_PATHS=ON \
-            -DBOOST_ROOT=${BOOST_ROOT} \
             -DChaste_USE_CVODE=${use_cvode} \
             -DChaste_USE_VTK=${use_vtk} \
-            -DCMAKE_PREFIX_PATH="${XERCESC_ROOT};${XSD_ROOT};${SUNDIALS_ROOT};${VTK_ROOT}" \
             -DCMAKE_BUILD_TYPE=Release \
             ..
 
