@@ -36,7 +36,7 @@ if [ -z "${base_dir}" ]; then usage; fi
 
 parallel="${parallel:-$(nproc)}"
 
-# Modulefile pointing to system version
+# Modulefile for system version
 if [ "$version" = "system" ]; then
     version=$(dpkg -s libboost-dev | grep 'Version:' | cut -d' ' -f2 | cut -d. -f1,2,3)
 
@@ -65,9 +65,8 @@ proc ModulesHelp { } {
 
 module-whatis "This adds the environment variables for boost ${version}"
 
-setenv          BOOST_ROOT           /usr
-setenv          BOOST_INCLUDEDIR     /usr/include/boost
-setenv          BOOST_LIBRARYDIR     /usr/lib/x86_64-linux-gnu
+setenv          Boost_NO_BOOST_CMAKE     OFF
+setenv          Boost_NO_SYSTEM_PATHS    OFF
 
 conflict boost
 EOF
@@ -174,6 +173,9 @@ prepend-path    C_INCLUDE_PATH       ${install_dir}/include
 prepend-path    CPLUS_INCLUDE_PATH   ${install_dir}/include
 
 prepend-path    CMAKE_PREFIX_PATH    ${install_dir}
+
+setenv          Boost_NO_BOOST_CMAKE     ON
+setenv          Boost_NO_SYSTEM_PATHS    ON
 
 conflict boost
 EOF

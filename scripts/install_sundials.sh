@@ -34,7 +34,7 @@ if [ -z "${base_dir}" ]; then usage; fi
 
 parallel="${parallel:-$(nproc)}"
 
-# Modulefile pointing to system version
+# Modulefile for system version
 if [ "$version" = "system" ]; then
     version=$(dpkg -s libsundials-dev | grep 'Version:' | cut -d' ' -f2 | cut -d. -f1,2,3 | cut -d+ -f1)
 
@@ -62,8 +62,6 @@ proc ModulesHelp { } {
 }
 
 module-whatis "This adds the environment variables for sundials ${version}"
-
-setenv          SUNDIALS_ROOT        /usr
 
 conflict sundials
 EOF

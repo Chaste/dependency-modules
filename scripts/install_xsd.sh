@@ -28,7 +28,7 @@ done
 if [ -z "${version}" ]; then usage; fi
 if [ -z "${base_dir}" ]; then usage; fi
 
-# Modulefile pointing to system version
+# Modulefile for system version
 if [ "$version" = "system" ]; then
     version=$(dpkg -s xsdcxx | grep 'Version:' | cut -d' ' -f2 | cut -d. -f1,2,3 | cut -d- -f1)
     
@@ -56,8 +56,6 @@ proc ModulesHelp { } {
 }
 
 module-whatis "This adds the environment variables for xsd ${version}"
-
-setenv          XSD_ROOT             /usr
 
 conflict xsd
 EOF

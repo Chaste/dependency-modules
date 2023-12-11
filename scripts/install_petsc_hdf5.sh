@@ -54,7 +54,7 @@ if [[ ! (${petsc_arch} = 'linux-gnu'
     usage
 fi
 
-# Modulefile pointing to system version
+# Modulefile for system version
 if [[ ("$petsc_version" = "system") 
    || ("$hdf5_version" = "system") 
    || ("$petsc_arch" = "system") ]]; then
@@ -63,7 +63,7 @@ if [[ ("$petsc_version" = "system")
 
     mkdir -p ${base_dir}/modulefiles/petsc_hdf5/${petsc_version}_${hdf5_version}
     cd  ${base_dir}/modulefiles/petsc_hdf5/${petsc_version}_${hdf5_version}
-    cat <<EOF > ${petsc_arch}
+    cat <<EOF > linux-gnu
 #%Module1.0#####################################################################
 ###
 ## petsc_hdf5 ${petsc_version}_${hdf5_version}/${petsc_arch} modulefile
@@ -90,9 +90,6 @@ proc ModulesHelp { } {
 }
 
 module-whatis "This adds the environment variables for petsc ${petsc_version} and hdf5 ${hdf5_version}, with PETSC_ARCH=${petsc_arch}"
-
-setenv          HDF5_ROOT            /usr
-setenv          PARMETIS_ROOT        /usr
 
 conflict petsc
 conflict hdf5
