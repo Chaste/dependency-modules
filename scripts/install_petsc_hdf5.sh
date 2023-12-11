@@ -54,7 +54,7 @@ if [[ ! (${petsc_arch} = 'linux-gnu'
     usage
 fi
 
-# Modulefile pointing to system version
+# Modulefile for system version
 if [[ ("$petsc_version" = "system") 
    || ("$hdf5_version" = "system") 
    || ("$petsc_arch" = "system") ]]; then
