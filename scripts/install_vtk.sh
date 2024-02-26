@@ -137,14 +137,19 @@ mkdir -p ${install_dir}
 mkdir -p ${src_dir}-build
 cd ${src_dir}-build
 cmake \
-    -DBUILD_SHARED_LIBS=ON \
-    -DBUILD_EXAMPLES=OFF \
-    -DBUILD_TESTING=OFF \
-    -DBUILD_DOCUMENTATION=OFF \
-    -DVTK_INSTALL_NO_DOCUMENTATION=ON \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=${install_dir} \
     -DCMAKE_INSTALL_RPATH=${install_dir}/lib/vtk-${major}.${minor} \
+    -DBUILD_TESTING=OFF \
+    -DBUILD_DOCUMENTATION=OFF \
+    -DBUILD_EXAMPLES=OFF \
+    -DBUILD_SHARED_LIBS=ON \
+    -DMPIEXEC="$(which mpiexec)" \
+    -DVTK_Group_MPI=ON \
+    -DVTK_ENABLE_VTKPYTHON=OFF \
+    -DVTK_INSTALL_NO_DOCUMENTATION=ON \
+    -DVTK_PYTHON_VERSION="$(python3 --version | cut -d' ' -f2)" \
+    -DVTK_WRAP_PYTHON=ON \
     ${src_dir} && \
 make -j ${parallel} && \
 make install
