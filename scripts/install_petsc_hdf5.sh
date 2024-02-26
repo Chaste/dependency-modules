@@ -105,15 +105,19 @@ petsc_minor=${petsc_version_arr[1]}
 hdf5_version_arr=(${hdf5_version//\./ })
 hdf5_major=${hdf5_version_arr[0]}
 hdf5_minor=${hdf5_version_arr[1]}
+hdf5_patch=${hdf5_version_arr[2]}
 
-# Unsupported versions: https://github.com/Chaste/dependency-modules/wiki
-if [[ (${petsc_major} -lt 3) || ((${petsc_major} -eq 3) && (${petsc_minor} -lt 7)) ]]; then  # PETSc < 3.7.x
-    echo "$(basename $0): PETSc versions < 3.7 not supported"
+# Unsupported versions: https://chaste.github.io/docs/installguides/dependency-versions/
+if [[ (${petsc_major} -lt 3) 
+  || ((${petsc_major} -eq 3) && (${petsc_minor} -lt 12)) ]]; then  # PETSc < 3.12.x
+    echo "$(basename $0): PETSc versions < 3.12 not supported"
     exit 1
 fi
 
-if [[ (${hdf5_major} -lt 1) || ((${hdf5_major} -eq 1) && (${hdf5_minor} -lt 10)) ]]; then  # HDF5 < 1.10.x
-    echo "$(basename $0): HDF5 versions < 1.10 not supported"
+if [[ (${hdf5_major} -lt 1) 
+  || ((${hdf5_major} -eq 1) && (${hdf5_minor} -lt 10))
+  || ((${hdf5_major} -eq 1) && (${hdf5_minor} -eq 10) && (${hdf5_patch} -lt 4)) ]]; then  # HDF5 < 1.10.4
+    echo "$(basename $0): HDF5 versions < 1.10.4 not supported"
     exit 1
 fi
 

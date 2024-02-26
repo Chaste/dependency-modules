@@ -72,9 +72,10 @@ version_arr=(${version//\./ })
 major=${version_arr[0]}
 minor=${version_arr[1]}
 
-# Unsupported versions: https://github.com/Chaste/dependency-modules/wiki
-if [[ (${major} -lt 2) || ((${major} -eq 2) && (${minor} -lt 7)) ]]; then  # Sundials < 2.7.x
-    echo "$(basename $0): Sundials versions < 2.7 not supported"
+# Unsupported versions: https://chaste.github.io/docs/installguides/dependency-versions/
+if [[ (${major} -lt 3) 
+  || ((${major} -eq 3) && (${minor} -lt 1)) ]]; then  # Sundials < 3.1.x
+    echo "$(basename $0): Sundials versions < 3.1 not supported"
     exit 1
 fi
 
