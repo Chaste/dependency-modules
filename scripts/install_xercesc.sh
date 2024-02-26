@@ -72,10 +72,13 @@ ver_si_on=${version//\./_}  # Converts 3.1.1 to 3_1_1
 version_arr=(${version//\./ })
 major=${version_arr[0]}
 minor=${version_arr[1]}
+patch=${version_arr[2]}
 
-# Unsupported versions: https://github.com/Chaste/dependency-modules/wiki
-if [[ (${major} -lt 3) || ((${major} -eq 3) && (${minor} -lt 2)) ]]; then  # Xerces-C < 3.2.x
-    echo "$(basename $0): Xerces-C versions < 3.2 not supported"
+# Unsupported versions: https://chaste.github.io/docs/installguides/dependency-versions/
+if [[ (${major} -lt 3) 
+  || ((${major} -eq 3) && (${minor} -lt 2))
+  || ((${major} -eq 3) && (${minor} -eq 2) && (${patch} -lt 1)) ]]; then  # Xerces-C < 3.2.1
+    echo "$(basename $0): Xerces-C versions < 3.2.1 not supported"
     exit 1
 fi
 

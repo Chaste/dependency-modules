@@ -37,10 +37,13 @@ parallel="${parallel:-$(nproc)}"
 version_arr=(${version//\./ })
 major=${version_arr[0]}
 minor=${version_arr[1]}
+patch=${version_arr[2]}
 
-# Unsupported versions: https://github.com/Chaste/dependency-modules/wiki
-if [[ (${major} -lt 3) || ((${major} -eq 3) && (${minor} -lt 5)) ]]; then  # CMake < 3.5.x
-    echo "$(basename $0): CMake versions < 3.5 not supported"
+# Unsupported versions: https://chaste.github.io/docs/installguides/dependency-versions/
+if [[ (${major} -lt 3) 
+  || ((${major} -eq 3) && (${minor} -lt 16)) 
+  || ((${major} -eq 3) && (${minor} -eq 16) && (${patch} -lt 3)) ]]; then  # CMake < 3.16.3
+    echo "$(basename $0): CMake versions < 3.16.3 not supported"
     exit 1
 fi
 
