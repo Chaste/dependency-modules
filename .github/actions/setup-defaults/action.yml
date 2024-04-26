@@ -7,7 +7,7 @@ runs:
       uses: ./.github/actions/set-env
 
     - name: install os dependencies
-      run: ./scripts/setup_${{ steps.set-env.outputs.os-ver }}.sh
+      run: ./scripts/setup_${{ steps.set-env.outputs.os_ver }}.sh
       shell: bash
 
     - name: test module command

@@ -17,20 +17,20 @@ runs:
           modules/opt/xsd/${{ inputs.xsd_ver }}
           modules/modulefiles/xsd/${{ inputs.xsd_ver }}
         key: |
-          ${{ steps.set-env.outputs.os-ver }}-xsd-${{ inputs.xsd_ver }}-${{ hashFiles('scripts/install_xsd.sh') }}
+          ${{ steps.set-env.outputs.os_ver }}-xsd-${{ inputs.xsd_ver }}-${{ hashFiles('scripts/install_xsd.sh') }}
         restore-keys: |
-          ${{ steps.set-env.outputs.os-ver }}-xsd-${{ inputs.xsd_ver }}-
+          ${{ steps.set-env.outputs.os_ver }}-xsd-${{ inputs.xsd_ver }}-
     
     - name: install xsd module
       if: steps.cache-xsd.outputs.cache-hit != 'true'
       working-directory: ${{ github.workspace }}
-      run: ./scripts/install_xsd.sh --version=${{ inputs.xsd_ver }} --modules-dir=${{ steps.set-env.modules_dir }}
+      run: ./scripts/install_xsd.sh --version=${{ inputs.xsd_ver }} --modules-dir=${{ steps.set-env.outputs.modules_dir }}
       shell: bash
         
     - name: test xsd module
       run: |
         source /etc/profile.d/modules.sh
-        module use ${{ steps.set-env.modules_dir }}
+        module use ${{ steps.set-env.outputs.modules_dir }}
         module load xsd/${{ inputs.xsd_ver }}
         module test xsd/${{ inputs.xsd_ver }}
       shell: bash
