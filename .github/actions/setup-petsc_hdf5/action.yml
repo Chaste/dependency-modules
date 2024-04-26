@@ -14,7 +14,7 @@ runs:
   using: composite
   steps:
     - id: cache-petsc_hdf5
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ${{ env.MODULES_DIR }}/opt/petsc_hdf5/${{ inputs.petsc_ver }}_${{ inputs.hdf5_ver }}

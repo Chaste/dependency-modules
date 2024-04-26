@@ -8,7 +8,7 @@ runs:
   using: composite
   steps:
     - id: cache-xercesc
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ${{ env.MODULES_DIR }}/opt/xercesc/${{ inputs.xercesc_ver }}
