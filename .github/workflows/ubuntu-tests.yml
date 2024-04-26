@@ -10,24 +10,14 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-20.04
+          - os: ubuntu:24.04
             xsd_ver: 4.0.0
             xercesc_ver: 3.2.4
-            sundials_ver: 5.8.0
-            boost_ver: 1.74.0
-            vtk_ver: 7.1.1
-            petsc_ver: 3.15.5
-            hdf5_ver: 1.10.8
-            petsc_arch: linux-gnu
-
-          - os: ubuntu-22.04
-            xsd_ver: 4.0.0
-            xercesc_ver: 3.2.4
-            sundials_ver: 5.8.0
-            boost_ver: 1.74.0
-            vtk_ver: 7.1.1
-            petsc_ver: 3.15.5
-            hdf5_ver: 1.10.8
+            sundials_ver: 6.4.1
+            boost_ver: 1.83.0
+            vtk_ver: 9.1.0
+            petsc_ver: 3.19.2
+            hdf5_ver: 1.10.10
             petsc_arch: linux-gnu
 
       fail-fast: false
@@ -101,7 +91,7 @@ jobs:
           cmake --build . --parallel $(nproc) --target TestChasteBuildInfo
 
           ctest -V -R TestChasteBuildInfo --output-on-failure | tee buildinfo
-          
+
         # login to source /etc/profile.d/modules.sh
         shell: bash --login -e -o pipefail {0}
 
