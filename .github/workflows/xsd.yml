@@ -4,34 +4,36 @@ on:
   workflow_dispatch:
     inputs:
       xsd_ver:
-        description: 'XSD version'
+        description: "XSD version"
         required: true
         type: string
-        default: '4.0.0'
+        default: "4.0.0"
 
       os:
-        description: 'OS'
+        description: "OS"
         required: true
         type: choice
         options:
-          - 'ubuntu-20.04'
-          - 'ubuntu-22.04'
-        default: 'ubuntu-22.04'
+          - "ubuntu:22.04"
+          - "ubuntu:24.04"
+        default: "ubuntu:24.04"
 
 jobs:
   setup:
-    name: install and cache xsd
-    
-    runs-on: ${{ github.event.inputs.os }}
-      
+    name: build and cache xsd
+
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ github.event.inputs.os }}
+
     steps:
       - name: checkout
         uses: actions/checkout@v3
 
       - name: setup os
         uses: ./.github/actions/setup-defaults
-          
-      - name: install and cache
+
+      - name: build and cache
         uses: ./.github/actions/setup-xsd
         with:
           xsd_ver: ${{ github.event.inputs.xsd_ver }}
