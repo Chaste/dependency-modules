@@ -3,26 +3,15 @@ description: setup environment and dependencies
 runs:
   using: composite
   steps:
-    - name: set environment variables
-      run: |
-        . /etc/os-release
-        os_version="$(echo ${ID}${VERSION_ID} | sed 's/\.//')"
-        echo "OS_VERSION=${os_version}" >> ${GITHUB_ENV}
-        echo "MODULES_DIR=${{ github.workspace }}/modules" >> ${GITHUB_ENV}
-        echo "CHASTE_TEST_OUTPUT=${{ github.workspace }}/testoutput" >> ${GITHUB_ENV}
-      shell: bash
+    - id: set-env
+      uses: ./.github/actions/set-env
 
-    - name: install dependencies
-      working-directory: ${{ github.workspace }}
-      run: ./scripts/setup_${{ env.OS_VERSION }}.sh
-      shell: bash
-        
-    - name: configure environment modules
-      run: |
-        mkdir -p ${{ env.MODULES_DIR }}/modulefiles
-        echo "module use ${{ env.MODULES_DIR }}/modulefiles" | tee -a /etc/profile.d/modules.sh
+    - name: install os dependencies
+      run: ./scripts/setup_${{ steps.set-env.outputs.os-ver }}.sh
       shell: bash
 
     - name: test module command
-      run: module avail
-      shell: bash --login -e -o pipefail {0}  # login to load /etc/profile.d/modules.sh
+      run: |
+        source /etc/profile.d/modules.sh
+        module avail
+      shell: bash

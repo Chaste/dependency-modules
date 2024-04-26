@@ -1,0 +1,19 @@
+name: set-env
+description: set ubuntu os version and modules base directory
+outputs:
+  modules_dir:
+    description: "the modules base directory"
+    value: ${{ steps.set-vars.outputs.os_ver }}
+  os_ver:
+    description: "the ubuntu os version"
+    value: ${{ steps.set-vars.outputs.os_ver }}
+runs:
+  using: composite
+  steps:
+    - id: set-vars
+      run: |
+        source /etc/os-release
+        os_ver="$(echo ${ID}${VERSION_ID} | sed 's/\.//')"
+        echo "os_ver=${os_ver}" >> $GITHUB_OUTPUT
+        echo "modules_dir=modules_dir" >> $GITHUB_OUTPUT
+      shell: bash
