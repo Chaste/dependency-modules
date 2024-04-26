@@ -37,7 +37,9 @@ jobs:
   setup:
     name: build and cache petsc_hdf5
 
-    runs-on: ${{ github.event.inputs.os }}
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ github.event.inputs.os }}
 
     steps:
       - name: checkout
