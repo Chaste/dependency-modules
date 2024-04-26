@@ -133,24 +133,14 @@ fi
 
 # VTK 9.1.x patches: https://sources.debian.org/patches/vtk9/9.1.0%2Breally9.1.0%2Bdfsg2-7.1/
 if [[ ${major} -eq 9 && ${minor} -eq 1 ]]; then  # VTK == 9.1.x
-    cd ${script_dir}/patches
-
-    wget https://sources.debian.org/data/main/v/vtk9/9.1.0%2Breally9.1.0%2Bdfsg2-7.1/debian/patches/gcc-13.patch
-    echo "0f7cb1212efe58cf87d4b0b46afbdd02a83643721e0abb4e280679d2c392f51b  gcc-13.patch" | sha256sum -c
-
     cd ${src_dir}
-    patch -t -p1 < ${script_dir}/patches/gcc-13.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/9.1/gcc-13.patch
 fi
 
 # VTK 9.2.x patches: https://sources.debian.org/patches/vtk9/9.1.0%2Breally9.1.0%2Bdfsg2-7.1/
 if [[ ${major} -eq 9 && ${minor} -eq 2 ]]; then  # VTK == 9.2.x
-    cd ${script_dir}/patches
-
-    wget https://sources.debian.org/data/main/v/vtk9/9.1.0%2Breally9.1.0%2Bdfsg2-7.1/debian/patches/gcc-13.patch
-    echo "0f7cb1212efe58cf87d4b0b46afbdd02a83643721e0abb4e280679d2c392f51b  gcc-13.patch" | sha256sum -c
-
     cd ${src_dir}
-    patch -t -p1 < ${script_dir}/patches/gcc-13.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/9.1/gcc-13.patch
 fi
 
 # Build and install
