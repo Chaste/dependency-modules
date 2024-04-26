@@ -14,13 +14,13 @@ runs:
 
     - name: install dependencies
       working-directory: ${{ github.workspace }}
-      run: sudo ./scripts/setup_${{ env.OS_VERSION }}.sh
+      run: ./scripts/setup_${{ env.OS_VERSION }}.sh
       shell: bash
         
     - name: configure environment modules
       run: |
         mkdir -p ${{ env.MODULES_DIR }}/modulefiles
-        echo "module use ${{ env.MODULES_DIR }}/modulefiles" | sudo tee -a /etc/profile.d/modules.sh
+        echo "module use ${{ env.MODULES_DIR }}/modulefiles" | tee -a /etc/profile.d/modules.sh
       shell: bash
 
     - name: test module command
