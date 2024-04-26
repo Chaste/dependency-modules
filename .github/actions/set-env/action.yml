@@ -15,5 +15,5 @@ runs:
         source /etc/os-release
         os_ver="$(echo ${ID}${VERSION_ID} | sed 's/\.//')"
         echo "os_ver=${os_ver}" >> $GITHUB_OUTPUT
-        echo "modules_dir=modules_dir" >> $GITHUB_OUTPUT
+        echo "modules_dir=/modules" >> $GITHUB_OUTPUT
       shell: bash
