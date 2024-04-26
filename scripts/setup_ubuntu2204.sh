@@ -15,6 +15,14 @@
 
 export DEBIAN_FRONTEND=noninteractive
 
+apt-get update &&
+apt-get install -y --no-install-recommends \
+  apt-utils \
+  apt-transport-https \
+  ca-certificates \
+  gnupg \
+  wget
+
 # https://chaste.github.io/docs/installguides/ubuntu-package/
 echo "deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu jammy/" > /etc/apt/sources.list.d/chaste.list
 apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 422C4D99
