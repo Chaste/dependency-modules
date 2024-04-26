@@ -11,10 +11,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - base: focal
-            tags: chaste/runner:focal, chaste/runner:latest
-          - base: jammy
-            tags: chaste/runner:jammy
+          - base: noble
+            tags: chaste/runner:noble, chaste/runner:latest
             
     steps:
       - name: Checkout
