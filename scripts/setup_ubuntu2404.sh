@@ -2,7 +2,16 @@
 
 export DEBIAN_FRONTEND=noninteractive
 
-apt-get update && \
+apt-get update &&
+apt-get install -y --no-install-recommends \
+  apt-utils \
+  apt-transport-https \
+  ca-certificates \
+  gnupg \
+  nano \
+  wget
+
+apt-get update &&
 apt-get install -y --no-install-recommends \
   cmake \
   cmake-curses-gui \
