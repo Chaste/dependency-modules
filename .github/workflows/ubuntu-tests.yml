@@ -22,7 +22,9 @@ jobs:
 
       fail-fast: false
 
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ matrix.os }}
 
     steps:
       - name: checkout
