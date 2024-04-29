@@ -27,15 +27,14 @@ runs:
         ./install_xsd.sh \
           --version=${{ inputs.xsd_ver }} \
           --modules-dir=${{ steps.set-env.outputs.modules_dir }}
-          ls ${{ steps.set-env.outputs.modules_dir }}
       working-directory: ${{ github.workspace }}/scripts
       shell: bash
 
     - name: test xsd module
       run: |
-        ls ${{ steps.set-env.outputs.modules_dir }}
-        source /etc/profile.d/modules.sh
+        ls -R ${{ steps.set-env.outputs.modules_dir }}
         module use ${{ steps.set-env.outputs.modules_dir }}
+        module avail
         module load xsd/${{ inputs.xsd_ver }}
         module test xsd/${{ inputs.xsd_ver }}
-      shell: bash
+      shell: bash --login -e -o pipefail {0}  # login to source /etc/profile.d/modules.sh
