@@ -13,24 +13,34 @@ inputs:
 runs:
   using: composite
   steps:
+    - id: set-env
+      uses: ./.github/actions/set-env
+
     - id: cache-petsc_hdf5
       uses: actions/cache@v4
       with:
         path: |
-          ${{ env.MODULES_DIR }}/opt/petsc_hdf5/${{ inputs.petsc_ver }}_${{ inputs.hdf5_ver }}
-          ${{ env.MODULES_DIR }}/modulefiles/petsc_hdf5/${{ inputs.petsc_ver }}_${{ inputs.hdf5_ver }}/${{ inputs.petsc_arch }}
-        key: ${{ env.OS_VERSION }}-petsc_hdf5-${{ inputs.petsc_ver }}-${{ inputs.hdf5_ver }}-${{ inputs.petsc_arch }}-${{ hashFiles('scripts/install_petsc_hdf5.sh') }}
+          ${{ steps.set-env.outputs.modules_dir }}/opt/petsc_hdf5/${{ inputs.petsc_ver }}_${{ inputs.hdf5_ver }}
+          ${{ steps.set-env.outputs.modules_dir }}/modulefiles/petsc_hdf5/${{ inputs.petsc_ver }}_${{ inputs.hdf5_ver }}/${{ inputs.petsc_arch }}
+        key: |
+          ${{ steps.set-env.outputs.os_ver }}-petsc_hdf5-${{ inputs.petsc_ver }}-${{ inputs.hdf5_ver }}-${{ inputs.petsc_arch }}-${{ hashFiles('scripts/install_petsc_hdf5.sh') }}
         restore-keys: |
-          ${{ env.OS_VERSION }}-petsc_hdf5-${{ inputs.petsc_ver }}-${{ inputs.hdf5_ver }}-${{ inputs.petsc_arch }}-
-    
+          ${{ steps.set-env.outputs.os_ver }}-petsc_hdf5-${{ inputs.petsc_ver }}-${{ inputs.hdf5_ver }}-${{ inputs.petsc_arch }}-
+
     - name: build and install petsc_hdf5 module
       if: steps.cache-petsc_hdf5.outputs.cache-hit != 'true'
-      working-directory: ${{ github.workspace }}
-      run: ./scripts/install_petsc_hdf5.sh --petsc-version=${{ inputs.petsc_ver }} --hdf5-version=${{ inputs.hdf5_ver }} --petsc-arch=${{ inputs.petsc_arch }} --modules-dir=${{ env.MODULES_DIR }}
+      run: |
+        ./install_petsc_hdf5.sh \
+          --petsc-version=${{ inputs.petsc_ver }} \
+          --hdf5-version=${{ inputs.hdf5_ver }} \
+          --petsc-arch=${{ inputs.petsc_arch }} \
+          --modules-dir=${{ steps.set-env.outputs.modules_dir }}
+      working-directory: ${{ github.workspace }}/scripts
       shell: bash
 
     - name: test petsc_hdf5 module
       run: |
+        module use ${{ steps.set-env.outputs.modules_dir }}/modulefiles
         module load petsc_hdf5/${{ inputs.petsc_ver }}_${{ inputs.hdf5_ver }}/${{ inputs.petsc_arch }}
         module test petsc_hdf5/${{ inputs.petsc_ver }}_${{ inputs.hdf5_ver }}/${{ inputs.petsc_arch }}
-      shell: bash --login -e -o pipefail {0}  # login to load /etc/profile.d/modules.sh
+      shell: bash --login -e -o pipefail {0} # login to source /etc/profile.d/modules.sh
