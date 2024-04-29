@@ -23,15 +23,17 @@ runs:
 
     - name: install xsd module
       if: steps.cache-xsd.outputs.cache-hit != 'true'
-      working-directory: ${{ github.workspace }}
       run: |
-        ./scripts/install_xsd.sh \
+        ./install_xsd.sh \
           --version=${{ inputs.xsd_ver }} \
           --modules-dir=${{ steps.set-env.outputs.modules_dir }}
+          ls ${{ steps.set-env.outputs.modules_dir }}
+      working-directory: ${{ github.workspace }}/scripts
       shell: bash
 
     - name: test xsd module
       run: |
+        ls ${{ steps.set-env.outputs.modules_dir }}
         source /etc/profile.d/modules.sh
         module use ${{ steps.set-env.outputs.modules_dir }}
         module load xsd/${{ inputs.xsd_ver }}
