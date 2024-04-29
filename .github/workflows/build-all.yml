@@ -1,11 +1,11 @@
-name: ubuntu-tests
+name: build-all
 
 on:
   workflow_dispatch:
 
 jobs:
   setup:
-    name: test modules on ubuntu
+    name: build all modules and compile chaste build info
 
     strategy:
       fail-fast: false
