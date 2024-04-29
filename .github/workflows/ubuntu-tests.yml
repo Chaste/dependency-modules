@@ -26,11 +26,11 @@ jobs:
       image: ${{ matrix.os }}
 
     steps:
-      - id: set-env
-        uses: ./.github/actions/set-env
-
       - name: checkout
         uses: actions/checkout@v4
+
+      - id: set-env
+        uses: ./.github/actions/set-env
 
       - name: setup defaults
         uses: ./.github/actions/setup-defaults
