@@ -35,4 +35,4 @@ runs:
         module use ${{ steps.set-env.outputs.modules_dir }}/modulefiles
         module load xsd/${{ inputs.xsd_ver }}
         module test xsd/${{ inputs.xsd_ver }}
-      shell: bash --login -e -o pipefail {0}  # login to source /etc/profile.d/modules.sh
+      shell: bash --login -e -o pipefail {0} # login to source /etc/profile.d/modules.sh
