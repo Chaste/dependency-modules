@@ -26,6 +26,9 @@ jobs:
       image: ${{ matrix.os }}
 
     steps:
+      - id: set-env
+        uses: ./.github/actions/set-env
+
       - name: checkout
         uses: actions/checkout@v4
 
@@ -78,9 +81,9 @@ jobs:
           echo "CHASTE_TEST_OUTPUT=$(pwd)/chaste-test-dir" >> ${GITHUB_ENV}
 
       - name: compile chaste build info
-        working-directory: Chaste/build
         run: |
           module purge
+          module use ${{ steps.set-env.outputs.modules_dir }}/modulefiles
           module load xsd/${{ matrix.xsd_ver }}
           module load xercesc/${{ matrix.xercesc_ver }}
           module load sundials/${{ matrix.sundials_ver }}
@@ -91,6 +94,7 @@ jobs:
           cmake -DCMAKE_BUILD_TYPE=Release ..
           cmake --build . --parallel $(nproc) --target TestChasteBuildInfo
           ctest -V -R TestChasteBuildInfo --output-on-failure | tee buildinfo
+        working-directory: Chaste/build
         shell: bash --login -e -o pipefail {0} # login to source /etc/profile.d/modules.sh
 
       - name: verify dependency versions
