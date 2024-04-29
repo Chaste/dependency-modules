@@ -10,24 +10,12 @@ runs:
     - id: set-env
       uses: ./.github/actions/set-env
 
-    - name: test-env
-      run: |
-        echo ${{ steps.set-env.outputs.os_ver }}
-        echo ${{ steps.set-env.outputs.modules_dir }}
-        echo ${{ github.workspace }}
-        ls /etc/profile.d/
-        whoami
-        echo $HOME
-        ls /home
-        ls /
-      shell: bash
-
     - id: cache-xsd
       uses: actions/cache@v4
       with:
         path: |
-          modules/opt/xsd/${{ inputs.xsd_ver }}
-          modules/modulefiles/xsd/${{ inputs.xsd_ver }}
+          ${{ steps.set-env.outputs.modules_dir }}/opt/xsd/${{ inputs.xsd_ver }}
+          ${{ steps.set-env.outputs.modules_dir }}/modulefiles/xsd/${{ inputs.xsd_ver }}
         key: |
           ${{ steps.set-env.outputs.os_ver }}-xsd-${{ inputs.xsd_ver }}-${{ hashFiles('scripts/install_xsd.sh') }}
         restore-keys: |
