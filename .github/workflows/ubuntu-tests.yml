@@ -8,6 +8,7 @@ jobs:
     name: test modules on ubuntu
 
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: ubuntu:24.04
@@ -19,8 +20,6 @@ jobs:
             petsc_ver: 3.19.2
             hdf5_ver: 1.10.10
             petsc_arch: linux-gnu
-
-      fail-fast: false
 
     runs-on: ubuntu-latest
     container:
@@ -75,7 +74,8 @@ jobs:
       - name: make build and test directories
         run: |
           mkdir -p Chaste/build
-          mkdir -p ${CHASTE_TEST_OUTPUT}
+          mkdir -p chaste-test-dir
+          echo "CHASTE_TEST_OUTPUT=$(pwd)/chaste-test-dir" >> ${GITHUB_ENV}
 
       - name: compile chaste build info
         working-directory: Chaste/build
@@ -89,16 +89,11 @@ jobs:
           module load petsc_hdf5/${{ matrix.petsc_ver }}_${{ matrix.hdf5_ver }}/${{ matrix.petsc_arch }}
 
           cmake -DCMAKE_BUILD_TYPE=Release ..
-
           cmake --build . --parallel $(nproc) --target TestChasteBuildInfo
-
           ctest -V -R TestChasteBuildInfo --output-on-failure | tee buildinfo
-
-        # login to source /etc/profile.d/modules.sh
-        shell: bash --login -e -o pipefail {0}
+        shell: bash --login -e -o pipefail {0} # login to source /etc/profile.d/modules.sh
 
       - name: verify dependency versions
-        working-directory: Chaste/build
         run: |
           sed -i.bak 's/"//g' buildinfo  # removes quotes from old sundials versions
 
@@ -120,4 +115,5 @@ jobs:
           grep "<VTK>${vtk_ver}</VTK>" buildinfo
           grep "<PETSc>${petsc_ver}</PETSc>" buildinfo
           grep "<HDF5>${hdf5_ver}</HDF5>" buildinfo
+        working-directory: Chaste/build
         shell: bash
