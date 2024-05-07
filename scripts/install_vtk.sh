@@ -116,19 +116,21 @@ fi
 # VTK 7.1.x patches: https://sources.debian.org/patches/vtk7/7.1.1%2Bdfsg2-10.2/
 if [[ ${major} -eq 7 && ${minor} -eq 1 ]]; then  # VTK == 7.1.x
     cd ${src_dir}
-    patch -t -p1 < ${script_dir}/patches/vtk7.1.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/7.1/vtk7.1.patch
 fi
 
 # VTK 8.2.x patches: https://sources.debian.org/patches/vtk7/7.1.1%2Bdfsg2-10.2/
 if [[ ${major} -eq 8 && ${minor} -eq 2 ]]; then  # VTK == 8.2.x
     cd ${src_dir}
-    patch -t -p1 < ${script_dir}/patches/vtk8.2.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.2/vtk8.2.patch
 fi
 
 # VTK 9.0.x patches: https://sources.debian.org/patches/vtk9/9.0.1%2Bdfsg1-8/
 if [[ ${major} -eq 9 && ${minor} -eq 0 ]]; then  # VTK == 9.0.x
     cd ${src_dir}
-    patch -t -p1 < ${script_dir}/patches/vtk9.0-fix-limits.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/9.0/50_fix_python-modules_path.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/9.0/70_fix_python_numpy_warning.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/9.0/fix-limits.patch
 fi
 
 # VTK 9.1.x patches: https://sources.debian.org/patches/vtk9/9.1.0%2Breally9.1.0%2Bdfsg2-7.1/
@@ -137,10 +139,10 @@ if [[ ${major} -eq 9 && ${minor} -eq 1 ]]; then  # VTK == 9.1.x
     patch -t -p1 < ${script_dir}/patches/vtk/9.1/gcc-13.patch
 fi
 
-# VTK 9.2.x patches: https://sources.debian.org/patches/vtk9/9.1.0%2Breally9.1.0%2Bdfsg2-7.1/
+# VTK 9.2.x patches
 if [[ ${major} -eq 9 && ${minor} -eq 2 ]]; then  # VTK == 9.2.x
     cd ${src_dir}
-    patch -t -p1 < ${script_dir}/patches/vtk/9.1/gcc-13.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/9.2/gcc-13.patch
 fi
 
 # Build and install
@@ -158,12 +160,13 @@ cmake \
     -DBUILD_TESTING=OFF \
     -DBUILD_DOCUMENTATION=OFF \
     -DVTK_INSTALL_NO_DOCUMENTATION=ON \
+    -DVTK_WRAP_PYTHON=ON \
     -DVTK_ENABLE_VTKPYTHON=OFF \
     -DVTK_PYTHON_VERSION=3 \
-    -DVTK_WRAP_PYTHON=ON \
-    -DMPIEXEC="$(which mpiexec)" \
-    -DVTK_Group_MPI=ON \
     -DVTK_USE_MPI=ON \
+    -DVTK_Group_MPI=ON \
+    -DMPIEXEC="$(which mpiexec)" \
+    -DVTK_MODULE_USE_EXTERNAL_VTK_mpi4py=ON \
     ${src_dir} && \
 make -j ${parallel} && \
 make install
