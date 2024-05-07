@@ -1,42 +1,36 @@
-name: ubuntu-tests
+name: build-all
 
 on:
   workflow_dispatch:
 
 jobs:
   setup:
-    name: test modules on ubuntu
+    name: build all modules and compile chaste build info
 
     strategy:
+      fail-fast: false
       matrix:
         include:
-          - os: ubuntu-20.04
+          - os: ubuntu:24.04
             xsd_ver: 4.0.0
             xercesc_ver: 3.2.4
-            sundials_ver: 5.8.0
-            boost_ver: 1.74.0
-            vtk_ver: 7.1.1
-            petsc_ver: 3.15.5
-            hdf5_ver: 1.10.8
+            sundials_ver: 6.4.1
+            boost_ver: 1.83.0
+            vtk_ver: 9.1.0
+            petsc_ver: 3.19.2
+            hdf5_ver: 1.10.10
             petsc_arch: linux-gnu
 
-          - os: ubuntu-22.04
-            xsd_ver: 4.0.0
-            xercesc_ver: 3.2.4
-            sundials_ver: 5.8.0
-            boost_ver: 1.74.0
-            vtk_ver: 7.1.1
-            petsc_ver: 3.15.5
-            hdf5_ver: 1.10.8
-            petsc_arch: linux-gnu
-
-      fail-fast: false
-
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ matrix.os }}
 
     steps:
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - id: set-env
+        uses: ./.github/actions/set-env
 
       - name: setup defaults
         uses: ./.github/actions/setup-defaults
@@ -74,7 +68,7 @@ jobs:
           petsc_arch: ${{ matrix.petsc_arch }}
 
       - name: checkout chaste
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: Chaste/Chaste
           path: Chaste
@@ -83,12 +77,13 @@ jobs:
       - name: make build and test directories
         run: |
           mkdir -p Chaste/build
-          mkdir -p ${CHASTE_TEST_OUTPUT}
+          mkdir -p chaste-test-dir
+          echo "CHASTE_TEST_OUTPUT=$(pwd)/chaste-test-dir" >> ${GITHUB_ENV}
 
       - name: compile chaste build info
-        working-directory: Chaste/build
         run: |
           module purge
+          module use ${{ steps.set-env.outputs.modules_dir }}/modulefiles
           module load xsd/${{ matrix.xsd_ver }}
           module load xercesc/${{ matrix.xercesc_ver }}
           module load sundials/${{ matrix.sundials_ver }}
@@ -97,16 +92,12 @@ jobs:
           module load petsc_hdf5/${{ matrix.petsc_ver }}_${{ matrix.hdf5_ver }}/${{ matrix.petsc_arch }}
 
           cmake -DCMAKE_BUILD_TYPE=Release ..
-
           cmake --build . --parallel $(nproc) --target TestChasteBuildInfo
-
           ctest -V -R TestChasteBuildInfo --output-on-failure | tee buildinfo
-          
-        # login to source /etc/profile.d/modules.sh
-        shell: bash --login -e -o pipefail {0}
+        working-directory: Chaste/build
+        shell: bash --login -e -o pipefail {0} # login to source /etc/profile.d/modules.sh
 
       - name: verify dependency versions
-        working-directory: Chaste/build
         run: |
           sed -i.bak 's/"//g' buildinfo  # removes quotes from old sundials versions
 
@@ -128,4 +119,5 @@ jobs:
           grep "<VTK>${vtk_ver}</VTK>" buildinfo
           grep "<PETSc>${petsc_ver}</PETSc>" buildinfo
           grep "<HDF5>${hdf5_ver}</HDF5>" buildinfo
+        working-directory: Chaste/build
         shell: bash
