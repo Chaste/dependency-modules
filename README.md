@@ -1,4 +1,9 @@
-![ubuntu-tests](https://github.com/Chaste/dependency-modules/actions/workflows/ubuntu-tests.yml/badge.svg)
+![boost](https://github.com/Chaste/dependency-modules/actions/workflows/boost.yml/badge.svg)
+![petsc_hdf5](https://github.com/Chaste/dependency-modules/actions/workflows/petsc_hdf5.yml/badge.svg)
+![sundials](https://github.com/Chaste/dependency-modules/actions/workflows/sundials.yml/badge.svg)
+![vtk](https://github.com/Chaste/dependency-modules/actions/workflows/vtk.yml/badge.svg)
+![xercesc](https://github.com/Chaste/dependency-modules/actions/workflows/xercesc.yml/badge.svg)
+![xsd](https://github.com/Chaste/dependency-modules/actions/workflows/xsd.yml/badge.svg)
 
 # Chaste Dependency Modules
 

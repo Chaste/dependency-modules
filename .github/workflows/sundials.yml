@@ -4,29 +4,31 @@ on:
   workflow_dispatch:
     inputs:
       sundials_ver:
-        description: 'SUNDIALS version'
+        description: "SUNDIALS version"
         required: true
         type: string
-        default: '5.8.0'
+        default: "6.4.1"
 
       os:
-        description: 'OS'
+        description: "OS"
         required: true
         type: choice
         options:
-          - 'ubuntu-20.04'
-          - 'ubuntu-22.04'
-        default: 'ubuntu-22.04'
+          - "ubuntu:22.04"
+          - "ubuntu:24.04"
+        default: "ubuntu:24.04"
 
 jobs:
   setup:
     name: build and cache sundials
-    
-    runs-on: ${{ github.event.inputs.os }}
-    
+
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ github.event.inputs.os }}
+
     steps:
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: setup os
         uses: ./.github/actions/setup-defaults

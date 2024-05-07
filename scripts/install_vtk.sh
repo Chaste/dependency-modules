@@ -131,6 +131,18 @@ if [[ ${major} -eq 9 && ${minor} -eq 0 ]]; then  # VTK == 9.0.x
     patch -t -p1 < ${script_dir}/patches/vtk9.0-fix-limits.patch
 fi
 
+# VTK 9.1.x patches: https://sources.debian.org/patches/vtk9/9.1.0%2Breally9.1.0%2Bdfsg2-7.1/
+if [[ ${major} -eq 9 && ${minor} -eq 1 ]]; then  # VTK == 9.1.x
+    cd ${src_dir}
+    patch -t -p1 < ${script_dir}/patches/vtk/9.1/gcc-13.patch
+fi
+
+# VTK 9.2.x patches: https://sources.debian.org/patches/vtk9/9.1.0%2Breally9.1.0%2Bdfsg2-7.1/
+if [[ ${major} -eq 9 && ${minor} -eq 2 ]]; then  # VTK == 9.2.x
+    cd ${src_dir}
+    patch -t -p1 < ${script_dir}/patches/vtk/9.1/gcc-13.patch
+fi
+
 # Build and install
 install_dir=${base_dir}/opt/vtk/${version}
 mkdir -p ${install_dir}

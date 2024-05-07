@@ -4,44 +4,46 @@ on:
   workflow_dispatch:
     inputs:
       petsc_ver:
-        description: 'PETSc version'
+        description: "PETSc version"
         required: true
         type: string
-        default: '3.15.5'
+        default: "3.19.2"
 
       petsc_arch:
-        description: 'PETSc arch'
+        description: "PETSc arch"
         required: true
         type: choice
         options:
-          - 'linux-gnu'
-          - 'linux-gnu-opt'
-        default: 'linux-gnu'
+          - "linux-gnu"
+          - "linux-gnu-opt"
+        default: "linux-gnu"
 
       hdf5_ver:
-        description: 'HDF5 version'
+        description: "HDF5 version"
         required: true
         type: string
-        default: '1.10.8'
+        default: "1.10.10"
 
       os:
-        description: 'OS'
+        description: "OS"
         required: true
         type: choice
         options:
-          - 'ubuntu-20.04'
-          - 'ubuntu-22.04'
-        default: 'ubuntu-22.04'
+          - "ubuntu:22.04"
+          - "ubuntu:24.04"
+        default: "ubuntu:24.04"
 
 jobs:
   setup:
     name: build and cache petsc_hdf5
-    
-    runs-on: ${{ github.event.inputs.os }}
-      
+
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ github.event.inputs.os }}
+
     steps:
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: setup os
         uses: ./.github/actions/setup-defaults

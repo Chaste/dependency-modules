@@ -7,24 +7,32 @@ inputs:
 runs:
   using: composite
   steps:
+    - id: set-env
+      uses: ./.github/actions/set-env
+
     - id: cache-xsd
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
-          ${{ env.MODULES_DIR }}/opt/xsd/${{ inputs.xsd_ver }}
-          ${{ env.MODULES_DIR }}/modulefiles/xsd/${{ inputs.xsd_ver }}
-        key: ${{ env.OS_VERSION }}-xsd-${{ inputs.xsd_ver }}-${{ hashFiles('scripts/install_xsd.sh') }}
+          ${{ steps.set-env.outputs.modules_dir }}/opt/xsd/${{ inputs.xsd_ver }}
+          ${{ steps.set-env.outputs.modules_dir }}/modulefiles/xsd/${{ inputs.xsd_ver }}
+        key: |
+          ${{ steps.set-env.outputs.os_ver }}-xsd-${{ inputs.xsd_ver }}-${{ hashFiles('scripts/install_xsd.sh') }}
         restore-keys: |
-          ${{ env.OS_VERSION }}-xsd-${{ inputs.xsd_ver }}-
-    
+          ${{ steps.set-env.outputs.os_ver }}-xsd-${{ inputs.xsd_ver }}-
+
     - name: install xsd module
       if: steps.cache-xsd.outputs.cache-hit != 'true'
-      working-directory: ${{ github.workspace }}
-      run: ./scripts/install_xsd.sh --version=${{ inputs.xsd_ver }} --modules-dir=${{ env.MODULES_DIR }}
+      run: |
+        ./install_xsd.sh \
+          --version=${{ inputs.xsd_ver }} \
+          --modules-dir=${{ steps.set-env.outputs.modules_dir }}
+      working-directory: ${{ github.workspace }}/scripts
       shell: bash
-        
+
     - name: test xsd module
       run: |
+        module use ${{ steps.set-env.outputs.modules_dir }}/modulefiles
         module load xsd/${{ inputs.xsd_ver }}
         module test xsd/${{ inputs.xsd_ver }}
-      shell: bash --login -e -o pipefail {0}  # login to load /etc/profile.d/modules.sh
+      shell: bash --login -e -o pipefail {0} # login to source /etc/profile.d/modules.sh
