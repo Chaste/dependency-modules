@@ -84,8 +84,9 @@ version_arr=(${version//\./ })
 major=${version_arr[0]}
 minor=${version_arr[1]}
 
-# Unsupported versions: https://github.com/Chaste/dependency-modules/wiki
-if [[ (${major} -lt 6) || ((${major} -eq 6) && (${minor} -lt 3)) ]]; then  # VTK < 6.3.x
+# Unsupported versions: https://chaste.github.io/docs/installguides/dependency-versions/
+if [[ (${major} -lt 6) 
+  || ((${major} -eq 6) && (${minor} -lt 3)) ]]; then  # VTK < 6.3.x
     echo "$(basename $0): VTK versions < 6.3 not supported"
     exit 1
 fi

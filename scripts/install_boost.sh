@@ -78,9 +78,9 @@ major=${version_arr[0]}
 minor=${version_arr[1]}
 ver_si_on=${version//\./_}  # Converts 1.69.0 to 1_69_0
 
-# Unsupported versions: https://github.com/Chaste/dependency-modules/wiki
-if [[ (${major} -lt 1) || ((${major} -eq 1) && (${minor} -lt 62)) ]]; then  # Boost < 1.62.x
-    echo "$(basename $0): Boost versions < 1.62 not supported"
+# Unsupported versions: https://chaste.github.io/docs/installguides/dependency-versions/
+if [[ (${major} -lt 1) || ((${major} -eq 1) && (${minor} -lt 67)) ]]; then  # Boost < 1.67.x
+    echo "$(basename $0): Boost versions < 1.67 not supported"
     exit 1
 fi
 
