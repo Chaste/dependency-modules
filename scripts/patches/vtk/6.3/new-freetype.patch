@@ -1,0 +1,16 @@
+Description: Fix another build failure due to new freetype
+Author: Gianfranco Costamagna <locutusofborg@debian.org>
+Last-Update: 2020-12-11
+
+--- vtk6-6.3.0+dfsg2.orig/Rendering/FreeType/vtkFreeTypeUtilities.cxx
++++ vtk6-6.3.0+dfsg2/Rendering/FreeType/vtkFreeTypeUtilities.cxx
+@@ -332,8 +332,7 @@ void vtkFreeTypeUtilities::MapIdToTextPr
+ 
+ //----------------------------------------------------------------------------
+ #ifdef VTK_FREETYPE_CACHING_SUPPORTED
+-FT_CALLBACK_DEF(FT_Error)
+-vtkFreeTypeUtilitiesFaceRequester(FTC_FaceID face_id,
++static FT_Error vtkFreeTypeUtilitiesFaceRequester(FTC_FaceID face_id,
+                                   FT_Library lib,
+                                   FT_Pointer request_data,
+                                   FT_Face* face)

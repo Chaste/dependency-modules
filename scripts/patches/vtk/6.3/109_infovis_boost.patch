@@ -1,0 +1,14 @@
+Description: Enable Infovis Boost support
+Author: Maurice Bremond <Maurice.Bremond@inria.fr>
+Debian-Bug: https://bugs.debian.org/857124
+
+--- a/Infovis/Layout/module.cmake
++++ b/Infovis/Layout/module.cmake
+@@ -6,6 +6,7 @@
+     vtkImagingHybrid
+     vtkFiltersModeling
+     vtkInfovisCore
++    vtkInfovisBoostGraphAlgorithms
+   TEST_DEPENDS
+     vtkRenderingLabel
+     vtkRendering${VTK_RENDERING_BACKEND}
