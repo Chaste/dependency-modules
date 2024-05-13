@@ -1,0 +1,18 @@
+Description: Remove the FORCE from the use_system_glew=off option
+ The embedded version of GLEW seems to be older than the version
+ provided by Debian, so I assume that the fixes have been applied. 
+Author: Gert Wollny <gw.fossdev@gmail.com> 
+
+Index: VTK-6.3.0/CMakeLists.txt
+===================================================================
+--- VTK-6.3.0.orig/CMakeLists.txt
++++ VTK-6.3.0/CMakeLists.txt
+@@ -207,7 +207,7 @@ else()
+ endif()
+ 
+ # default to not using the system GLEW as ours has fixes in it right now
+-set(VTK_USE_SYSTEM_GLEW OFF CACHE BOOL "do not use a system glew" FORCE)
++set(VTK_USE_SYSTEM_GLEW OFF CACHE BOOL "do not use a system glew" ON)
+ 
+ set(VTK_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
+ 

@@ -1,0 +1,23 @@
+From 31e8e4ebeb3152f7cfdb3f14f24f7e5d31a4f8b5 Mon Sep 17 00:00:00 2001
+From: Ben Boeckel <ben.boeckel@kitware.com>
+Date: Sun, 22 Nov 2020 20:04:19 -0500
+Subject: [PATCH] vtkFontConfigFreeTypeTools: remove last FT_CALLBACK_DEF usage
+
+---
+ Rendering/FreeTypeFontConfig/vtkFontConfigFreeTypeTools.cxx | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/Rendering/FreeTypeFontConfig/vtkFontConfigFreeTypeTools.cxx b/Rendering/FreeTypeFontConfig/vtkFontConfigFreeTypeTools.cxx
+index 5c1908cf24b..818ff058bb9 100644
+--- a/Rendering/FreeTypeFontConfig/vtkFontConfigFreeTypeTools.cxx
++++ b/Rendering/FreeTypeFontConfig/vtkFontConfigFreeTypeTools.cxx
+@@ -31,8 +31,7 @@ vtkStandardNewMacro(vtkFontConfigFreeTypeTools);
+ namespace
+ {
+ // The FreeType face requester callback:
+-FT_CALLBACK_DEF(FT_Error)
+-vtkFontConfigFreeTypeToolsFaceRequester(FTC_FaceID face_id,
++static FT_Error vtkFontConfigFreeTypeToolsFaceRequester(FTC_FaceID face_id,
+                                         FT_Library lib,
+                                         FT_Pointer request_data,
+                                         FT_Face* face)

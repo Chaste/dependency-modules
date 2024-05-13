@@ -1,0 +1,22 @@
+Description: Reintroduce my_bool to fix build with MySQL 8
+ (patch inspired from the one in cppdb 0.3.1+dfsg-8ubuntu2)
+Author: Gianfranco Costamagna <locutusofborg@debian.org>, Andreas Hasenack <andreas@canonical.com>
+Bug-Ubuntu: https://bugs.launchpad.net/bugs/1863026
+Forwarded: no
+Last-Update: 2020-12-15
+
+diff --git a/IO/MySQL/vtkMySQLDatabasePrivate.h b/IO/MySQL/vtkMySQLDatabasePrivate.h
+index 4deb747..8e0c9e3 100644
+--- a/IO/MySQL/vtkMySQLDatabasePrivate.h
++++ b/IO/MySQL/vtkMySQLDatabasePrivate.h
+@@ -7,6 +7,10 @@
+ 
+ #include "vtkIOMySQLModule.h" // For export macro
+ #include <mysql.h> // needed for MYSQL typedefs
++#if !defined(MARIADB_BASE_VERSION) && !defined(MARIADB_VERSION_ID) && \
++  MYSQL_VERSION_ID >= 80001 && MYSQL_VERSION_ID != 80002
++typedef bool my_bool;
++#endif
+ 
+ class VTKIOMYSQL_EXPORT vtkMySQLDatabasePrivate
+ {

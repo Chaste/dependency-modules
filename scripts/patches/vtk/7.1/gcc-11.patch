@@ -1,0 +1,42 @@
+--- vtk7-7.1.1+dfsg2.orig/ThirdParty/xdmf2/vtkxdmf2/libsrc/XdmfDsmComm.cxx
++++ vtk7-7.1.1+dfsg2/ThirdParty/xdmf2/vtkxdmf2/libsrc/XdmfDsmComm.cxx
+@@ -52,7 +52,7 @@
+         XdmfErrorMessage("Cannot Receive Message of Length = " << Msg->Length);
+         return(XDMF_FAIL);
+     }
+-    if(Msg->Data <= 0 ){
++    if(!Msg->Data){
+         XdmfErrorMessage("Cannot Receive Message into Data Buffer = " << Msg->Length);
+         return(XDMF_FAIL);
+     }
+@@ -66,7 +66,7 @@
+         XdmfErrorMessage("Cannot Send Message of Length = " << Msg->Length);
+         return(XDMF_FAIL);
+     }
+-    if(Msg->Data <= 0 ){
++    if(!Msg->Data){
+         XdmfErrorMessage("Cannot Send Message from Data Buffer = " << Msg->Length);
+         return(XDMF_FAIL);
+     }
+--- vtk7-7.1.1+dfsg2.orig/Rendering/Label/vtkLabelHierarchyPrivate.h
++++ vtk7-7.1.1+dfsg2/Rendering/Label/vtkLabelHierarchyPrivate.h
+@@ -66,7 +66,7 @@
+     {
+     }
+ 
+-    bool operator () ( const vtkIdType& a, const vtkIdType& b )
++    bool operator () ( const vtkIdType& a, const vtkIdType& b ) const
+     {
+       if (0 == this->Hierarchy)
+       {
+--- vtk7-7.1.1+dfsg2.orig/Rendering/Label/vtkLabelHierarchy.cxx
++++ vtk7-7.1.1+dfsg2/Rendering/Label/vtkLabelHierarchy.cxx
+@@ -525,7 +525,7 @@
+   {
+   public:
+     bool operator()(const vtkHierarchyNode & a,
+-                    const vtkHierarchyNode & b)
++                    const vtkHierarchyNode & b) const
+     {
+       if (a.Level != b.Level)
+       {

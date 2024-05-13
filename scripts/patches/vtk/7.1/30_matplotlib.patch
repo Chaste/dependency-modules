@@ -1,0 +1,14 @@
+Description: _matplotlib
+--- a/Rendering/Matplotlib/vtkMatplotlibMathTextUtilities.h
++++ b/Rendering/Matplotlib/vtkMatplotlibMathTextUtilities.h
+@@ -156,6 +156,10 @@
+    * to implement IsAvailable.
+    */
+   static Availability CheckMPLAvailability();
++  static void DisableMPL()
++    {
++    MPLMathTextAvailable = UNAVAILABLE;
++    };
+ 
+   //@{
+   /**
