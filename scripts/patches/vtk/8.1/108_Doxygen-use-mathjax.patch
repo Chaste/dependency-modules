@@ -1,0 +1,29 @@
+Description: _Doxygen use mathjax
+--- a/Utilities/Doxygen/CMakeLists.txt
++++ b/Utilities/Doxygen/CMakeLists.txt
+@@ -52,6 +52,13 @@
+     endif()
+   endforeach()
+   
++  FIND_PATH(MATHJAX_CODEFILE MathJax.js
++    PATHS
++    /usr/share/mathjax/
++    /usr/share/javascript/
++    /usr/share/javascript/mathjax/
++    )
++  
+   configure_file(
+     ${VTK_SOURCE_DIR}/Utilities/Doxygen/doxyfile.in
+     ${VTK_BINARY_DIR}/Utilities/Doxygen/doxyfile)
+--- a/Utilities/Doxygen/doxyfile.in
++++ b/Utilities/Doxygen/doxyfile.in
+@@ -19,6 +19,9 @@
+ GENERATE_TAGFILE     = "@VTK_BINARY_DIR@/Utilities/Doxygen/vtk@VTK_MAJOR_VERSION@.@VTK_MINOR_VERSION@.tag"
+ 
+ PDF_HYPERLINKS       = YES
++USE_MATHJAX  = YES
++MATHJAX_RELPATH = @MATHJAX_CODEFILE@
++
+ 
+ HAVE_DOT             = @HAVE_DOT_YESNO@
+ DOT_PATH             = "@DOT_PATH@"

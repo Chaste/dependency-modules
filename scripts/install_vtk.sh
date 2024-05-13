@@ -101,7 +101,7 @@ mkdir -p ${src_dir}
 wget -nc https://github.com/Kitware/VTK/archive/v${version}.tar.gz
 tar -xzf v${version}.tar.gz -C ${src_dir} --strip-components=1
 
-# VTK 6.3.x patches: https://sources.debian.org/patches/vtk6/6.3.0%2Bdfsg2-8.1/
+# VTK 6.3.x patches: https://sources.debian.org/patches/vtk6/
 if [[ ${major} -eq 6 && ${minor} -eq 3 ]]; then  # VTK == 6.3.x
     cd ${src_dir}
     patch -t -p1 < ${script_dir}/patches/vtk/6.3/10_allpatches.patch
@@ -127,7 +127,7 @@ if [[ ${major} -eq 6 && ${minor} -eq 3 ]]; then  # VTK == 6.3.x
     patch -t -p1 < ${script_dir}/patches/vtk/6.3/vtk6-gcc11-support.patch
 fi
 
-# VTK 7.1.x patches: https://sources.debian.org/patches/vtk7/7.1.1%2Bdfsg2-10.2/
+# VTK 7.1.x patches: https://sources.debian.org/patches/vtk7/
 if [[ ${major} -eq 7 && ${minor} -eq 1 ]]; then  # VTK == 7.1.x
     cd ${src_dir}
     patch -t -p1 < ${script_dir}/patches/vtk/7.1/10_allpatches.patch
@@ -159,16 +159,50 @@ fi
 # VTK 8.1.x patches
 if [[ ${major} -eq 8 && ${minor} -eq 1 ]]; then  # VTK == 8.1.x
     cd ${src_dir}
+    patch -t -p1 < ${script_dir}/patches/vtk/8.1/20_soversion-sharedlib.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.1/30_matplotlib.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.1/60_use_system_mpi4py.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.1/70_vtk8_fix_ftbfs_gcc49.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.1/100_javac-heap.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.1/101_java_install_path.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.1/106_install_doxygen_scripts_in_nodoc_build.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.1/108_Doxygen-use-mathjax.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.1/109_java-jar-nonjavafiles.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.1/110_python-371.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.1/111_fix_perl.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.1/112_riscv_support.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.1/113_vtk8_fix_python_equal.patch
     patch -t -p1 < ${script_dir}/patches/vtk/8.1/115_support-gcc10.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.1/mysq8_my_bool.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.1/3edc0de2b04ae1e100c229e592d6b9fa94f2915a.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.1/581d9eb874b2b80a3fb21c739a96fa6f955ffb5e.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.1/vtk8-gcc-11-exodus.patch
 fi
 
 # VTK 8.2.x patches
 if [[ ${major} -eq 8 && ${minor} -eq 2 ]]; then  # VTK == 8.2.x
     cd ${src_dir}
-    patch -t -p1 < ${script_dir}/patches/vtk/8.2/vtk8.2.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.2/20_soversion-sharedlib.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.2/30_matplotlib.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.2/60_vtk8_use_system_mpi4py.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.2/70_vtk8_fix_ftbfs_gcc49.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.2/100_javac-heap.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.2/101_java_install_path.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.2/106_install_doxygen_scripts_in_nodoc_build.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.2/108_Doxygen-use-mathjax.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.2/109_java-jar-nonjavafiles.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.2/110_python-371.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.2/111_fix_perl.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.2/112_riscv_support.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.2/113_vtk8_fix_python_equal.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.2/115_support-gcc10.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.2/mysq8_my_bool.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.2/3edc0de2b04ae1e100c229e592d6b9fa94f2915a.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.2/581d9eb874b2b80a3fb21c739a96fa6f955ffb5e.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/8.2/vtk8-gcc-11-exodus.patch
 fi
 
-# VTK 9.0.x patches: https://sources.debian.org/patches/vtk9/9.0.1%2Bdfsg1-8/
+# VTK 9.0.x patches: https://sources.debian.org/patches/vtk9/
 if [[ ${major} -eq 9 && ${minor} -eq 0 ]]; then  # VTK == 9.0.x
     cd ${src_dir}
     patch -t -p1 < ${script_dir}/patches/vtk/9.0/50_fix_python-modules_path.patch
@@ -176,7 +210,7 @@ if [[ ${major} -eq 9 && ${minor} -eq 0 ]]; then  # VTK == 9.0.x
     patch -t -p1 < ${script_dir}/patches/vtk/9.0/fix-limits.patch
 fi
 
-# VTK 9.1.x patches: https://sources.debian.org/patches/vtk9/9.1.0%2Breally9.1.0%2Bdfsg2-7.1/
+# VTK 9.1.x patches: https://sources.debian.org/patches/vtk9/
 if [[ ${major} -eq 9 && ${minor} -eq 1 ]]; then  # VTK == 9.1.x
     cd ${src_dir}
     patch -t -p1 < ${script_dir}/patches/vtk/9.1/gcc-13.patch
@@ -203,9 +237,6 @@ cmake \
     -DBUILD_TESTING=OFF \
     -DBUILD_DOCUMENTATION=OFF \
     -DVTK_INSTALL_NO_DOCUMENTATION=ON \
-    -DVTK_WRAP_PYTHON=ON \
-    -DVTK_ENABLE_VTKPYTHON=OFF \
-    -DVTK_PYTHON_VERSION=3 \
     ${src_dir} && \
 make -j ${parallel} && \
 make install

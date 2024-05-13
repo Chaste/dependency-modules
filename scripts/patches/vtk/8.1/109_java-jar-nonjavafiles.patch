@@ -1,0 +1,28 @@
+Author: Gert Wollny <gewo@debian.org>
+Description: Delete java files before building jar
+--- a/Wrapping/Java/CMakeLists.txt
++++ b/Wrapping/Java/CMakeLists.txt
+@@ -259,7 +259,7 @@
+   if(VTK_JAVA_SWT_COMPONENT)
+     set(VTK_JAVA_SAMPLE_DEPENDENCIES ${VTK_JAVA_SAMPLE_DEPENDENCIES}
+       rendering/SwtConeRendering
+-    )
++q    )
+   endif()
+ endif()
+ 
+@@ -358,11 +358,10 @@
+   COMMENT "Compiling Java Classes"
+   )
+ 
+-# Create the JAR file containing all compiled classes and
++
+ add_custom_command(
+-  COMMAND ${JAVA_ARCHIVE} -cvf  "${VTK_JAR_PATH}/vtk.jar"
+-  -C ${VTK_BINARY_DIR}/java
+-  vtk
++  COMMAND cd ${VTK_BINARY_DIR}/java && find . -name "*.class" -print | sort -u > classes.list
++  COMMAND cd ${VTK_BINARY_DIR}/java && ${JAVA_ARCHIVE} -cvf  "${VTK_JAR_PATH}/vtk.jar" @${VTK_BINARY_DIR}/java/classes.list
+   DEPENDS ${VTK_BINARY_DIR}/java/javac_stamp.txt ${JAVA_LIBRARIES}
+   OUTPUT ${VTK_JAR_PATH}/vtk.jar
+   COMMENT "Java Archive"
