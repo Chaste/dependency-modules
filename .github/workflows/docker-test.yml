@@ -16,12 +16,12 @@ jobs:
             build-args: |
               BASE=jammy
               XSD=4.0.0
-              XERCESC=3.2.2
-              SUNDIALS=3.1.2
-              BOOST=1.67.0
-              VTK=6.3.0
-              PETSC=3.12.4
-              HDF5=1.10.4
+              XERCESC=3.2.4
+              SUNDIALS=6.0.0
+              BOOST=1.78.0
+              VTK=9.2.0
+              PETSC=3.22.0
+              HDF5=1.12.2
 
     steps:
       - name: Checkout

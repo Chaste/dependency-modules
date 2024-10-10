@@ -148,7 +148,7 @@ if [[ (${petsc_major} -eq 3) && (${petsc_minor} -eq 12) ]]; then  # PETSc 3.12.x
 fi
 
 # Download and extract PETSc
-URL_PETSC=https://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-lite-${petsc_version}.tar.gz
+URL_PETSC=https://web.cels.anl.gov/projects/petsc/download/release-snapshots/petsc-lite-${petsc_version}.tar.gz
 wget -nc ${URL_PETSC}
 
 install_dir=${base_dir}/opt/petsc_hdf5/${petsc_version}_${hdf5_version}
