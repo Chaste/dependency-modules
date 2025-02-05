@@ -6,8 +6,6 @@ usage()
     exit 1
 }
 
-script_dir="$(cd "$(dirname "$0")"; pwd)"
-
 # Parse arguments
 version=
 base_dir=
@@ -76,11 +74,11 @@ fi
 version_arr=(${version//\./ })
 major=${version_arr[0]}
 minor=${version_arr[1]}
-ver_si_on=${version//\./_}  # Converts 1.69.0 to 1_69_0
+ver_si_on=${version//\./_}  # Converts 1.74.0 to 1_74_0
 
 # Unsupported versions: https://chaste.github.io/docs/installguides/dependency-versions/
-if [[ (${major} -lt 1) || ((${major} -eq 1) && (${minor} -lt 67)) ]]; then  # Boost < 1.67.x
-    echo "$(basename $0): Boost versions < 1.67 not supported"
+if [[ (${major} -lt 1) || ((${major} -eq 1) && (${minor} -lt 67)) ]]; then  # Boost < 1.74.x
+    echo "$(basename $0): Boost versions < 1.74 not supported"
     exit 1
 fi
 
@@ -92,34 +90,6 @@ wget -nc https://archives.boost.io/release/${version}/source/boost_${ver_si_on}.
 tar -xjf boost_${ver_si_on}.tar.bz2
 
 src_dir="$(pwd)/boost_${ver_si_on}"
-
-# Fix for Python 3.10+ in Boost <= 1.74.x
-# https://github.com/boostorg/python/commit/cbd2d9f033c61d29d0a1df14951f4ec91e7d05cd
-if [[ (${major} -eq 1) && (${minor} -le 74) ]]; then  # Boost <= 1.74.x
-    cd ${src_dir}/libs/python/src
-    sed -i.bak 's#_Py_fopen#fopen#g' exec.cpp
-fi
-
-# Patch for Python 3.7+ in Boost <= 1.66.x
-# https://github.com/boostorg/python/commit/660487c43fde76f3e64f1cb2e644500da92fe582
-if [[ (${major} -eq 1) && (${minor} -le 66) ]]; then  # Boost <= 1.66.x
-    cd ${src_dir}/libs/python
-    patch -t -p1 < ${script_dir}/patches/boost/1.66/boost_166-python37-unicode-as-string.patch
-fi
-
-# Patch for serialization in Boost <= 1.64.x
-# https://github.com/boostorg/serialization/commit/1d86261581230e2dc5d617a9b16287d326f3e229
-if [[ (${major} -eq 1) && (${minor} -le 64) ]]; then  # Boost <= 1.64.x
-    cd ${src_dir}
-    patch -t -p2 < ${script_dir}/patches/boost/1.64/boost_164-serialization-array-wrapper.patch
-fi
-
-# Patch for pthread in 1.69.x <= Boost <= 1.72.x
-# https://github.com/boostorg/thread/pull/297/commits/74fb0a26099bc51d717f5f154b37231ce7df3e98
-if [[ (${major} -eq 1) && (${minor} -ge 69) && (${minor} -le 72) ]]; then  # 1.69.x <= Boost <= 1.72.x
-    cd ${src_dir}
-    patch -t -p2 < ${script_dir}/patches/boost/1.69/boost_169-pthread.patch
-fi
 
 # Build and install
 install_dir=${base_dir}/opt/boost/${version}
