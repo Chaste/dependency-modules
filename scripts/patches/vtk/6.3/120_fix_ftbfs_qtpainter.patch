@@ -1,0 +1,33 @@
+Description: Fix compilation with new QT
+Author: Gianfranco Costamagna <locutusofborg@debian.org>
+Acked-By: Anton Gladky <gladk@debian.org>
+Bug-Debian: https://bugs.debian.org/975135
+Bug-Debian: https://bugs.debian.org/976424
+Last-Update: 2020-12-05
+
+Index: vtk6/Rendering/Qt/vtkQtLabelRenderStrategy.cxx
+===================================================================
+--- vtk6.orig/Rendering/Qt/vtkQtLabelRenderStrategy.cxx
++++ vtk6/Rendering/Qt/vtkQtLabelRenderStrategy.cxx
+@@ -13,7 +13,7 @@
+ 
+ =========================================================================*/
+ #include "vtkQtLabelRenderStrategy.h"
+-
++#include <QPainterPath>
+ #include "vtkCoordinate.h"
+ #include "vtkImageData.h"
+ #include "vtkLabeledDataMapper.h"
+Index: vtk6/Rendering/Qt/vtkQtStringToImage.cxx
+===================================================================
+--- vtk6.orig/Rendering/Qt/vtkQtStringToImage.cxx
++++ vtk6/Rendering/Qt/vtkQtStringToImage.cxx
+@@ -14,7 +14,7 @@
+ =========================================================================*/
+ 
+ #include "vtkQtStringToImage.h"
+-
++#include <QPainterPath>
+ #include "vtkQImageToImageSource.h"
+ #include "vtkStdString.h"
+ #include "vtkUnicodeString.h"

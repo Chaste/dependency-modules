@@ -1,0 +1,108 @@
+Author: Gert Wollny <gewo@debian.org>
+Description: Remove reverences to vtkHAVSVolumeMapper
+ The license of the related files is not clear. 
+
+--- a/Rendering/VolumeOpenGL/CMakeLists.txt
++++ b/Rendering/VolumeOpenGL/CMakeLists.txt
+@@ -1,7 +1,6 @@
+ include(vtkObjectFactory)
+ 
+ set(Module_SRCS
+-  vtkOpenGLHAVSVolumeMapper.cxx
+   vtkOpenGLProjectedAAHexahedraMapper.cxx
+   vtkOpenGLProjectedTetrahedraMapper.cxx
+   vtkOpenGLRayCastImageDisplayHelper.cxx
+@@ -45,13 +44,6 @@
+   vtkGPUVolumeRayCastMapper_FourComponentsFS.glsl
+   vtkGPUVolumeRayCastMapper_NoShadeFS.glsl
+   vtkGPUVolumeRayCastMapper_ShadeFS.glsl
+-  vtkHAVSVolumeMapper_kbufferVP.asm
+-  vtkHAVSVolumeMapper_k2FP.asm
+-  vtkHAVSVolumeMapper_k2BeginFP.asm
+-  vtkHAVSVolumeMapper_k2EndFP.asm
+-  vtkHAVSVolumeMapper_k6FP.asm
+-  vtkHAVSVolumeMapper_k6BeginFP.asm
+-  vtkHAVSVolumeMapper_k6EndFP.asm
+   vtkProjectedAAHexahedraMapper_VS.glsl
+   vtkProjectedAAHexahedraMapper_GS.glsl
+   vtkProjectedAAHexahedraMapper_FS.glsl
+@@ -83,7 +75,6 @@
+ 
+ # Nwo for the object factory.
+ set(opengl_overrides
+-  HAVSVolumeMapper
+   ProjectedAAHexahedraMapper
+   ProjectedTetrahedraMapper
+   RayCastImageDisplayHelper
+--- a/Examples/Infovis/Python/vtklibrary.xml
++++ b/Examples/Infovis/Python/vtklibrary.xml
+@@ -2382,10 +2382,6 @@
+   <node id="VolumeRendering">
+     <node id="vtkUnstructuredGridVolumeMapper">
+     </node>
+-    <node id="vtkHAVSVolumeMapper">
+-    </node>
+-    <node id="vtkOpenGLHAVSVolumeMapper">
+-    </node>
+     <node id="vtkProjectedTetrahedraMapper">
+     </node>
+     <node id="vtkOpenGLProjectedTetrahedraMapper">
+--- a/Examples/Infovis/Python/vtkclasses.xml
++++ b/Examples/Infovis/Python/vtkclasses.xml
+@@ -555,10 +555,6 @@
+             <class id="vtkAbstractMapper3D" library="Rendering">
+                <class id="vtkAbstractVolumeMapper" library="Rendering">
+                   <class id="vtkUnstructuredGridVolumeMapper" library="VolumeRendering">
+-                     <class id="vtkHAVSVolumeMapper" library="VolumeRendering">
+-                        <class id="vtkOpenGLHAVSVolumeMapper" library="VolumeRendering">
+-                        </class>
+-                     </class>
+                      <class id="vtkProjectedTetrahedraMapper" library="VolumeRendering">
+                         <class id="vtkOpenGLProjectedTetrahedraMapper" library="VolumeRendering">
+                         </class>
+--- a/Examples/GUI/Qt/GraphicsView/vtkclasses.xml
++++ b/Examples/GUI/Qt/GraphicsView/vtkclasses.xml
+@@ -555,10 +555,6 @@
+             <class id="vtkAbstractMapper3D" library="Rendering">
+                <class id="vtkAbstractVolumeMapper" library="Rendering">
+                   <class id="vtkUnstructuredGridVolumeMapper" library="VolumeRendering">
+-                     <class id="vtkHAVSVolumeMapper" library="VolumeRendering">
+-                        <class id="vtkOpenGLHAVSVolumeMapper" library="VolumeRendering">
+-                        </class>
+-                     </class>
+                      <class id="vtkProjectedTetrahedraMapper" library="VolumeRendering">
+                         <class id="vtkOpenGLProjectedTetrahedraMapper" library="VolumeRendering">
+                         </class>
+--- a/Examples/GUI/Qt/GraphicsView/vtklibrary.xml
++++ b/Examples/GUI/Qt/GraphicsView/vtklibrary.xml
+@@ -2382,10 +2382,6 @@
+   <node id="VolumeRendering">
+     <node id="vtkUnstructuredGridVolumeMapper">
+     </node>
+-    <node id="vtkHAVSVolumeMapper">
+-    </node>
+-    <node id="vtkOpenGLHAVSVolumeMapper">
+-    </node>
+     <node id="vtkProjectedTetrahedraMapper">
+     </node>
+     <node id="vtkOpenGLProjectedTetrahedraMapper">
+--- a/Rendering/Volume/CMakeLists.txt
++++ b/Rendering/Volume/CMakeLists.txt
+@@ -61,7 +61,6 @@
+ # only some volume mappers are supported for the OpenGL2 backend
+ if(NOT VTK_RENDERING_BACKEND STREQUAL "OpenGL2")
+   set(Module_SRCS ${Module_SRCS}
+-    vtkHAVSVolumeMapper.cxx
+     vtkProjectedAAHexahedraMapper.cxx
+     vtkVolumeTextureMapper2D.cxx
+     vtkVolumeTextureMapper3D.cxx
+--- a/Rendering/Volume/Testing/Cxx/CMakeLists.txt
++++ b/Rendering/Volume/Testing/Cxx/CMakeLists.txt
+@@ -38,7 +38,6 @@
+   PreIntegrationIncremental.cxx
+   PreIntegrationNonIncremental.cxx
+   TestGPURayCastCompositeShadeMask.cxx # This test depends on vtkOpenGLExtensionManager
+-  TestHAVSVolumeMapper.cxx
+   TestProjectedHexahedra.cxx
+   TestProp3DFollower.cxx
+   TestTM3DLightComponents.cxx

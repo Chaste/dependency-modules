@@ -104,21 +104,21 @@ fi
 # https://github.com/boostorg/python/commit/660487c43fde76f3e64f1cb2e644500da92fe582
 if [[ (${major} -eq 1) && (${minor} -le 66) ]]; then  # Boost <= 1.66.x
     cd ${src_dir}/libs/python
-    patch -t -p1 < ${script_dir}/patches/boost_166-python37-unicode-as-string.patch
+    patch -t -p1 < ${script_dir}/patches/boost/1.66/boost_166-python37-unicode-as-string.patch
 fi
 
 # Patch for serialization in Boost <= 1.64.x
 # https://github.com/boostorg/serialization/commit/1d86261581230e2dc5d617a9b16287d326f3e229
 if [[ (${major} -eq 1) && (${minor} -le 64) ]]; then  # Boost <= 1.64.x
     cd ${src_dir}
-    patch -t -p2 < ${script_dir}/patches/boost_164-serialization-array-wrapper.patch
+    patch -t -p2 < ${script_dir}/patches/boost/1.64/boost_164-serialization-array-wrapper.patch
 fi
 
 # Patch for pthread in 1.69.x <= Boost <= 1.72.x
 # https://github.com/boostorg/thread/pull/297/commits/74fb0a26099bc51d717f5f154b37231ce7df3e98
 if [[ (${major} -eq 1) && (${minor} -ge 69) && (${minor} -le 72) ]]; then  # 1.69.x <= Boost <= 1.72.x
     cd ${src_dir}
-    patch -t -p2 < ${script_dir}/patches/boost_169-pthread.patch
+    patch -t -p2 < ${script_dir}/patches/boost/1.69/boost_169-pthread.patch
 fi
 
 # Build and install
