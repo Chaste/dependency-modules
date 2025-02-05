@@ -42,8 +42,9 @@ apt-get install -y --no-install-recommends \
   libdouble-conversion-dev \
   libdouble-conversion1 \
   libeigen3-dev \
-  libexpat1-dev \
-  libexpat1 \
+  libfftw3-3 \
+  libfftw3-bin \
+  libfftw3-dev \
   libfmt-dev \
   libfontconfig1 \
   libfreetype6 \
