@@ -1,0 +1,33 @@
+Description: use system mpi4py
+Author: Anton Gladky <gladk@debian.org>
+Last-Update: 2015-03-24
+
+--- a/Parallel/MPI4Py/CMakeLists.txt
++++ b/Parallel/MPI4Py/CMakeLists.txt
+@@ -18,7 +18,7 @@ if(VTK_USE_SYSTEM_MPI4PY)
+     mark_as_advanced(MPI4PY_INCLUDE_DIR)
+   endif()
+ else()
+-  set(MPI4PY_INCLUDE_DIR "${vtkmpi4py_SOURCE_DIR}/vtkmpi4py/src/include")
++  set(MPI4PY_INCLUDE_DIR "/usr/include")
+ endif()
+ include_directories("${MPI4PY_INCLUDE_DIR}")
+ 
+--- a/Parallel/MPI4Py/module.cmake
++++ b/Parallel/MPI4Py/module.cmake
+@@ -5,7 +5,6 @@ if (VTK_WRAP_PYTHON)
+     DEPENDS
+       vtkParallelMPI
+     COMPILE_DEPENDS
+-      vtkmpi4py
+       vtkPython
+     OPTIONAL_PYTHON_LINK
+     EXCLUDE_FROM_TCL_WRAPPING
+@@ -18,4 +17,5 @@ if (VTK_WRAP_PYTHON)
+     PRIVATE_DEPENDS
+       vtkParallelMPI
+     )
+-endif ()
+\ No newline at end of file
++endif ()
++

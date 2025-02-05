@@ -34,7 +34,7 @@ if [ -z "${base_dir}" ]; then usage; fi
 
 parallel="${parallel:-$(nproc)}"
 
-# Modulefile for system version
+# Use Ubuntu system version
 if [ "$version" = "system" ]; then
     version=$(dpkg -s libsundials-dev | grep 'Version:' | cut -d' ' -f2 | cut -d. -f1,2,3 | cut -d+ -f1)
 
@@ -96,6 +96,7 @@ cmake \
     -DCMAKE_INSTALL_PREFIX=${install_dir} \
     -DBUILD_SHARED_LIBS=ON \
     -DCMAKE_BUILD_TYPE=Release \
+    -DENABLE_MPI=ON \
     -DEXAMPLES_ENABLE=OFF .. && \
 make -j ${parallel} && \
 make install

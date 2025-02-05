@@ -2,8 +2,8 @@
 
 usage()
 {
-    echo 'Usage: '"$(basename $0)"' --petsc-version=version --hdf5-version=version [--mpich-version=version]'
-    echo '        --petsc-arch={linux-gnu|linux-gnu-opt} --modules-dir=path [--parallel=value]'
+    echo 'Usage: '"$(basename $0)"' --petsc-version=version --petsc-arch={linux-gnu|linux-gnu-opt}'
+    echo '        --hdf5-version=version --modules-dir=path [--parallel=value]'
     exit 1
 }
 
@@ -11,7 +11,6 @@ usage()
 petsc_version=
 petsc_arch=
 hdf5_version=
-mpich_version=
 base_dir=
 parallel=
 
@@ -25,9 +24,6 @@ for option; do
             ;;
         --hdf5-version=*)
             hdf5_version=$(expr "x$option" : "x--hdf5-version=\(.*\)")
-            ;;
-        --mpich-version=*)
-            mpich_version=$(expr "x$option" : "x--mpich-version=\(.*\)")
             ;;
         --modules-dir=*)
             base_dir=$(expr "x$option" : "x--modules-dir=\(.*\)")
@@ -54,7 +50,7 @@ if [[ ! (${petsc_arch} = 'linux-gnu'
     usage
 fi
 
-# Modulefile for system version
+# Use Ubuntu system version
 if [[ ("$petsc_version" = "system") 
    || ("$hdf5_version" = "system") 
    || ("$petsc_arch" = "system") ]]; then
@@ -121,10 +117,7 @@ if [[ (${hdf5_major} -lt 1)
     exit 1
 fi
 
-# Preferred MPICH versions
-URL_MPICH_3_4=https://www.mpich.org/static/downloads/3.4a3/mpich-3.4a3.tar.gz
-
-# Retrieving packages to fix "url is not a tarball" errors
+# Retrieve packages to fix "url is not a tarball" errors
 mkdir -p ${base_dir}/src/petsc_hdf5
 cd ${base_dir}/src/petsc_hdf5
 
@@ -132,20 +125,6 @@ download_hdf5=1
 URL_HDF5=https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-${hdf5_major}.${hdf5_minor}/hdf5-${hdf5_version}/src/hdf5-${hdf5_version}.tar.gz
 wget -nc ${URL_HDF5}
 download_hdf5=$(pwd)/$(basename ${URL_HDF5})
-
-download_mpich=1
-if [ -n "${mpich_version}" ]; then
-    URL_MPICH=https://www.mpich.org/static/downloads/${mpich_version}/mpich-${mpich_version}.tar.gz
-    wget -nc ${URL_MPICH}
-    download_mpich=$(pwd)/$(basename ${URL_MPICH})
-fi
-
-if [[ (${petsc_major} -eq 3) && (${petsc_minor} -eq 12) ]]; then  # PETSc 3.12.x
-    if [ -z "${mpich_version}" ]; then
-        wget -nc ${URL_MPICH_3_4}
-        download_mpich=$(pwd)/$(basename ${URL_MPICH_3_4})
-    fi
-fi
 
 # Download and extract PETSc
 URL_PETSC=https://web.cels.anl.gov/projects/petsc/download/release-snapshots/petsc-lite-${petsc_version}.tar.gz
@@ -172,41 +151,39 @@ case ${petsc_arch} in
     linux-gnu)
         export PETSC_ARCH=linux-gnu
         python3 ./configure \
-            --with-make-np=${parallel} \
-            --with-cc=gcc \
-            --with-cxx=g++ \
-            --with-fc=0 \
             --COPTFLAGS=-Og \
             --CXXOPTFLAGS=-Og \
-            --with-x=false \
-            --with-ssl=false \
             --download-f2cblaslapack=1 \
-            --download-mpich=${download_mpich} \
             --download-hdf5=${download_hdf5} \
-            --download-parmetis=1 \
-            --download-metis=1 \
             --download-hypre=1 \
-            --with-shared-libraries && \
+            --download-metis=1 \
+            --download-mpich=1 \
+            --download-parmetis=1 \
+            --with-cc=gcc \
+            --with-cxx=g++ \
+            --with-debugging=1 \
+            --with-fc=0 \
+            --with-shared-libraries \
+            --with-ssl=false \
+            --with-x=false && \
         make -j ${parallel} all
         ;;
 
     linux-gnu-opt)
         export PETSC_ARCH=linux-gnu-opt
         python3 ./configure \
-            --with-make-np=${parallel} \
+            --download-f2cblaslapack=1 \
+            --download-hdf5=${download_hdf5} \
+            --download-hypre=1 \
+            --download-metis=1 \
+            --download-mpich=1 \
+            --download-parmetis=1 \
             --with-cc=gcc \
             --with-cxx=g++ \
             --with-fc=0 \
-            --with-x=false \
-            --with-ssl=false \
-            --download-f2cblaslapack=1 \
-            --download-mpich=${download_mpich} \
-            --download-hdf5=${download_hdf5} \
-            --download-parmetis=1 \
-            --download-metis=1 \
-            --download-hypre=1 \
             --with-shared-libraries \
-            --with-debugging=0 && \
+            --with-ssl=false \
+            --with-x=false && \
         make -j ${parallel} all
         ;;
     *)

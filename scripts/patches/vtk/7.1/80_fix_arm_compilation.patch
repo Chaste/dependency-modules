@@ -1,0 +1,25 @@
+Description: Drop some examples, which require Qt
+ It is necessary for the fixing of arm-compilation
+ where Qt is not available
+Author: Anton Gladky <gladk@debian.org>
+Bug-Debian: https://bugs.debian.org/793304
+Last-Update: 2015-07-29
+
+--- a/Examples/Infovis/Cxx/CMakeLists.txt
++++ b/Examples/Infovis/Cxx/CMakeLists.txt
+@@ -48,15 +48,6 @@
+   target_link_LIBRARIES(MultiView ${VTK_LIBRARIES})
+ endif()
+ 
+-# If Qt is enabled include the QT based examples
+-if(vtkGUISupportQt_LOADED AND vtkViewsQt_LOADED)
+-  add_subdirectory(EasyView)
+-  add_subdirectory(CustomLinkView)
+-  if(vtkIOSQL_LOADED)
+-    add_subdirectory(StatsView)
+-  endif()
+-endif()
+-
+ if(vtkInfovisParallel_LOADED)
+   add_executable(ParallelBFS ParallelBFS.cxx)
+   find_package(MPI REQUIRED)
