@@ -5,7 +5,7 @@ on:
 
 jobs:
   setup:
-    name: build all modules and compile chaste build info
+    name: build all dependencies
 
     strategy:
       fail-fast: false
