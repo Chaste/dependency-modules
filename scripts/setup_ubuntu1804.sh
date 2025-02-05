@@ -24,8 +24,6 @@ apt-get install -y --no-install-recommends \
   doxygen \
   git \
   lcov \
-  libmpich12 \
-  libmpich-dev \
   python3 \
   python3-dev \
   python3-pip \

@@ -96,6 +96,7 @@ cmake \
     -DCMAKE_INSTALL_PREFIX=${install_dir} \
     -DBUILD_SHARED_LIBS=ON \
     -DCMAKE_BUILD_TYPE=Release \
+    -DENABLE_MPI=ON \
     -DEXAMPLES_ENABLE=OFF .. && \
 make -j ${parallel} && \
 make install
