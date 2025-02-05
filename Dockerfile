@@ -40,30 +40,23 @@ RUN source /etc/profile.d/modules.sh && \
     mkdir -p ${MODULES_DIR}/modulefiles && \
     module use ${MODULES_DIR}/modulefiles && \
     echo "module use ${MODULES_DIR}/modulefiles" >> ${DEFAULT_HOME}/.bashrc && \
-    install_xsd.sh \
-        --version=${XSD} \
-        --modules-dir=${MODULES_DIR} && \
-    module test xsd && \
-    install_xercesc.sh \
-        --version=${XERCESC} \
-        --parallel=$(nproc) \
-        --modules-dir=${MODULES_DIR} && \
-    module test xercesc && \
-    install_sundials.sh \
-        --version=${SUNDIALS} \
-        --parallel=$(nproc) \
-        --modules-dir=${MODULES_DIR} && \
-    module test sundials && \
     install_boost.sh \
         --version=${BOOST} \
         --parallel=$(nproc) \
         --modules-dir=${MODULES_DIR} && \
     module test boost && \
-    install_vtk.sh \
-        --version=${VTK} \
+    module load boost && \
+    install_xsd.sh \
+        --version=${XSD} \
+        --modules-dir=${MODULES_DIR} && \
+    module test xsd && \
+    module load xsd && \
+    install_xercesc.sh \
+        --version=${XERCESC} \
         --parallel=$(nproc) \
         --modules-dir=${MODULES_DIR} && \
-    module test vtk && \
+    module test xercesc && \
+    module load xercesc && \
     install_petsc_hdf5.sh \
         --petsc-version=${PETSC} \
         --petsc-arch=linux-gnu \
@@ -71,6 +64,19 @@ RUN source /etc/profile.d/modules.sh && \
         --parallel=$(nproc) \
         --modules-dir=${MODULES_DIR} && \
     module test petsc_hdf5 && \
+    module load petsc_hdf5 && \
+    install_sundials.sh \
+        --version=${SUNDIALS} \
+        --parallel=$(nproc) \
+        --modules-dir=${MODULES_DIR} && \
+    module test sundials && \
+    module load sundials && \
+    install_vtk.sh \
+        --version=${VTK} \
+        --parallel=$(nproc) \
+        --modules-dir=${MODULES_DIR} && \
+    module test vtk && \
+    module load vtk && \
     rm -rf ${MODULES_DIR}/src/* && \
     rm -rf /tmp/*
 
