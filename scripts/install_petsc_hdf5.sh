@@ -117,10 +117,7 @@ if [[ (${hdf5_major} -lt 1)
     exit 1
 fi
 
-# Preferred MPICH versions
-URL_MPICH_3_4=https://www.mpich.org/static/downloads/3.4a3/mpich-3.4a3.tar.gz
-
-# Retrieving packages to fix "url is not a tarball" errors
+# Retrieve packages to fix "url is not a tarball" errors
 mkdir -p ${base_dir}/src/petsc_hdf5
 cd ${base_dir}/src/petsc_hdf5
 
@@ -128,20 +125,6 @@ download_hdf5=1
 URL_HDF5=https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-${hdf5_major}.${hdf5_minor}/hdf5-${hdf5_version}/src/hdf5-${hdf5_version}.tar.gz
 wget -nc ${URL_HDF5}
 download_hdf5=$(pwd)/$(basename ${URL_HDF5})
-
-download_mpich=1
-if [ -n "${mpich_version}" ]; then
-    URL_MPICH=https://www.mpich.org/static/downloads/${mpich_version}/mpich-${mpich_version}.tar.gz
-    wget -nc ${URL_MPICH}
-    download_mpich=$(pwd)/$(basename ${URL_MPICH})
-fi
-
-if [[ (${petsc_major} -eq 3) && (${petsc_minor} -eq 12) ]]; then  # PETSc 3.12.x
-    if [ -z "${mpich_version}" ]; then
-        wget -nc ${URL_MPICH_3_4}
-        download_mpich=$(pwd)/$(basename ${URL_MPICH_3_4})
-    fi
-fi
 
 # Download and extract PETSc
 URL_PETSC=https://web.cels.anl.gov/projects/petsc/download/release-snapshots/petsc-lite-${petsc_version}.tar.gz
@@ -207,11 +190,10 @@ case ${petsc_arch} in
             --with-x=false \
             --download-f2cblaslapack=1 \
             --download-hdf5=${download_hdf5} \
-            --download-hypre=${download_hypre} \
+            --download-hypre=1 \
             --download-metis=1 \
             --download-parmetis=1 \
-            --with-make-np=${parallel} && \
-        make all
+        make -j ${parallel} all
         ;;
     *)
         ;;

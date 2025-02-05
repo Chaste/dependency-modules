@@ -19,40 +19,40 @@ module use ${modules_dir}/modulefiles
 echo "module use ${modules_dir}/modulefiles" >> ${HOME}/.bashrc
 
 # Set number of parallel processes
-ncpu=$(( $(nproc) < 8 ? $(nproc) : 8 ))
+parallel=$(( $(nproc) < 8 ? $(nproc) : 8 ))
 
 # Get install scripts
 git clone https://github.com/Chaste/dependency-modules.git /tmp/dependency-modules
 cd /tmp/dependency-modules/scripts
 
 # Install specific dependency versions
-./install_cmake.sh --version=3.24.1 --modules-dir=${modules_dir} --parallel=${ncpu}
-module test cmake/3.24.1
-module load cmake/3.24.1
+./install_cmake.sh --version=3.28.6 --modules-dir=${modules_dir} --parallel=${parallel}
+module test cmake/3.28.6
+module load cmake/3.28.6
 
 ./install_xsd.sh --version=4.0.0 --modules-dir=${modules_dir}
 module test xsd/4.0.0
 
-./install_xercesc.sh --version=3.2.3 --modules-dir=${modules_dir} --parallel=${ncpu}
-module test xercesc/3.2.3
+./install_xercesc.sh --version=3.2.4 --modules-dir=${modules_dir} --parallel=${parallel}
+module test xercesc/3.2.4
 
-./install_sundials.sh --version=5.8.0 --modules-dir=${modules_dir} --parallel=${ncpu}
-module test sundials/5.8.0
+./install_sundials.sh --version=6.4.0 --modules-dir=${modules_dir} --parallel=${parallel}
+module test sundials/6.4.0
 
-./install_boost.sh --version=1.74.0 --modules-dir=${modules_dir} --parallel=${ncpu}
-module test boost/1.74.0
+./install_boost.sh --version=1.83.0 --modules-dir=${modules_dir} --parallel=${parallel}
+module test boost/1.83.0
 
-./install_vtk.sh --version=9.1.0 --modules-dir=${modules_dir} --parallel=${ncpu}
-module test vtk/9.1.0
+./install_vtk.sh --version=9.3.1 --modules-dir=${modules_dir} --parallel=${parallel}
+module test vtk/9.3.1
 
 ./install_petsc_hdf5.sh \
-    --petsc-version=3.11.3 \
-    --hdf5-version=1.10.5 \
+    --petsc-version=3.19.6 \
+    --hdf5-version=1.10.10 \
     --petsc-arch=linux-gnu \
     --modules-dir=${modules_dir} \
-    --parallel=${ncpu}
+    --parallel=${parallel}
 
-module test petsc_hdf5/3.11.3_1.10.5/linux-gnu
+module test petsc_hdf5/3.19.0_1.10.10/linux-gnu
 
 # Cleanup
 cd -
