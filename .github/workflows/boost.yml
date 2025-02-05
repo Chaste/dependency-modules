@@ -4,29 +4,31 @@ on:
   workflow_dispatch:
     inputs:
       boost_ver:
-        description: 'Boost version'
+        description: "Boost version"
         required: true
         type: string
-        default: '1.74.0'
+        default: "1.83.0"
 
       os:
-        description: 'OS'
+        description: "OS"
         required: true
         type: choice
         options:
-          - 'ubuntu-20.04'
-          - 'ubuntu-22.04'
-        default: 'ubuntu-22.04'
+          - "ubuntu:22.04"
+          - "ubuntu:24.04"
+        default: "ubuntu:24.04"
 
 jobs:
   setup:
     name: build and cache boost
-    
-    runs-on: ${{ github.event.inputs.os }}
+
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ github.event.inputs.os }}
 
     steps:
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: setup os
         uses: ./.github/actions/setup-defaults

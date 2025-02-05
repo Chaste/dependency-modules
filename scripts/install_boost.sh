@@ -36,14 +36,51 @@ if [ -z "${base_dir}" ]; then usage; fi
 
 parallel="${parallel:-$(nproc)}"
 
+# Modulefile for system version
+if [ "$version" = "system" ]; then
+    version=$(dpkg -s libboost-dev | grep 'Version:' | cut -d' ' -f2 | cut -d. -f1,2,3)
+
+    mkdir -p ${base_dir}/modulefiles/boost && cd  ${base_dir}/modulefiles/boost
+    cat <<EOF > ${version}
+#%Module1.0#####################################################################
+###
+## boost ${version} modulefile
+##
+proc ModulesTest { } {
+    set paths "/usr/include/boost
+               /usr/lib/x86_64-linux-gnu/libboost_serialization.so"
+
+    foreach path \$paths {
+        if { ![file exists \$path] } {
+            puts stderr "ERROR: Does not exist: \$path"
+            return 0
+        }
+    }
+    return 1
+}
+
+proc ModulesHelp { } {
+    puts stderr "\tThis adds the environment variables for boost ${version}\n"
+}
+
+module-whatis "This adds the environment variables for boost ${version}"
+
+setenv          Boost_NO_BOOST_CMAKE     OFF
+setenv          Boost_NO_SYSTEM_PATHS    OFF
+
+conflict boost
+EOF
+    exit 0
+fi
+
 version_arr=(${version//\./ })
 major=${version_arr[0]}
 minor=${version_arr[1]}
 ver_si_on=${version//\./_}  # Converts 1.69.0 to 1_69_0
 
-# Unsupported versions: https://github.com/Chaste/dependency-modules/wiki
-if [[ (${major} -lt 1) || ((${major} -eq 1) && (${minor} -lt 62)) ]]; then  # Boost < 1.62.x
-    echo "$(basename $0): Boost versions < 1.62 not supported"
+# Unsupported versions: https://chaste.github.io/docs/installguides/dependency-versions/
+if [[ (${major} -lt 1) || ((${major} -eq 1) && (${minor} -lt 67)) ]]; then  # Boost < 1.67.x
+    echo "$(basename $0): Boost versions < 1.67 not supported"
     exit 1
 fi
 
@@ -51,12 +88,7 @@ fi
 mkdir -p ${base_dir}/src/boost
 cd ${base_dir}/src/boost
 
-if [[ (${major} -eq 1) && (${minor} -eq 62) ]]; then  # Boost == 1.62.x
-    wget -nc https://downloads.sourceforge.net/project/boost/boost/${version}/boost_${ver_si_on}.tar.bz2
-
-else  # Boost > 1.62.x
-    wget -nc https://boostorg.jfrog.io/artifactory/main/release/${version}/source/boost_${ver_si_on}.tar.bz2
-fi
+wget -nc https://archives.boost.io/release/${version}/source/boost_${ver_si_on}.tar.bz2
 tar -xjf boost_${ver_si_on}.tar.bz2
 
 src_dir="$(pwd)/boost_${ver_si_on}"
@@ -72,21 +104,21 @@ fi
 # https://github.com/boostorg/python/commit/660487c43fde76f3e64f1cb2e644500da92fe582
 if [[ (${major} -eq 1) && (${minor} -le 66) ]]; then  # Boost <= 1.66.x
     cd ${src_dir}/libs/python
-    patch -t -p1 < ${script_dir}/patches/boost_166-python37-unicode-as-string.patch
+    patch -t -p1 < ${script_dir}/patches/boost/1.66/boost_166-python37-unicode-as-string.patch
 fi
 
 # Patch for serialization in Boost <= 1.64.x
 # https://github.com/boostorg/serialization/commit/1d86261581230e2dc5d617a9b16287d326f3e229
 if [[ (${major} -eq 1) && (${minor} -le 64) ]]; then  # Boost <= 1.64.x
     cd ${src_dir}
-    patch -t -p2 < ${script_dir}/patches/boost_164-serialization-array-wrapper.patch
+    patch -t -p2 < ${script_dir}/patches/boost/1.64/boost_164-serialization-array-wrapper.patch
 fi
 
 # Patch for pthread in 1.69.x <= Boost <= 1.72.x
 # https://github.com/boostorg/thread/pull/297/commits/74fb0a26099bc51d717f5f154b37231ce7df3e98
 if [[ (${major} -eq 1) && (${minor} -ge 69) && (${minor} -le 72) ]]; then  # 1.69.x <= Boost <= 1.72.x
     cd ${src_dir}
-    patch -t -p2 < ${script_dir}/patches/boost_169-pthread.patch
+    patch -t -p2 < ${script_dir}/patches/boost/1.69/boost_169-pthread.patch
 fi
 
 # Build and install
@@ -136,6 +168,9 @@ prepend-path    C_INCLUDE_PATH       ${install_dir}/include
 prepend-path    CPLUS_INCLUDE_PATH   ${install_dir}/include
 
 prepend-path    CMAKE_PREFIX_PATH    ${install_dir}
+
+setenv          Boost_NO_BOOST_CMAKE     ON
+setenv          Boost_NO_SYSTEM_PATHS    ON
 
 conflict boost
 EOF

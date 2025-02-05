@@ -45,8 +45,53 @@ if [ -z "${base_dir}" ]; then usage; fi
 parallel="${parallel:-$(nproc)}"
 
 if [[ ! (${petsc_arch} = 'linux-gnu' 
-      || ${petsc_arch} = 'linux-gnu-opt') ]]; then
+      || ${petsc_arch} = 'linux-gnu-opt'
+      || ${petsc_arch} = 'system') ]]; then
     usage
+fi
+
+# Modulefile for system version
+if [[ ("$petsc_version" = "system") 
+   || ("$hdf5_version" = "system") 
+   || ("$petsc_arch" = "system") ]]; then
+    petsc_version=$(dpkg -s libpetsc-real-dev | grep 'Version:' | cut -d' ' -f2 | cut -d. -f1,2,3 | cut -d+ -f1)
+    hdf5_version=$(dpkg -s libhdf5-openmpi-dev | grep 'Version:' | cut -d' ' -f2 | cut -d. -f1,2,3 | cut -d+ -f1)
+
+    mkdir -p ${base_dir}/modulefiles/petsc_hdf5/${petsc_version}_${hdf5_version}
+    cd  ${base_dir}/modulefiles/petsc_hdf5/${petsc_version}_${hdf5_version}
+    cat <<EOF > linux-gnu
+#%Module1.0#####################################################################
+###
+## petsc_hdf5 ${petsc_version}_${hdf5_version}/${petsc_arch} modulefile
+##
+proc ModulesTest { } {
+    set paths "/usr/bin/h5pcc
+               /usr/include/hdf5
+               /usr/lib/x86_64-linux-gnu/hdf5
+               /usr/include/petsc
+               /usr/lib/x86_64-linux-gnu/libpetsc.so
+               /usr/lib/libparmetis.so"
+
+    foreach path \$paths {
+        if { ![file exists \$path] } {
+            puts stderr "ERROR: Does not exist: \$path"
+            return 0
+        }
+    }
+    return 1
+}
+
+proc ModulesHelp { } {
+    puts stderr "\tThis adds the environment variables for petsc ${petsc_version} and hdf5 ${hdf5_version}, with PETSC_ARCH=${petsc_arch}\n"
+}
+
+module-whatis "This adds the environment variables for petsc ${petsc_version} and hdf5 ${hdf5_version}, with PETSC_ARCH=${petsc_arch}"
+
+conflict petsc
+conflict hdf5
+conflict petsc_hdf5
+EOF
+    exit 0
 fi
 
 petsc_version_arr=(${petsc_version//\./ })
@@ -56,23 +101,24 @@ petsc_minor=${petsc_version_arr[1]}
 hdf5_version_arr=(${hdf5_version//\./ })
 hdf5_major=${hdf5_version_arr[0]}
 hdf5_minor=${hdf5_version_arr[1]}
+hdf5_patch=${hdf5_version_arr[2]}
 
-# Unsupported versions: https://github.com/Chaste/dependency-modules/wiki
-if [[ (${petsc_major} -lt 3) || ((${petsc_major} -eq 3) && (${petsc_minor} -lt 7)) ]]; then  # PETSc < 3.7.x
-    echo "$(basename $0): PETSc versions < 3.7 not supported"
+# Unsupported versions: https://chaste.github.io/docs/installguides/dependency-versions/
+if [[ (${petsc_major} -lt 3) 
+  || ((${petsc_major} -eq 3) && (${petsc_minor} -lt 12)) ]]; then  # PETSc < 3.12.x
+    echo "$(basename $0): PETSc versions < 3.12 not supported"
     exit 1
 fi
 
-if [[ (${hdf5_major} -lt 1) || ((${hdf5_major} -eq 1) && (${hdf5_minor} -lt 10)) ]]; then  # HDF5 < 1.10.x
-    echo "$(basename $0): HDF5 versions < 1.10 not supported"
+if [[ (${hdf5_major} -lt 1) 
+  || ((${hdf5_major} -eq 1) && (${hdf5_minor} -lt 10))
+  || ((${hdf5_major} -eq 1) && (${hdf5_minor} -eq 10) && (${hdf5_patch} -lt 4)) ]]; then  # HDF5 < 1.10.4
+    echo "$(basename $0): HDF5 versions < 1.10.4 not supported"
     exit 1
 fi
 
-# Fixes for broken Hypre links in some PETSc versions
-URL_HYPRE_2_11=https://github.com/hypre-space/hypre/archive/refs/tags/v2.11.1.tar.gz
-URL_HYPRE_2_12=https://github.com/hypre-space/hypre/archive/refs/tags/v2.12.0.tar.gz
-URL_HYPRE_2_14=https://github.com/hypre-space/hypre/archive/refs/tags/v2.14.0.tar.gz
-URL_HYPRE_2_15=https://github.com/hypre-space/hypre/archive/refs/tags/v2.15.1.tar.gz
+# Preferred MPICH versions
+URL_MPICH_3_4=https://www.mpich.org/static/downloads/3.4a3/mpich-3.4a3.tar.gz
 
 # Retrieving packages to fix "url is not a tarball" errors
 mkdir -p ${base_dir}/src/petsc_hdf5
@@ -83,30 +129,22 @@ URL_HDF5=https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-${hdf5_major}.${hdf
 wget -nc ${URL_HDF5}
 download_hdf5=$(pwd)/$(basename ${URL_HDF5})
 
-download_hypre=1
-if [[ (${petsc_major} -eq 3) && (${petsc_minor} -eq 7) ]]; then  # PETSc 3.7.x
-    wget -nc ${URL_HYPRE_2_11}  # Fixes broken hypre link in this version
-    download_hypre=$(pwd)/$(basename ${URL_HYPRE_2_11})
+download_mpich=1
+if [ -n "${mpich_version}" ]; then
+    URL_MPICH=https://www.mpich.org/static/downloads/${mpich_version}/mpich-${mpich_version}.tar.gz
+    wget -nc ${URL_MPICH}
+    download_mpich=$(pwd)/$(basename ${URL_MPICH})
+fi
 
-elif [[ (${petsc_major} -eq 3) && (${petsc_minor} -eq 8) ]]; then  # PETSc 3.8.x
-    wget -nc ${URL_HYPRE_2_12}  # Fixes broken hypre link in this version
-    download_hypre=$(pwd)/$(basename ${URL_HYPRE_2_12})
-
-elif [[ (${petsc_major} -eq 3) && (${petsc_minor} -eq 9) ]]; then  # PETSc 3.9.x
-    wget -nc ${URL_HYPRE_2_14}  # Fixes broken hypre link in this version
-    download_hypre=$(pwd)/$(basename ${URL_HYPRE_2_14})
-
-elif [[ (${petsc_major} -eq 3) && (${petsc_minor} -eq 10) ]]; then  # PETSc 3.10.x
-    wget -nc ${URL_HYPRE_2_14}  # Fixes broken hypre link in this version
-    download_hypre=$(pwd)/$(basename ${URL_HYPRE_2_14})
-    
-elif [[ (${petsc_major} -eq 3) && (${petsc_minor} -eq 11) ]]; then  # PETSc 3.11.x
-    wget -nc ${URL_HYPRE_2_15}  # Fixes broken hypre link in this version
-    download_hypre=$(pwd)/$(basename ${URL_HYPRE_2_15})
+if [[ (${petsc_major} -eq 3) && (${petsc_minor} -eq 12) ]]; then  # PETSc 3.12.x
+    if [ -z "${mpich_version}" ]; then
+        wget -nc ${URL_MPICH_3_4}
+        download_mpich=$(pwd)/$(basename ${URL_MPICH_3_4})
+    fi
 fi
 
 # Download and extract PETSc
-URL_PETSC=https://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-lite-${petsc_version}.tar.gz
+URL_PETSC=https://web.cels.anl.gov/projects/petsc/download/release-snapshots/petsc-lite-${petsc_version}.tar.gz
 wget -nc ${URL_PETSC}
 
 install_dir=${base_dir}/opt/petsc_hdf5/${petsc_version}_${hdf5_version}
@@ -121,12 +159,6 @@ if [[ (${petsc_major} -eq 3) && ((${petsc_minor} -eq 12) || (${petsc_minor} -eq 
     sed -i.bak 's/thread.isAlive()/thread.is_alive()/g' config/BuildSystem/script.py
 fi
 
-# Set Python version
-PYTHON=python3
-if [[ (${petsc_major} -lt 3) || ((${petsc_major} -eq 3) && (${petsc_minor} -lt 11)) ]]; then  # PETSc < 3.11.x
-    PYTHON=python2
-fi
-
 # Build and install
 cd ${install_dir}
 export PETSC_DIR=$(pwd)
@@ -135,10 +167,10 @@ case ${petsc_arch} in
 
     linux-gnu)
         export PETSC_ARCH=linux-gnu
-        ${PYTHON} ./configure \
-            --with-mpi=1 \
-            --with-cc=mpicc \
-            --with-cxx=mpicxx \
+        python3 ./configure \
+            --with-make-np=${parallel} \
+            --with-cc=gcc \
+            --with-cxx=g++ \
             --with-fc=0 \
             --with-debugging=1 \
             --COPTFLAGS=-Og \
@@ -148,21 +180,28 @@ case ${petsc_arch} in
             --with-x=false \
             --download-f2cblaslapack=1 \
             --download-hdf5=${download_hdf5} \
-            --download-hypre=${download_hypre} \
-            --download-metis=1 \
             --download-parmetis=1 \
-            --with-make-np=${parallel} && \
-        make all
+            --download-metis=1 \
+            --download-hypre=1 \
+            --with-shared-libraries && \
+        make -j ${parallel} all
         ;;
 
     linux-gnu-opt)
         export PETSC_ARCH=linux-gnu-opt
-        ${PYTHON} ./configure \
-            --with-mpi=1 \
-            --with-cc=mpicc \
-            --with-cxx=mpicxx \
+        python3 ./configure \
+            --with-make-np=${parallel} \
+            --with-cc=gcc \
+            --with-cxx=g++ \
             --with-fc=0 \
-            --with-debugging=0 \
+            --with-x=false \
+            --with-ssl=false \
+            --download-f2cblaslapack=1 \
+            --download-mpich=${download_mpich} \
+            --download-hdf5=${download_hdf5} \
+            --download-parmetis=1 \
+            --download-metis=1 \
+            --download-hypre=1 \
             --with-shared-libraries \
             --with-ssl=false \
             --with-x=false \

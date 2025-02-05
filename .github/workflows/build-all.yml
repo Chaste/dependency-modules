@@ -1,0 +1,123 @@
+name: build-all
+
+on:
+  workflow_dispatch:
+
+jobs:
+  setup:
+    name: build all modules and compile chaste build info
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu:24.04
+            xsd_ver: 4.0.0
+            xercesc_ver: 3.2.4
+            sundials_ver: 6.4.1
+            boost_ver: 1.83.0
+            vtk_ver: 9.1.0
+            petsc_ver: 3.19.2
+            hdf5_ver: 1.10.10
+            petsc_arch: linux-gnu
+
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ matrix.os }}
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - id: set-env
+        uses: ./.github/actions/set-env
+
+      - name: setup defaults
+        uses: ./.github/actions/setup-defaults
+
+      - name: install and cache xsd module
+        uses: ./.github/actions/setup-xsd
+        with:
+          xsd_ver: ${{ matrix.xsd_ver }}
+
+      - name: build and cache xercesc module
+        uses: ./.github/actions/setup-xercesc
+        with:
+          xercesc_ver: ${{ matrix.xercesc_ver }}
+
+      - name: build and cache sundials module
+        uses: ./.github/actions/setup-sundials
+        with:
+          sundials_ver: ${{ matrix.sundials_ver }}
+
+      - name: build and cache boost module
+        uses: ./.github/actions/setup-boost
+        with:
+          boost_ver: ${{ matrix.boost_ver }}
+
+      - name: build and cache vtk module
+        uses: ./.github/actions/setup-vtk
+        with:
+          vtk_ver: ${{ matrix.vtk_ver }}
+
+      - name: build and cache petsc_hdf5 module
+        uses: ./.github/actions/setup-petsc_hdf5
+        with:
+          petsc_ver: ${{ matrix.petsc_ver }}
+          hdf5_ver: ${{ matrix.hdf5_ver }}
+          petsc_arch: ${{ matrix.petsc_arch }}
+
+      - name: checkout chaste
+        uses: actions/checkout@v4
+        with:
+          repository: Chaste/Chaste
+          path: Chaste
+          submodules: recursive
+
+      - name: make build and test directories
+        run: |
+          mkdir -p Chaste/build
+          mkdir -p chaste-test-dir
+          echo "CHASTE_TEST_OUTPUT=$(pwd)/chaste-test-dir" >> ${GITHUB_ENV}
+
+      - name: compile chaste build info
+        run: |
+          module purge
+          module use ${{ steps.set-env.outputs.modules_dir }}/modulefiles
+          module load xsd/${{ matrix.xsd_ver }}
+          module load xercesc/${{ matrix.xercesc_ver }}
+          module load sundials/${{ matrix.sundials_ver }}
+          module load boost/${{ matrix.boost_ver }}
+          module load vtk/${{ matrix.vtk_ver }}
+          module load petsc_hdf5/${{ matrix.petsc_ver }}_${{ matrix.hdf5_ver }}/${{ matrix.petsc_arch }}
+
+          cmake -DCMAKE_BUILD_TYPE=Release ..
+          cmake --build . --parallel $(nproc) --target TestChasteBuildInfo
+          ctest -V -R TestChasteBuildInfo --output-on-failure | tee buildinfo
+        working-directory: Chaste/build
+        shell: bash --login -e -o pipefail {0} # login to source /etc/profile.d/modules.sh
+
+      - name: verify dependency versions
+        run: |
+          sed -i.bak 's/"//g' buildinfo  # removes quotes from old sundials versions
+
+          maj_min_rev='^[0-9]\+\.[0-9]\+\.[0-9]\+'
+          maj_min='^[0-9]\+\.[0-9]\+'
+
+          xsd_ver="$(echo ${{ matrix.xsd_ver }} | grep -o ${maj_min_rev})"
+          xercesc_ver="$(echo ${{ matrix.xercesc_ver }} | grep -o ${maj_min_rev})"
+          sundials_ver="$(echo ${{ matrix.sundials_ver }} | grep -o ${maj_min_rev})"
+          boost_ver="$(echo ${{ matrix.boost_ver }} | grep -o ${maj_min_rev})"
+          vtk_ver="$(echo ${{ matrix.vtk_ver }} | grep -o ${maj_min})"
+          petsc_ver="$(echo ${{ matrix.petsc_ver }} | grep -o ${maj_min_rev})"
+          hdf5_ver="$(echo ${{ matrix.hdf5_ver }} | grep -o ${maj_min_rev})"
+
+          grep "<XSD>${xsd_ver}</XSD>" buildinfo
+          grep "<Xerces>${xercesc_ver}</Xerces>" buildinfo
+          grep "<SUNDIALS>${sundials_ver}</SUNDIALS>" buildinfo
+          grep "<Boost>${boost_ver}</Boost>" buildinfo
+          grep "<VTK>${vtk_ver}</VTK>" buildinfo
+          grep "<PETSc>${petsc_ver}</PETSc>" buildinfo
+          grep "<HDF5>${hdf5_ver}</HDF5>" buildinfo
+        working-directory: Chaste/build
+        shell: bash

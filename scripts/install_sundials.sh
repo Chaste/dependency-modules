@@ -34,13 +34,48 @@ if [ -z "${base_dir}" ]; then usage; fi
 
 parallel="${parallel:-$(nproc)}"
 
+# Modulefile for system version
+if [ "$version" = "system" ]; then
+    version=$(dpkg -s libsundials-dev | grep 'Version:' | cut -d' ' -f2 | cut -d. -f1,2,3 | cut -d+ -f1)
+
+    mkdir -p ${base_dir}/modulefiles/sundials && cd  ${base_dir}/modulefiles/sundials
+    cat <<EOF > ${version}
+#%Module1.0#####################################################################
+###
+## sundials ${version} modulefile
+##
+proc ModulesTest { } {
+    set paths "/usr/include/sundials
+               /usr/lib/x86_64-linux-gnu/libsundials_cvode.so"
+
+    foreach path \$paths {
+        if { ![file exists \$path] } {
+            puts stderr "ERROR: Does not exist: \$path"
+            return 0
+        }
+    }
+    return 1
+}
+
+proc ModulesHelp { } {
+    puts stderr "\tThis adds the environment variables for sundials ${version}\n"
+}
+
+module-whatis "This adds the environment variables for sundials ${version}"
+
+conflict sundials
+EOF
+    exit 0
+fi
+
 version_arr=(${version//\./ })
 major=${version_arr[0]}
 minor=${version_arr[1]}
 
-# Unsupported versions: https://github.com/Chaste/dependency-modules/wiki
-if [[ (${major} -lt 2) || ((${major} -eq 2) && (${minor} -lt 7)) ]]; then  # Sundials < 2.7.x
-    echo "$(basename $0): Sundials versions < 2.7 not supported"
+# Unsupported versions: https://chaste.github.io/docs/installguides/dependency-versions/
+if [[ (${major} -lt 3) 
+  || ((${major} -eq 3) && (${minor} -lt 1)) ]]; then  # Sundials < 3.1.x
+    echo "$(basename $0): Sundials versions < 3.1 not supported"
     exit 1
 fi
 

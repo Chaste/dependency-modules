@@ -4,11 +4,11 @@ FROM ubuntu:${BASE}
 
 ARG XSD=4.0.0
 ARG XERCESC=3.2.4
-ARG SUNDIALS=5.8.0
-ARG BOOST=1.74.0
-ARG VTK=8.2.0
-ARG PETSC=3.15.5
-ARG HDF5=1.10.8
+ARG SUNDIALS=6.4.1
+ARG BOOST=1.83.0
+ARG VTK=9.1.0
+ARG PETSC=3.19.2
+ARG HDF5=1.10.10
 
 SHELL ["/bin/bash", "-e", "-o", "pipefail", "-c"]
 
@@ -43,35 +43,35 @@ RUN source /etc/profile.d/modules.sh && \
     install_xsd.sh \
         --version=${XSD} \
         --modules-dir=${MODULES_DIR} && \
-    module test xsd/${XSD} && \
+    module test xsd && \
     install_xercesc.sh \
         --version=${XERCESC} \
         --parallel=$(nproc) \
         --modules-dir=${MODULES_DIR} && \
-    module test xercesc/${XERCESC} && \
+    module test xercesc && \
     install_sundials.sh \
         --version=${SUNDIALS} \
         --parallel=$(nproc) \
         --modules-dir=${MODULES_DIR} && \
-    module test sundials/${SUNDIALS} && \
+    module test sundials && \
     install_boost.sh \
         --version=${BOOST} \
         --parallel=$(nproc) \
         --modules-dir=${MODULES_DIR} && \
-    module test boost/${BOOST} && \
+    module test boost && \
     install_vtk.sh \
         --version=${VTK} \
         --parallel=$(nproc) \
         --modules-dir=${MODULES_DIR} && \
-    module test vtk/${VTK} && \
+    module test vtk && \
     install_petsc_hdf5.sh \
         --petsc-version=${PETSC} \
         --petsc-arch=linux-gnu \
         --hdf5-version=${HDF5} \
         --parallel=$(nproc) \
         --modules-dir=${MODULES_DIR} && \
-    module test petsc_hdf5/${PETSC}_${HDF5}/linux-gnu && \
-    rm -rf /tmp/* && \
-    rm -rf ${MODULES_DIR}/src
+    module test petsc_hdf5 && \
+    rm -rf ${MODULES_DIR}/src/* && \
+    rm -rf /tmp/*
 
 ENTRYPOINT ["docker-entrypoint.sh"]

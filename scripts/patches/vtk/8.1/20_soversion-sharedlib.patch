@@ -1,0 +1,25 @@
+Description: _soversion sharedlib
+--- a/CMake/vtkModuleMacros.cmake
++++ b/CMake/vtkModuleMacros.cmake
+@@ -417,8 +417,8 @@
+ function(vtk_target_name _name)
+   get_property(_type TARGET ${_name} PROPERTY TYPE)
+   if(NOT "${_type}" STREQUAL EXECUTABLE AND NOT VTK_JAVA_INSTALL)
+-    set_property(TARGET ${_name} PROPERTY VERSION 1)
+-    set_property(TARGET ${_name} PROPERTY SOVERSION 1)
++    set_property(TARGET ${_name} PROPERTY VERSION ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION})
++    set_property(TARGET ${_name} PROPERTY SOVERSION ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION})
+   endif()
+   if("${_name}" MATCHES "^[Vv][Tt][Kk]")
+     set(_vtk "")
+--- a/Rendering/Tk/CMakeLists.txt
++++ b/Rendering/Tk/CMakeLists.txt
+@@ -118,7 +118,7 @@
+     vtk_target_install(vtkRenderingPythonTkWidgets)
+ 
+     set_property(TARGET vtkRenderingPythonTkWidgets PROPERTY OUTPUT_NAME
+-         vtkRenderingPythonTkWidgets-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION})
++         vtkRenderingPythonTkWidgets)
+ 
+     set(Module_PYTHON_LIBS ${VTK_TK_LIBRARIES})
+     if(VTK_USE_X)
