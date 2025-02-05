@@ -36,7 +36,7 @@ if [ -z "${base_dir}" ]; then usage; fi
 
 parallel="${parallel:-$(nproc)}"
 
-# Modulefile for system version
+# Use Ubuntu system version
 if [ "$version" = "system" ]; then
     version=""
     for i in 9 8 7 6

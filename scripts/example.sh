@@ -52,7 +52,7 @@ module test vtk/9.3.1
     --modules-dir=${modules_dir} \
     --parallel=${parallel}
 
-module test petsc_hdf5/3.19.0_1.10.10/linux-gnu
+module test petsc_hdf5/3.19.6_1.10.10/linux-gnu
 
 # Cleanup
 cd -

@@ -63,14 +63,12 @@ make -j ${parallel} && \
 make install
 
 # Add symbolic links
-if [ ${major} -eq 3 ]; then
-    cd ${install_dir}/bin
-    if [ ! -f python]; then
-        ln -s python3 python
-    fi
-    if [ ! -f pip]; then
-        ln -s pip3 pip
-    fi
+cd ${install_dir}/bin
+if [ ! -f python]; then
+    ln -s python3 python
+fi
+if [ ! -f pip]; then
+    ln -s pip3 pip
 fi
 
 # Add modulefile

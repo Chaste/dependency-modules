@@ -50,7 +50,7 @@ if [[ ! (${petsc_arch} = 'linux-gnu'
     usage
 fi
 
-# Modulefile for system version
+# Use Ubuntu system version
 if [[ ("$petsc_version" = "system") 
    || ("$hdf5_version" = "system") 
    || ("$petsc_arch" = "system") ]]; then
@@ -151,48 +151,39 @@ case ${petsc_arch} in
     linux-gnu)
         export PETSC_ARCH=linux-gnu
         python3 ./configure \
-            --with-make-np=${parallel} \
-            --with-cc=gcc \
-            --with-cxx=g++ \
-            --with-fc=0 \
-            --with-debugging=1 \
             --COPTFLAGS=-Og \
             --CXXOPTFLAGS=-Og \
-            --with-shared-libraries \
-            --with-ssl=false \
-            --with-x=false \
             --download-f2cblaslapack=1 \
             --download-hdf5=${download_hdf5} \
-            --download-parmetis=1 \
-            --download-metis=1 \
             --download-hypre=1 \
-            --with-shared-libraries && \
+            --download-metis=1 \
+            --download-mpich=1 \
+            --download-parmetis=1 \
+            --with-cc=gcc \
+            --with-cxx=g++ \
+            --with-debugging=1 \
+            --with-fc=0 \
+            --with-shared-libraries \
+            --with-ssl=false \
+            --with-x=false && \
         make -j ${parallel} all
         ;;
 
     linux-gnu-opt)
         export PETSC_ARCH=linux-gnu-opt
         python3 ./configure \
-            --with-make-np=${parallel} \
+            --download-f2cblaslapack=1 \
+            --download-hdf5=${download_hdf5} \
+            --download-hypre=1 \
+            --download-metis=1 \
+            --download-mpich=1 \
+            --download-parmetis=1 \
             --with-cc=gcc \
             --with-cxx=g++ \
             --with-fc=0 \
-            --with-x=false \
-            --with-ssl=false \
-            --download-f2cblaslapack=1 \
-            --download-mpich=${download_mpich} \
-            --download-hdf5=${download_hdf5} \
-            --download-parmetis=1 \
-            --download-metis=1 \
-            --download-hypre=1 \
             --with-shared-libraries \
             --with-ssl=false \
-            --with-x=false \
-            --download-f2cblaslapack=1 \
-            --download-hdf5=${download_hdf5} \
-            --download-hypre=1 \
-            --download-metis=1 \
-            --download-parmetis=1 \
+            --with-x=false && \
         make -j ${parallel} all
         ;;
     *)

@@ -28,7 +28,7 @@ done
 if [ -z "${version}" ]; then usage; fi
 if [ -z "${base_dir}" ]; then usage; fi
 
-# Modulefile for system version
+# Use Ubuntu system version
 if [ "$version" = "system" ]; then
     version=$(dpkg -s xsdcxx | grep 'Version:' | cut -d' ' -f2 | cut -d. -f1,2,3 | cut -d- -f1)
     
