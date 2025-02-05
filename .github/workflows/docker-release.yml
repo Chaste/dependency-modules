@@ -36,7 +36,6 @@ jobs:
           context: .
           pull: true
           load: true
-          build-args: BASE=${{ matrix.base }}
           tags: ${{ matrix.tags }}
 
       - name: Test image
@@ -49,5 +48,5 @@ jobs:
           context: .
           pull: true
           push: true
-          build-args: BASE=${{ matrix.base }}
           tags: ${{ matrix.tags }}
+          build-args: ${{ matrix.build-args }}

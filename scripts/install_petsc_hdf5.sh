@@ -2,8 +2,8 @@
 
 usage()
 {
-    echo 'Usage: '"$(basename $0)"' --petsc-version=version --hdf5-version=version [--mpich-version=version]'
-    echo '        --petsc-arch={linux-gnu|linux-gnu-opt} --modules-dir=path [--parallel=value]'
+    echo 'Usage: '"$(basename $0)"' --petsc-version=version --petsc-arch={linux-gnu|linux-gnu-opt}'
+    echo '        --hdf5-version=version --modules-dir=path [--parallel=value]'
     exit 1
 }
 
@@ -11,7 +11,6 @@ usage()
 petsc_version=
 petsc_arch=
 hdf5_version=
-mpich_version=
 base_dir=
 parallel=
 
@@ -25,9 +24,6 @@ for option; do
             ;;
         --hdf5-version=*)
             hdf5_version=$(expr "x$option" : "x--hdf5-version=\(.*\)")
-            ;;
-        --mpich-version=*)
-            mpich_version=$(expr "x$option" : "x--mpich-version=\(.*\)")
             ;;
         --modules-dir=*)
             base_dir=$(expr "x$option" : "x--modules-dir=\(.*\)")
@@ -176,12 +172,13 @@ case ${petsc_arch} in
             --with-cc=gcc \
             --with-cxx=g++ \
             --with-fc=0 \
+            --with-debugging=1 \
             --COPTFLAGS=-Og \
             --CXXOPTFLAGS=-Og \
-            --with-x=false \
+            --with-shared-libraries \
             --with-ssl=false \
+            --with-x=false \
             --download-f2cblaslapack=1 \
-            --download-mpich=${download_mpich} \
             --download-hdf5=${download_hdf5} \
             --download-parmetis=1 \
             --download-metis=1 \
@@ -206,8 +203,15 @@ case ${petsc_arch} in
             --download-metis=1 \
             --download-hypre=1 \
             --with-shared-libraries \
-            --with-debugging=0 && \
-        make -j ${parallel} all
+            --with-ssl=false \
+            --with-x=false \
+            --download-f2cblaslapack=1 \
+            --download-hdf5=${download_hdf5} \
+            --download-hypre=${download_hypre} \
+            --download-metis=1 \
+            --download-parmetis=1 \
+            --with-make-np=${parallel} && \
+        make all
         ;;
     *)
         ;;
