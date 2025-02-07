@@ -28,40 +28,6 @@ done
 if [ -z "${version}" ]; then usage; fi
 if [ -z "${base_dir}" ]; then usage; fi
 
-# Use Ubuntu system version
-if [ "$version" = "system" ]; then
-    version=$(dpkg -s xsdcxx | grep 'Version:' | cut -d' ' -f2 | cut -d. -f1,2,3 | cut -d- -f1)
-    
-    mkdir -p ${base_dir}/modulefiles/xsd && cd  ${base_dir}/modulefiles/xsd
-    cat <<EOF > ${version}
-#%Module1.0#####################################################################
-###
-## xsd ${version} modulefile
-##
-proc ModulesTest { } {
-    set paths "/usr/bin/xsdcxx
-               /usr/include/xsd"
-
-    foreach path \$paths {
-        if { ![file exists \$path] } {
-            puts stderr "ERROR: Does not exist: \$path"
-            return 0
-        }
-    }
-    return 1
-}
-
-proc ModulesHelp { } {
-    puts stderr "\tThis adds the environment variables for xsd ${version}\n"
-}
-
-module-whatis "This adds the environment variables for xsd ${version}"
-
-conflict xsd
-EOF
-    exit 0
-fi
-
 version_arr=(${version//\./ })
 major=${version_arr[0]}
 minor=${version_arr[1]}

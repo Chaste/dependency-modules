@@ -34,40 +34,6 @@ if [ -z "${base_dir}" ]; then usage; fi
 
 parallel="${parallel:-$(nproc)}"
 
-# Use Ubuntu system version
-if [ "$version" = "system" ]; then
-    version=$(dpkg -s libxerces-c-dev | grep 'Version:' | cut -d' ' -f2 | cut -d. -f1,2,3 | cut -d+ -f1)
-    
-    mkdir -p ${base_dir}/modulefiles/xercesc && cd  ${base_dir}/modulefiles/xercesc
-    cat <<EOF > ${version}
-#%Module1.0#####################################################################
-###
-## xercesc ${version} modulefile
-##
-proc ModulesTest { } {
-    set paths "/usr/include/xercesc
-               /usr/lib/x86_64-linux-gnu/libxerces-c.so"
-
-    foreach path \$paths {
-        if { ![file exists \$path] } {
-            puts stderr "ERROR: Does not exist: \$path"
-            return 0
-        }
-    }
-    return 1
-}
-
-proc ModulesHelp { } {
-    puts stderr "\tThis adds the environment variables for xercesc ${version}\n"
-}
-
-module-whatis "This adds the environment variables for xercesc ${version}"
-
-conflict xercesc
-EOF
-    exit 0
-fi
-
 ver_si_on=${version//\./_}  # Converts 3.1.1 to 3_1_1
 version_arr=(${version//\./ })
 major=${version_arr[0]}

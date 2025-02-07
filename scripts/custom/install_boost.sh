@@ -34,43 +34,6 @@ if [ -z "${base_dir}" ]; then usage; fi
 
 parallel="${parallel:-$(nproc)}"
 
-# Use Ubuntu system version
-if [ "$version" = "system" ]; then
-    version=$(dpkg -s libboost-dev | grep 'Version:' | cut -d' ' -f2 | cut -d. -f1,2,3)
-
-    mkdir -p ${base_dir}/modulefiles/boost && cd  ${base_dir}/modulefiles/boost
-    cat <<EOF > ${version}
-#%Module1.0#####################################################################
-###
-## boost ${version} modulefile
-##
-proc ModulesTest { } {
-    set paths "/usr/include/boost
-               /usr/lib/x86_64-linux-gnu/libboost_serialization.so"
-
-    foreach path \$paths {
-        if { ![file exists \$path] } {
-            puts stderr "ERROR: Does not exist: \$path"
-            return 0
-        }
-    }
-    return 1
-}
-
-proc ModulesHelp { } {
-    puts stderr "\tThis adds the environment variables for boost ${version}\n"
-}
-
-module-whatis "This adds the environment variables for boost ${version}"
-
-setenv          Boost_NO_BOOST_CMAKE     OFF
-setenv          Boost_NO_SYSTEM_PATHS    OFF
-
-conflict boost
-EOF
-    exit 0
-fi
-
 version_arr=(${version//\./ })
 major=${version_arr[0]}
 minor=${version_arr[1]}
@@ -146,9 +109,6 @@ prepend-path    C_INCLUDE_PATH       ${install_dir}/include
 prepend-path    CPLUS_INCLUDE_PATH   ${install_dir}/include
 
 prepend-path    CMAKE_PREFIX_PATH    ${install_dir}
-
-setenv          Boost_NO_BOOST_CMAKE     ON
-setenv          Boost_NO_SYSTEM_PATHS    ON
 
 conflict boost
 EOF
