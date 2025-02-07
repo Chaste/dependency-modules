@@ -23,16 +23,16 @@ SHELL ["/bin/bash", "-e", "-o", "pipefail", "-c"]
 
 USER root
 
-# Setup base dependencies and install actions runner
-
 ENV DEFAULT_USER="runner" \
     DEFAULT_HOME="/home/runner" \
     RUNNER_DIR="/home/runner/actions-runner" \
     RUNNER_WORK_DIR="/home/runner/_work" \
     MODULES_DIR="/home/runner/modules"
 
-COPY scripts/custom/ /usr/local/bin/
+# Copy scripts
+COPY scripts/*.sh scripts/custom/ /usr/local/bin/
 
+# Setup base dependencies and install actions runner
 RUN useradd -r -m -d ${DEFAULT_HOME} -s /bin/bash ${DEFAULT_USER} && \
     os_id="$(. /etc/os-release && echo ${VERSION_ID} | sed 's/\.//')" && \
     setup_ubuntu${os_id}.sh && \
@@ -48,7 +48,6 @@ USER ${DEFAULT_USER}:${DEFAULT_USER}
 WORKDIR ${DEFAULT_HOME}
 
 # Build Chaste dependencies from source
-
 RUN source /etc/profile.d/modules.sh && \
     mkdir -p ${MODULES_DIR}/modulefiles && \
     module use ${MODULES_DIR}/modulefiles && \

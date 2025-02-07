@@ -27,7 +27,7 @@ runs:
         ./install_xercesc.sh \
           --version=${{ inputs.xercesc_ver }} \
           --modules-dir=${{ steps.set-env.outputs.modules_dir }}
-      working-directory: ${{ github.workspace }}/scripts
+      working-directory: ${{ github.workspace }}/scripts/custom
       shell: bash
         
     - name: test xercesc module

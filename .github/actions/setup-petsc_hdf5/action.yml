@@ -35,7 +35,7 @@ runs:
           --hdf5-version=${{ inputs.hdf5_ver }} \
           --petsc-arch=${{ inputs.petsc_arch }} \
           --modules-dir=${{ steps.set-env.outputs.modules_dir }}
-      working-directory: ${{ github.workspace }}/scripts
+      working-directory: ${{ github.workspace }}/scripts/custom
       shell: bash
 
     - name: test petsc_hdf5 module
