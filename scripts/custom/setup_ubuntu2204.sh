@@ -23,6 +23,9 @@ apt-get install -y --no-install-recommends \
   doxygen \
   git \
   lcov \
+  libfftw3-3 \
+  libfftw3-bin \
+  libfftw3-dev \
   python3 \
   python3-dev \
   python3-pip \
@@ -42,9 +45,6 @@ apt-get install -y --no-install-recommends \
   libdouble-conversion-dev \
   libdouble-conversion3 \
   libeigen3-dev \
-  libfftw3-3 \
-  libfftw3-bin \
-  libfftw3-dev \
   libfmt-dev \
   libfmt8 \
   libfontconfig1 \
@@ -114,8 +114,5 @@ apt-get install -y --no-install-recommends \
   zlib1g \
   zlib1g-dev
 
-# Set default `python` to Python 3
 update-alternatives --install /usr/local/bin/python python /usr/bin/python3 10
 update-alternatives --install /usr/local/bin/pip pip /usr/bin/pip3 10
-
-pip install --upgrade pip
