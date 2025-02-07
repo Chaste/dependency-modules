@@ -1,0 +1,56 @@
+# Build the image:
+# docker build -t chaste/runner:portability-system .
+
+# Run the container in interactive mode:
+# docker run --init -it -e RUNNER_OFF=1 chaste/runner:portability-system /bin/bash
+
+# Run the container:
+# docker run --init -it chaste/runner:portability-system
+
+ARG BASE=jammy
+
+FROM ubuntu:${BASE}
+
+SHELL ["/bin/bash", "-e", "-o", "pipefail", "-c"]
+
+USER root
+
+# Setup Chaste dependencies and install actions runner
+
+ENV DEFAULT_USER="runner" \
+    DEFAULT_HOME="/home/runner" \
+    RUNNER_DIR="/home/runner/actions-runner" \
+    RUNNER_WORK_DIR="/home/runner/_work" \
+    MODULES_DIR="/home/runner/modules"
+
+COPY scripts/system/ /usr/local/bin/
+
+RUN useradd -r -m -d ${DEFAULT_HOME} -s /bin/bash ${DEFAULT_USER} && \
+    os_id="$(. /etc/os-release && echo ${VERSION_ID} | sed 's/\.//')" && \
+    setup_ubuntu${os_id}.sh && \
+    runner_install.sh --install_dir="/tmp/tmp-runner" && \
+    /tmp/tmp-runner/bin/installdependencies.sh && \
+    apt-get -y clean && \
+    rm -rf /var/cache/apt && \
+    rm -rf /var/lib/apt/lists/* && \
+    rm -rf /var/tmp/* && \
+    rm -rf /tmp/*
+
+USER ${DEFAULT_USER}:${DEFAULT_USER}
+WORKDIR ${DEFAULT_HOME}
+
+# Add modulefile stubs for system dependency versions
+
+RUN source /etc/profile.d/modules.sh && \
+    mkdir -p ${MODULES_DIR}/modulefiles && \
+    module use ${MODULES_DIR}/modulefiles && \
+    echo "module use ${MODULES_DIR}/modulefiles" >> ${DEFAULT_HOME}/.bashrc && \
+    install_modulefiles.sh --modules-dir=${MODULES_DIR} && \
+    module test boost && \
+    module test xsd && \
+    module test xercesc && \
+    module test petsc_hdf5 && \
+    module test sundials && \
+    module test vtk
+
+ENTRYPOINT ["docker-entrypoint.sh"]

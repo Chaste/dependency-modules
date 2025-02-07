@@ -1,3 +1,12 @@
+# Build the image:
+# docker build -t chaste/runner:portability-test .
+
+# Run the container in interactive mode:
+# docker run --init -it -e RUNNER_OFF=1 chaste/runner:portability-test /bin/bash
+
+# Run the container:
+# docker run --init -it chaste/runner:portability-test
+
 ARG BASE=jammy
 
 FROM ubuntu:${BASE}
@@ -14,13 +23,15 @@ SHELL ["/bin/bash", "-e", "-o", "pipefail", "-c"]
 
 USER root
 
+# Setup base dependencies and install actions runner
+
 ENV DEFAULT_USER="runner" \
     DEFAULT_HOME="/home/runner" \
     RUNNER_DIR="/home/runner/actions-runner" \
     RUNNER_WORK_DIR="/home/runner/_work" \
     MODULES_DIR="/home/runner/modules"
 
-COPY scripts/ /usr/local/bin/
+COPY scripts/custom/ /usr/local/bin/
 
 RUN useradd -r -m -d ${DEFAULT_HOME} -s /bin/bash ${DEFAULT_USER} && \
     os_id="$(. /etc/os-release && echo ${VERSION_ID} | sed 's/\.//')" && \
@@ -35,6 +46,8 @@ RUN useradd -r -m -d ${DEFAULT_HOME} -s /bin/bash ${DEFAULT_USER} && \
 
 USER ${DEFAULT_USER}:${DEFAULT_USER}
 WORKDIR ${DEFAULT_HOME}
+
+# Build Chaste dependencies from source
 
 RUN source /etc/profile.d/modules.sh && \
     mkdir -p ${MODULES_DIR}/modulefiles && \

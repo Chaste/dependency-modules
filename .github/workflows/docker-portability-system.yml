@@ -19,15 +19,7 @@ jobs:
         include:
           - tags: |
               chaste/runner:${{ github.event.inputs.ubuntu_release }}.portability-system
-            build-args: |
-              BASE=${{ github.event.inputs.ubuntu_release }}
-              XSD=system
-              XERCESC=system
-              SUNDIALS=system
-              BOOST=system
-              VTK=system
-              PETSC=system
-              HDF5=system
+            build-args: BASE=${{ github.event.inputs.ubuntu_release }}
 
     steps:
       - name: Checkout
@@ -49,6 +41,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          file: ./Dockerfile.system
           pull: true
           load: true
           tags: ${{ matrix.tags }}
