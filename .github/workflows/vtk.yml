@@ -58,7 +58,7 @@ jobs:
 
       - name: Test
         run: |
-          module use ${MODULES_DIR}/modulefiles
+          module use ${{ env.MODULES_DIR }}/modulefiles
           module avail
           module load vtk/${{ env.VTK_VER }}
           module test vtk/${{ env.VTK_VER }}

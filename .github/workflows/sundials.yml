@@ -58,7 +58,7 @@ jobs:
 
       - name: Test
         run: |
-          module use ${MODULES_DIR}/modulefiles
+          module use ${{ env.MODULES_DIR }}/modulefiles
           module avail
           module load sundials/${{ env.SUNDIALS_VER }}
           module test sundials/${{ env.SUNDIALS_VER }}

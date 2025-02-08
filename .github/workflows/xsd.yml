@@ -52,12 +52,12 @@ jobs:
       - name: Run build script
         run: |
           ./install_xsd.sh \
-          --version=${{ env.XSD_VER }} \
-          --modules-dir=${{ env.MODULES_DIR }}
+            --version=${{ env.XSD_VER }} \
+            --modules-dir=${{ env.MODULES_DIR }}
 
       - name: Test
         run: |
-          module use ${MODULES_DIR}/modulefiles
+          module use ${{ env.MODULES_DIR }}/modulefiles
           module avail
           module load xsd/${{ env.XSD_VER }}
           module test xsd/${{ env.XSD_VER }}

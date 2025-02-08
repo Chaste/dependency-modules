@@ -52,12 +52,12 @@ jobs:
       - name: Run build script
         run: |
           ./install_xercesc.sh \
-          --version=${{ env.XERCESC_VER }} \
-          --modules-dir=${{ env.MODULES_DIR }}
+            --version=${{ env.XERCESC_VER }} \
+            --modules-dir=${{ env.MODULES_DIR }}
 
       - name: Test
         run: |
-          module use ${MODULES_DIR}/modulefiles
+          module use ${{ env.MODULES_DIR }}/modulefiles
           module avail
           module load xercesc/${{ env.XERCESC_VER }}
           module test xercesc/${{ env.XERCESC_VER }}

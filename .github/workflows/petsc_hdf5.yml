@@ -76,7 +76,7 @@ jobs:
 
       - name: Test
         run: |
-          module use ${MODULES_DIR}/modulefiles
+          module use ${{ env.MODULES_DIR }}/modulefiles
           module avail
           module load petsc_hdf5/${{ env.PETSC_VER }}_${{ env.HDF5_VER }}/${{ env.PETSC_ARCH }}
           module test petsc_hdf5/${{ env.PETSC_VER }}_${{ env.HDF5_VER }}/${{ env.PETSC_ARCH }}

@@ -1,123 +1,235 @@
-name: build-all
+name: Build all
 
 on:
   workflow_dispatch:
+    inputs:
+      boost_ver:
+        description: "Boost version"
+        required: true
+        type: string
+        default: "1.83.0"
+
+      hdf5_ver:
+        description: "HDF5 version"
+        required: true
+        type: string
+        default: "1.10.10"
+
+      petsc_ver:
+        description: "PETSc version"
+        required: true
+        type: string
+        default: "3.19.2"
+
+      petsc_arch:
+        description: "PETSc arch"
+        required: true
+        type: choice
+        options:
+          - "linux-gnu"
+          - "linux-gnu-opt"
+        default: "linux-gnu"
+
+      sundials_ver:
+        description: "SUNDIALS version"
+        required: true
+        type: string
+        default: "6.4.1"
+
+      vtk_ver:
+        description: "VTK version"
+        required: true
+        type: string
+        default: "9.1.0"
+
+      xercesc_ver:
+        description: "Xerces-C version"
+        required: true
+        type: string
+        default: "3.2.4"
+
+      xsd_ver:
+        description: "XSD version"
+        required: true
+        type: string
+        default: "4.0.0"
+
+      os:
+        description: "OS"
+        required: true
+        type: choice
+        options:
+          - "ubuntu-22.04"
+          - "ubuntu-24.04"
+        default: "ubuntu-22.04"
+
+defaults:
+  run:
+    shell: bash --login -e -o pipefail {0} # login for environment modules
+    working-directory: ./scripts/custom
 
 jobs:
   setup:
-    name: build all dependencies
+    name: Build all dependencies
 
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: ubuntu:24.04
-            xsd_ver: 4.0.0
-            xercesc_ver: 3.2.4
-            sundials_ver: 6.4.1
-            boost_ver: 1.83.0
-            vtk_ver: 9.1.0
-            petsc_ver: 3.19.2
-            hdf5_ver: 1.10.10
-            petsc_arch: linux-gnu
-
-    runs-on: ubuntu-latest
-    container:
-      image: ${{ matrix.os }}
+    runs-on: ${{ github.event.inputs.os }}
 
     steps:
-      - name: checkout
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - id: set-env
-        uses: ./.github/actions/set-env
-
-      - name: setup defaults
-        uses: ./.github/actions/setup-defaults
-
-      - name: install and cache xsd module
-        uses: ./.github/actions/setup-xsd
-        with:
-          xsd_ver: ${{ matrix.xsd_ver }}
-
-      - name: build and cache xercesc module
-        uses: ./.github/actions/setup-xercesc
-        with:
-          xercesc_ver: ${{ matrix.xercesc_ver }}
-
-      - name: build and cache sundials module
-        uses: ./.github/actions/setup-sundials
-        with:
-          sundials_ver: ${{ matrix.sundials_ver }}
-
-      - name: build and cache boost module
-        uses: ./.github/actions/setup-boost
-        with:
-          boost_ver: ${{ matrix.boost_ver }}
-
-      - name: build and cache vtk module
-        uses: ./.github/actions/setup-vtk
-        with:
-          vtk_ver: ${{ matrix.vtk_ver }}
-
-      - name: build and cache petsc_hdf5 module
-        uses: ./.github/actions/setup-petsc_hdf5
-        with:
-          petsc_ver: ${{ matrix.petsc_ver }}
-          hdf5_ver: ${{ matrix.hdf5_ver }}
-          petsc_arch: ${{ matrix.petsc_arch }}
-
-      - name: checkout chaste
+      - name: Checkout Chaste
         uses: actions/checkout@v4
         with:
           repository: Chaste/Chaste
           path: Chaste
-          submodules: recursive
 
-      - name: make build and test directories
+      - name: Set env
         run: |
-          mkdir -p Chaste/build
-          mkdir -p chaste-test-dir
-          echo "CHASTE_TEST_OUTPUT=$(pwd)/chaste-test-dir" >> ${GITHUB_ENV}
+          source /etc/os-release
+          OS_ID="$(echo ${ID}${VERSION_ID} | sed 's/\.//')"
+          echo "OS_ID=${OS_ID}" >> $GITHUB_ENV
+          echo "MODULES_DIR=$HOME/modules" >> $GITHUB_ENV
+          echo "BOOST_VER=${{ github.event.inputs.boost_ver }}" >> $GITHUB_ENV
+          echo "HDF5_VER=${{ github.event.inputs.hdf5_ver }}" >> $GITHUB_ENV
+          echo "PETSC_VER=${{ github.event.inputs.petsc_ver }}" >> $GITHUB_ENV
+          echo "PETSC_ARCH=${{ github.event.inputs.petsc_arch }}" >> $GITHUB_ENV
+          echo "SUNDIALS_VER=${{ github.event.inputs.sundials_ver }}" >> $GITHUB_ENV
+          echo "VTK_VER=${{ github.event.inputs.vtk_ver }}" >> $GITHUB_ENV
+          echo "XERCESC_VER=${{ github.event.inputs.xercesc_ver }}" >> $GITHUB_ENV
+          echo "XSD_VER=${{ github.event.inputs.xsd_ver }}" >> $GITHUB_ENV
 
-      - name: compile chaste build info
+      - name: Setup OS
         run: |
-          module purge
-          module use ${{ steps.set-env.outputs.modules_dir }}/modulefiles
-          module load xsd/${{ matrix.xsd_ver }}
-          module load xercesc/${{ matrix.xercesc_ver }}
-          module load sundials/${{ matrix.sundials_ver }}
-          module load boost/${{ matrix.boost_ver }}
-          module load vtk/${{ matrix.vtk_ver }}
-          module load petsc_hdf5/${{ matrix.petsc_ver }}_${{ matrix.hdf5_ver }}/${{ matrix.petsc_arch }}
+          sudo ./setup_${{ env.OS_ID }}.sh
 
+      - name: List environment modules
+        run: |
+          module avail
+
+      - name: Build Boost
+        run: |
+          module use ${{ env.MODULES_DIR }}/modulefiles
+
+          ./install_boost.sh \
+            --version=${{ env.BOOST_VER }} \
+            --modules-dir=${{ env.MODULES_DIR }}
+
+          module test boost/${{ env.BOOST_VER }}
+
+      - name: Build XSD
+        run: |
+          module use ${{ env.MODULES_DIR }}/modulefiles
+          module load boost/${{ env.BOOST_VER }}
+
+          ./install_xsd.sh \
+            --version=${{ env.XSD_VER }} \
+            --modules-dir=${{ env.MODULES_DIR }}
+
+          module test xsd/${{ env.XSD_VER }}
+
+      - name: Build Xerces-C
+        run: |
+          module use ${{ env.MODULES_DIR }}/modulefiles
+          module load boost/${{ env.BOOST_VER }}
+          module load xsd/${{ env.XSD_VER }}
+
+          ./install_xercesc.sh \
+            --version=${{ env.XERCESC_VER }} \
+            --modules-dir=${{ env.MODULES_DIR }}
+
+          module test xercesc/${{ env.XERCESC_VER }}
+
+      - name: Build PETSc + HDF5
+        run: |
+          module use ${{ env.MODULES_DIR }}/modulefiles
+          module load boost/${{ env.BOOST_VER }}
+          module load xsd/${{ env.XSD_VER }}
+          module load xercesc/${{ env.XERCESC_VER }}
+
+          ./install_petsc_hdf5.sh \
+            --petsc-version=${{ env.PETSC_VER }} \
+            --petsc-arch=${{ env.PETSC_ARCH }} \
+            --hdf5-version=${{ env.HDF5_VER }} \
+            --modules-dir=${{ env.MODULES_DIR }}
+
+          module test petsc_hdf5/${{ env.PETSC_VER }}_${{ env.HDF5_VER }}/${{ env.PETSC_ARCH }}
+
+      - name: Build SUNDIALS
+        run: |
+          module use ${{ env.MODULES_DIR }}/modulefiles
+          module load boost/${{ env.BOOST_VER }}
+          module load xsd/${{ env.XSD_VER }}
+          module load xercesc/${{ env.XERCESC_VER }}
+          module load petsc_hdf5/${{ env.PETSC_VER }}_${{ env.HDF5_VER }}/${{ env.PETSC_ARCH }}
+
+          ./install_sundials.sh \
+            --version=${{ env.SUNDIALS_VER }} \
+            --modules-dir=${{ env.MODULES_DIR }}
+
+          module test sundials/${{ env.SUNDIALS_VER }}
+
+      - name: Build VTK
+        run: |
+          module use ${{ env.MODULES_DIR }}/modulefiles
+          module load boost/${{ env.BOOST_VER }}
+          module load xsd/${{ env.XSD_VER }}
+          module load xercesc/${{ env.XERCESC_VER }}
+          module load petsc_hdf5/${{ env.PETSC_VER }}_${{ env.HDF5_VER }}/${{ env.PETSC_ARCH }}
+          module load sundials/${{ env.SUNDIALS_VER }}
+
+          ./install_vtk.sh \
+            --version=${{ env.VTK_VER }} \
+            --modules-dir=${{ env.MODULES_DIR }}
+            
+          module test vtk/${{ env.VTK_VER }}
+
+      - name: List environment modules
+        run: |
+          module use ${{ env.MODULES_DIR }}/modulefiles
+          module avail
+
+      - name: TestChasteBuildInfo
+        run: |
+          module use ${{ env.MODULES_DIR }}/modulefiles
+          module load boost/${{ env.BOOST_VER }}
+          module load xsd/${{ env.XSD_VER }}
+          module load xercesc/${{ env.XERCESC_VER }}
+          module load petsc_hdf5/${{ env.PETSC_VER }}_${{ env.HDF5_VER }}/${{ env.PETSC_ARCH }}
+          module load sundials/${{ env.SUNDIALS_VER }}
+          module load vtk/${{ env.VTK_VER }}
+
+          mkdir -p build && cd build
           cmake -DCMAKE_BUILD_TYPE=Release ..
-          cmake --build . --parallel $(nproc) --target TestChasteBuildInfo
-          ctest -V -R TestChasteBuildInfo --output-on-failure | tee buildinfo
-        working-directory: Chaste/build
-        shell: bash --login -e -o pipefail {0} # login to source /etc/profile.d/modules.sh
+          make -j $(nproc) TestChasteBuildInfo
+          ctest -V -R TestChasteBuildInfo$ | tee buildinfo
+        working-directory: Chaste
 
-      - name: verify dependency versions
+      - name: Verify dependency versions
         run: |
-          sed -i.bak 's/"//g' buildinfo  # removes quotes from old sundials versions
+          sed -i.bak 's/"//g' buildinfo  # remove quotes from old sundials versions
 
           maj_min_rev='^[0-9]\+\.[0-9]\+\.[0-9]\+'
           maj_min='^[0-9]\+\.[0-9]\+'
 
-          xsd_ver="$(echo ${{ matrix.xsd_ver }} | grep -o ${maj_min_rev})"
-          xercesc_ver="$(echo ${{ matrix.xercesc_ver }} | grep -o ${maj_min_rev})"
-          sundials_ver="$(echo ${{ matrix.sundials_ver }} | grep -o ${maj_min_rev})"
-          boost_ver="$(echo ${{ matrix.boost_ver }} | grep -o ${maj_min_rev})"
-          vtk_ver="$(echo ${{ matrix.vtk_ver }} | grep -o ${maj_min})"
-          petsc_ver="$(echo ${{ matrix.petsc_ver }} | grep -o ${maj_min_rev})"
-          hdf5_ver="$(echo ${{ matrix.hdf5_ver }} | grep -o ${maj_min_rev})"
-
-          grep "<XSD>${xsd_ver}</XSD>" buildinfo
-          grep "<Xerces>${xercesc_ver}</Xerces>" buildinfo
-          grep "<SUNDIALS>${sundials_ver}</SUNDIALS>" buildinfo
+          boost_ver="$(echo ${{ env.BOOST_VER }} | grep -o ${maj_min_rev})"
           grep "<Boost>${boost_ver}</Boost>" buildinfo
-          grep "<VTK>${vtk_ver}</VTK>" buildinfo
-          grep "<PETSc>${petsc_ver}</PETSc>" buildinfo
+
+          hdf5_ver="$(echo ${{ env.HDF5_VER }} | grep -o ${maj_min_rev})"
           grep "<HDF5>${hdf5_ver}</HDF5>" buildinfo
+
+          petsc_ver="$(echo ${{ env.PETSC_VER }} | grep -o ${maj_min_rev})"
+          grep "<PETSc>${petsc_ver}</PETSc>" buildinfo
+
+          sundials_ver="$(echo ${{ env.SUNDIALS_VER }} | grep -o ${maj_min_rev})"
+          grep "<SUNDIALS>${sundials_ver}</SUNDIALS>" buildinfo
+
+          vtk_ver="$(echo ${{ env.VTK_VER }} | grep -o ${maj_min})"
+          grep "<VTK>${vtk_ver}</VTK>" buildinfo
+
+          xercesc_ver="$(echo ${{ env.XERCESC_VER }} | grep -o ${maj_min_rev})"
+          grep "<Xerces>${xercesc_ver}</Xerces>" buildinfo
+
+          xsd_ver="$(echo ${{ env.XSD_VER }} | grep -o ${maj_min_rev})"
+          grep "<XSD>${xsd_ver}</XSD>" buildinfo
         working-directory: Chaste/build
-        shell: bash
