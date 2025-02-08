@@ -1,4 +1,4 @@
-name: vtk
+name: Build VTK
 
 on:
   workflow_dispatch:
@@ -14,26 +14,50 @@ on:
         required: true
         type: choice
         options:
-          - "ubuntu:22.04"
-          - "ubuntu:24.04"
-        default: "ubuntu:24.04"
+          - "ubuntu-22.04"
+          - "ubuntu-24.04"
+        default: "ubuntu-22.04"
+
+defaults:
+  run:
+    shell: bash --login -e -o pipefail {0} # login for environment modules
 
 jobs:
   setup:
-    name: build and cache vtk
+    name: Build VTK ${{ github.event.inputs.vtk_ver }}
 
-    runs-on: ubuntu-latest
-    container:
-      image: ${{ github.event.inputs.os }}
+    runs-on: ${{ github.event.inputs.os }}
 
     steps:
-      - name: checkout
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: setup os
-        uses: ./.github/actions/setup-defaults
+      - name: Set env
+        run: |
+          source /etc/os-release
+          OS_ID="$(echo ${ID}${VERSION_ID} | sed 's/\.//')"
+          echo "OS_ID=${OS_ID}" >> $GITHUB_ENV
+          echo "MODULES_DIR=$HOME/modules" >> $GITHUB_ENV
+          echo "VTK_VER=${{ github.event.inputs.vtk_ver }}" >> $GITHUB_ENV
 
-      - name: build and cache
-        uses: ./.github/actions/setup-vtk
-        with:
-          vtk_ver: ${{ github.event.inputs.vtk_ver }}
+      - name: Setup OS
+        run: |
+          sudo ./scripts/custom/setup_${{ env.OS_ID }}.sh && \
+          sudo apt-get install -y mpi-default-bin mpi-default-dev
+
+      - name: List environment modules
+        run: |
+          module avail
+
+      - name: Run build script
+        run: |
+          ./scripts/custom/install_vtk.sh \
+            --version=${{ env.VTK_VER }} \
+            --modules-dir=${{ env.MODULES_DIR }}
+
+      - name: Test
+        run: |
+          module use ${MODULES_DIR}/modulefiles
+          module avail
+          module load vtk/${{ env.VTK_VER }}
+          module test vtk/${{ env.VTK_VER }}

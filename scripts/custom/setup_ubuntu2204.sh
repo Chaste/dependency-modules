@@ -113,6 +113,8 @@ apt-get install -y --no-install-recommends \
   x11proto-core-dev \
   zlib1g \
   zlib1g-dev
+# mpi-default-bin mpi-default-dev  # to be supplied by custom petsc build
+# libexpat1-dev libexpat1  # to be supplied by custom vtk build
 
 update-alternatives --install /usr/local/bin/python python /usr/bin/python3 10
 update-alternatives --install /usr/local/bin/pip pip /usr/bin/pip3 10
