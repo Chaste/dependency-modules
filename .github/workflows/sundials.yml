@@ -1,4 +1,4 @@
-name: sundials
+name: Build SUNDIALS
 
 on:
   workflow_dispatch:
@@ -14,26 +14,51 @@ on:
         required: true
         type: choice
         options:
-          - "ubuntu:22.04"
-          - "ubuntu:24.04"
-        default: "ubuntu:24.04"
+          - "ubuntu-22.04"
+          - "ubuntu-24.04"
+        default: "ubuntu-22.04"
+
+defaults:
+  run:
+    shell: bash --login -e -o pipefail {0} # login for environment modules
+    working-directory: ./scripts/custom
 
 jobs:
   setup:
-    name: build and cache sundials
+    name: Build SUNDIALS ${{ github.event.inputs.sundials_ver }}
 
-    runs-on: ubuntu-latest
-    container:
-      image: ${{ github.event.inputs.os }}
+    runs-on: ${{ github.event.inputs.os }}
 
     steps:
-      - name: checkout
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: setup os
-        uses: ./.github/actions/setup-defaults
+      - name: Set env
+        run: |
+          source /etc/os-release
+          OS_ID="$(echo ${ID}${VERSION_ID} | sed 's/\.//')"
+          echo "OS_ID=${OS_ID}" >> $GITHUB_ENV
+          echo "MODULES_DIR=$HOME/modules" >> $GITHUB_ENV
+          echo "SUNDIALS_VER=${{ github.event.inputs.sundials_ver }}" >> $GITHUB_ENV
 
-      - name: build and cache
-        uses: ./.github/actions/setup-sundials
-        with:
-          sundials_ver: ${{ github.event.inputs.sundials_ver }}
+      - name: Setup OS
+        run: |
+          sudo ./setup_${{ env.OS_ID }}.sh && \
+          sudo apt-get install -y mpi-default-bin mpi-default-dev
+
+      - name: List environment modules
+        run: |
+          module avail
+
+      - name: Run build script
+        run: |
+          ./install_sundials.sh \
+            --version=${{ env.SUNDIALS_VER }} \
+            --modules-dir=${{ env.MODULES_DIR }}
+
+      - name: Test
+        run: |
+          module use ${MODULES_DIR}/modulefiles
+          module avail
+          module load sundials/${{ env.SUNDIALS_VER }}
+          module test sundials/${{ env.SUNDIALS_VER }}

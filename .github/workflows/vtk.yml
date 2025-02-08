@@ -21,6 +21,7 @@ on:
 defaults:
   run:
     shell: bash --login -e -o pipefail {0} # login for environment modules
+    working-directory: ./scripts/custom
 
 jobs:
   setup:
@@ -42,7 +43,7 @@ jobs:
 
       - name: Setup OS
         run: |
-          sudo ./scripts/custom/setup_${{ env.OS_ID }}.sh && \
+          sudo ./setup_${{ env.OS_ID }}.sh && \
           sudo apt-get install -y mpi-default-bin mpi-default-dev
 
       - name: List environment modules
@@ -51,7 +52,7 @@ jobs:
 
       - name: Run build script
         run: |
-          ./scripts/custom/install_vtk.sh \
+          ./install_vtk.sh \
             --version=${{ env.VTK_VER }} \
             --modules-dir=${{ env.MODULES_DIR }}
 
