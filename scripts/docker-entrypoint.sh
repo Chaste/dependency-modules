@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 if [ -n "${RUNNER_OFF}" ]; then
-    /bin/bash --login  # login to source /etc/profile.d/modules.sh
+    /bin/bash --login  # login for environment modules
     exit 0
 fi
 

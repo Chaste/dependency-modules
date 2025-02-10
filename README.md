@@ -19,6 +19,10 @@ Installation on Ubuntu:
 
 ``` bash
 apt-get install environment-modules
+```
+
+To activate environment modules, close and open a new bash shell, or alternatively run:
+```bash
 source /etc/profile.d/modules.sh
 ```
 
