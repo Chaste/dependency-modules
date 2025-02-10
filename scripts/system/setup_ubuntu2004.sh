@@ -33,8 +33,7 @@ apt-get install -y --no-install-recommends \
   libpetsc-real3.12-dbg \
   libpetsc-real3.12-dev \
   libsundials-dev \
-  libvtk9.1 \
-  libvtk9-dev \
+  libvtk7-dev \
   libxerces-c-dev \
   mencoder \
   petsc-dev \
@@ -43,6 +42,7 @@ apt-get install -y --no-install-recommends \
   python3-pip \
   python3-venv \
   valgrind \
+  vtk7 \
   xsdcxx
 
 update-alternatives --install /usr/local/bin/python python /usr/bin/python3 10
