@@ -2,7 +2,7 @@
 
 export DEBIAN_FRONTEND=noninteractive
 
-# General dependencies
+# System dependencies
 apt-get update && \
 apt-get install -y --no-install-recommends \
   apt-transport-https \
@@ -16,21 +16,24 @@ apt-get install -y --no-install-recommends \
   rsync \
   wget
 
-# Chaste dependencies
+# Build dependencies
 apt-get install -y --no-install-recommends \
   build-essential \
   cmake \
   doxygen \
   git \
   lcov \
-  libfftw3-3 \
-  libfftw3-bin \
-  libfftw3-dev \
   python3 \
   python3-dev \
   python3-pip \
   python3-venv \
   valgrind
+
+# Chaste dependencies
+apt-get install -y --no-install-recommends \
+  libfftw3-3 \
+  libfftw3-bin \
+  libfftw3-dev \
 
 # VTK dependencies
 apt-get install -y --no-install-recommends \

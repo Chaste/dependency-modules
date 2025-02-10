@@ -2,20 +2,26 @@
 
 export DEBIAN_FRONTEND=noninteractive
 
+# System dependencies
 apt-get update && \
 apt-get install -y --no-install-recommends \
-  apt-utils \
   apt-transport-https \
+  apt-utils \
   ca-certificates \
+  curl \
+  environment-modules \
   gnupg \
+  jq \
+  openssl \
+  rsync \
   wget
 
+# Chaste dependencies
 apt-get update && \
 apt-get install -y --no-install-recommends \
   cmake \
   cmake-curses-gui \
   doxygen \
-  environment-modules \
   g++ \
   git \
   gnuplot \
