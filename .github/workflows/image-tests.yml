@@ -41,40 +41,47 @@ jobs:
         run: |
           su - runner
 
-          cat > init_build_env.sh<< EOF
-          su - runner
+          cat > init_build_env.sh << 'EOF'
           module use /home/runner/modules/modulefiles
           module load boost petsc_hdf5 sundials vtk xercesc xsd
           cd Chaste/build
           EOF
 
+          cat init_build_env.sh
+
       - name: Configure
         run: |
+          su - runner
           source init_build_env.sh
           cmake -DCMAKE_BUILD_TYPE=Release ..
 
       - name: TestChasteBuildInfo
         run: |
+          su - runner
           source init_build_env.sh
           cmake --build . --target TestChasteBuildInfo --parallel $(nproc)
           ctest -V -R TestChasteBuildInfo --output-on-failure
 
       - name: Build Continuous test pack
         run: |
+          su - runner
           source init_build_env.sh
           cmake --build . --target Continuous --parallel $(nproc)
 
       - name: Build Nightly test pack
         run: |
+          su - runner
           source init_build_env.sh
           cmake --build . --target Nightly --parallel $(nproc)
 
       - name: Run Continuous test pack
         run: |
+          su - runner
           source init_build_env.sh
           ctest -j $(nproc) -L Continuous --output-on-failure
 
       - name: Run Nightly test pack
         run: |
+          su - runner
           source init_build_env.sh
           ctest -j $(nproc) -L Nightly --output-on-failure
