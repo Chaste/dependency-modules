@@ -28,20 +28,20 @@ jobs:
     defaults:
       run:
         shell: bash --login -e -o pipefail {0} # login for environment modules
-        working-directory: /home/runner
+        working-directory: /home/runner/Chaste/build
 
     steps:
       - name: Checkout Chaste/${{ github.event.inputs.chaste_branch }}
         run: |
-          git clone --branch ${{ github.event.inputs.chaste_branch }} https://github.com/Chaste/Chaste
-          mkdir -p Chaste/build
+          git clone -b ${{ github.event.inputs.chaste_branch }} https://github.com/Chaste/Chaste
+          cd Chaste && mkdir build
+        working-directory: /home/runner
 
       - name: Create build env init script
         run: |
           cat > init_build_env.sh << 'EOF'
           module use /home/runner/modules/modulefiles
           module load boost petsc_hdf5 sundials vtk xercesc xsd
-          cd Chaste/build
           EOF
 
           cat init_build_env.sh
