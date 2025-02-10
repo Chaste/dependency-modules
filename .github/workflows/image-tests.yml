@@ -1,4 +1,4 @@
-name: image-tests
+name: Portability
 
 on:
   workflow_dispatch:
@@ -10,10 +10,10 @@ on:
         default: "develop"
 
       image_tag:
-        description: "Runner image tag"
+        description: "Portability image"
         required: true
         type: string
-        default: "test"
+        default: "jammy.portability-01"
 
 jobs:
   build-and-test:
@@ -23,9 +23,7 @@ jobs:
       image: "chaste/runner:${{ github.event.inputs.image_tag }}"
       env:
         RUNNER_OFF: 1
-      volumes:
-        - runner_volume:/home/runner
-      options: --user 0 --cpus 2
+      options: --user 0
 
     env:
       CC: gcc
@@ -33,71 +31,57 @@ jobs:
 
     defaults:
       run:
-        shell: bash
+        shell: bash --login -e -o pipefail {0} # login for environment modules
+        working-directory: /home/runner
 
     steps:
-      - name: compiler version
-        run: ${CXX} --version
-
-      - name: checkout chaste
-        uses: actions/checkout@v4
-        with:
-          repository: Chaste/Chaste
-          path: Chaste
-          ref: ${{ github.event.inputs.chaste_branch }}
-
-      - name: make build and test directories
+      - name: Checkout Chaste/${{ github.event.inputs.chaste_branch }}
         run: |
-          mkdir -p chaste-build-dir
-          mkdir -p chaste-test-dir
-          echo "CHASTE_TEST_OUTPUT=$(pwd)/chaste-test-dir" >> ${GITHUB_ENV}
+          su - runner
+          git clone --branch ${{ github.event.inputs.chaste_branch }} https://github.com/Chaste/Chaste
 
-      - name: create module init script
+      - name: Create load_modules script
         run: |
-          cat > init.sh<< EOF
-          source /etc/profile.d/modules.sh
+          su - runner
+          cat > load_modules.sh<< EOF
           module use /home/runner/modules/modulefiles
-          module purge
           module load boost petsc_hdf5 sundials vtk xercesc xsd
           EOF
-        working-directory: chaste-build-dir
 
-      - name: set runner user privileges
-        run: chown -R runner:runner .
-
-      - name: cmake configure
+      - name: Configure
         run: |
-          source init.sh
-          su -m runner -c "cmake -DCMAKE_BUILD_TYPE=Release ../Chaste"
-        working-directory: chaste-build-dir
+          su - runner
+          source load_modules.sh
+          mkdir -p Chaste/build && cd Chaste/build
+          cmake -DCMAKE_BUILD_TYPE=Release ..
 
-      - name: compile build info
+      - name: TestChasteBuildInfo
         run: |
-          source init.sh
-          su -m runner -c "cmake --build . --target TestChasteBuildInfo --parallel $(nproc)"
-          su -m runner -c "ctest -V -R TestChasteBuildInfo --output-on-failure"
-        working-directory: chaste-build-dir
+          su - runner
+          source load_modules.sh
+          cmake --build . --target TestChasteBuildInfo --parallel $(nproc)
+          ctest -V -R TestChasteBuildInfo --output-on-failure
 
-      - name: build continuous test pack
+      - name: Build Continuous test pack
         run: |
-          source init.sh
-          su -m runner -c "cmake --build . --target Continuous --parallel $(nproc)"
-        working-directory: chaste-build-dir
+          su - runner
+          source load_modules.sh
+          cmake --build . --target Continuous --parallel $(nproc)
 
-      - name: build nightly test pack
+      - name: Build Nightly test pack
         run: |
-          source init.sh
-          su -m runner -c "cmake --build . --target Nightly --parallel $(nproc)"
-        working-directory: chaste-build-dir
+          su - runner
+          source load_modules.sh
+          cmake --build . --target Nightly --parallel $(nproc)
 
-      - name: run continuous test pack
+      - name: Run Continuous test pack
         run: |
-          source init.sh
-          su -m runner -c "ctest -j $(nproc) -L Continuous --output-on-failure"
-        working-directory: chaste-build-dir
+          su - runner
+          source load_modules.sh
+          ctest -j $(nproc) -L Continuous --output-on-failure
 
-      - name: run nightly test pack
+      - name: Run Nightly test pack
         run: |
-          source init.sh
-          su -m runner -c "ctest -j $(nproc) -L Nightly --output-on-failure"
-        working-directory: chaste-build-dir
+          su - runner
+          source load_modules.sh
+          ctest -j $(nproc) -L Nightly --output-on-failure
