@@ -58,6 +58,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          file: ./Dockerfile.system
           pull: true
           push: true
           tags: ${{ matrix.tags }}
