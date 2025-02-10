@@ -10,7 +10,7 @@ on:
         default: "develop"
 
       image_tag:
-        description: "Portability image"
+        description: "Portability image tag"
         required: true
         type: string
         default: "jammy.portability-01"
@@ -25,10 +25,6 @@ jobs:
         RUNNER_OFF: 1
       options: --user 0
 
-    env:
-      CC: gcc
-      CXX: g++
-
     defaults:
       run:
         shell: bash --login -e -o pipefail {0} # login for environment modules
@@ -39,49 +35,46 @@ jobs:
         run: |
           su - runner
           git clone --branch ${{ github.event.inputs.chaste_branch }} https://github.com/Chaste/Chaste
+          mkdir -p Chaste/build
 
-      - name: Create load_modules script
+      - name: Create build env init script
         run: |
           su - runner
-          cat > load_modules.sh<< EOF
+
+          cat > init_build_env.sh<< EOF
+          su - runner
           module use /home/runner/modules/modulefiles
           module load boost petsc_hdf5 sundials vtk xercesc xsd
+          cd Chaste/build
           EOF
 
       - name: Configure
         run: |
-          su - runner
-          source load_modules.sh
-          mkdir -p Chaste/build && cd Chaste/build
+          source init_build_env.sh
           cmake -DCMAKE_BUILD_TYPE=Release ..
 
       - name: TestChasteBuildInfo
         run: |
-          su - runner
-          source load_modules.sh
+          source init_build_env.sh
           cmake --build . --target TestChasteBuildInfo --parallel $(nproc)
           ctest -V -R TestChasteBuildInfo --output-on-failure
 
       - name: Build Continuous test pack
         run: |
-          su - runner
-          source load_modules.sh
+          source init_build_env.sh
           cmake --build . --target Continuous --parallel $(nproc)
 
       - name: Build Nightly test pack
         run: |
-          su - runner
-          source load_modules.sh
+          source init_build_env.sh
           cmake --build . --target Nightly --parallel $(nproc)
 
       - name: Run Continuous test pack
         run: |
-          su - runner
-          source load_modules.sh
+          source init_build_env.sh
           ctest -j $(nproc) -L Continuous --output-on-failure
 
       - name: Run Nightly test pack
         run: |
-          su - runner
-          source load_modules.sh
+          source init_build_env.sh
           ctest -j $(nproc) -L Nightly --output-on-failure
