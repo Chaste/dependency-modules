@@ -2,7 +2,7 @@
 
 usage()
 {
-    echo 'Usage: '"$(basename $0)"' --petsc-version=version --petsc-arch={linux-gnu|linux-gnu-opt}'
+    echo 'Usage: '"$(basename $0)"' --petsc-version=version --petsc-arch=[{linux-gnu|linux-gnu-opt}]'
     echo '        --hdf5-version=version --modules-dir=path [--parallel=value]'
     exit 1
 }
@@ -45,13 +45,15 @@ if [ -z "${petsc_version}" ]; then usage; fi
 if [ -z "${hdf5_version}" ]; then usage; fi
 if [ -z "${base_dir}" ]; then usage; fi
 
-parallel="${parallel:-$(nproc)}"
+if [ -z "${petsc_arch}" ]; then
+    petsc_arch=linux-gnu
+fi
 
-if [[ ! (${petsc_arch} = 'linux-gnu' 
-      || ${petsc_arch} = 'linux-gnu-opt'
-      || ${petsc_arch} = 'system') ]]; then
+if [[ ! (${petsc_arch} = 'linux-gnu' || ${petsc_arch} = 'linux-gnu-opt') ]]; then
     usage
 fi
+
+parallel="${parallel:-$(nproc)}"
 
 read -r petsc_version petsc_major petsc_minor _ < <(split_version ${petsc_version})
 read -r hdf5_version hdf5_major hdf5_minor hdf5_patch < <(split_version ${hdf5_version})

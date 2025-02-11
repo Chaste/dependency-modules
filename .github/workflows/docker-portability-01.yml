@@ -31,7 +31,7 @@ on:
         description: "PETSc version"
         required: true
         type: string
-        default: "3.17.7"
+        default: "3.17.5"
 
       sundials_ver:
         description: "SUNDIALS version"
