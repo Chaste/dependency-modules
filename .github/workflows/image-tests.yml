@@ -32,10 +32,16 @@ jobs:
 
     steps:
       - name: Checkout Chaste/${{ github.event.inputs.chaste_branch }}
+        uses: actions/checkout@v4
+        with:
+          repository: Chaste/Chaste
+          path: /home/runner/Chaste
+          ref: ${{ github.event.inputs.chaste_branch }}
+
+      - name: Create build directory
         run: |
-          git clone -b ${{ github.event.inputs.chaste_branch }} https://github.com/Chaste/Chaste
-          cd Chaste && mkdir -p build
-        working-directory: /home/runner
+          mkdir -p build
+        working-directory: /home/runner/Chaste
 
       - name: Create build env init script
         run: |

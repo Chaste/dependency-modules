@@ -38,7 +38,7 @@ apt-get install -y --no-install-recommends \
 # https://bugs.launchpad.net/ubuntu/+source/expat/+bug/2058415
 if [ "${codename}" = 'jammy' ]; then
   apt-get update && \
-  apt-get install libexpat1=2.4.7-1 libexpat1-dev=2.4.7-1 && \
+  apt-get install -y libexpat1=2.4.7-1 libexpat1-dev=2.4.7-1 && \
   apt-mark hold libexpat1 libexpat1-dev
 fi
 
