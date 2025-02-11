@@ -17,9 +17,11 @@ apt-get install -y --no-install-recommends \
   wget
 
 # Chaste dependencies
-codename="$(. /etc/os-release && echo ${VERSION_CODENAME} | sed 's/\.//')"
-echo "deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu ${codename}/" > /etc/apt/sources.list.d/chaste.list
 wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
+
+codename="$(. /etc/os-release && echo ${VERSION_CODENAME} | sed 's/\.//')"
+repo="deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu ${codename}/"
+echo "${repo}" > /etc/apt/sources.list.d/chaste.list
 
 apt-get update && \
 apt-get install -y --no-install-recommends \
@@ -35,8 +37,9 @@ apt-get install -y --no-install-recommends \
 
 # https://bugs.launchpad.net/ubuntu/+source/expat/+bug/2058415
 if [ "${codename}" = 'jammy' ]; then
-    apt-get install libexpat1=2.4.7-1 libexpat1-dev=2.4.7-1
-    apt-mark hold libexpat1 libexpat1-dev
+  apt-get update && \
+  apt-get install libexpat1=2.4.7-1 libexpat1-dev=2.4.7-1 && \
+  apt-mark hold libexpat1 libexpat1-dev
 fi
 
 update-alternatives --install /usr/local/bin/python python /usr/bin/python3 10
