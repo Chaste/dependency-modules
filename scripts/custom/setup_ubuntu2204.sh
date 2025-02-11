@@ -33,7 +33,7 @@ apt-get install -y --no-install-recommends \
 apt-get install -y --no-install-recommends \
   libfftw3-3 \
   libfftw3-bin \
-  libfftw3-dev \
+  libfftw3-dev
 
 # VTK dependencies
 apt-get install -y --no-install-recommends \
@@ -53,8 +53,6 @@ apt-get install -y --no-install-recommends \
   libfontconfig1 \
   libfreetype6 \
   libfreetype6-dev \
-  libgdal-dev \
-  libgdal30 \
   libgl1-mesa-dev \
   libgl1-mesa-glx \
   libgl2ps-dev \
@@ -116,8 +114,15 @@ apt-get install -y --no-install-recommends \
   x11proto-core-dev \
   zlib1g \
   zlib1g-dev
-# mpi-default-bin mpi-default-dev  # to be supplied by custom petsc build
-# libexpat1-dev libexpat1  # to be supplied by custom vtk build
+
+# mpi-default-bin mpi-default-dev:
+# To be supplied by custom PETSc build for better compatibility.
+
+# libexpat1-dev libexpat1:
+# To be supplied by custom VTK build due to version conflicts.
+
+# libgdal-dev libgdal30:
+# To be supplied by custom VTK build due to reliance on system boost.
 
 update-alternatives --install /usr/local/bin/python python /usr/bin/python3 10
 update-alternatives --install /usr/local/bin/pip pip /usr/bin/pip3 10
