@@ -1,29 +1,80 @@
-name: docker-portability-01
+name: Docker Custom Image
 
 on:
   workflow_dispatch:
+    inputs:
+      ubuntu_codename:
+        description: "Ubuntu codename"
+        required: true
+        type: string
+        default: "jammy"
+
+      image_tag:
+        description: "Portability image tag"
+        required: true
+        type: string
+        default: "portability-dev"
+
+      boost_ver:
+        description: "Boost version"
+        required: true
+        type: string
+        default: "1.77.0"
+
+      hdf5_ver:
+        description: "HDF5 version"
+        required: true
+        type: string
+        default: "1.12.1"
+
+      petsc_ver:
+        description: "PETSc version"
+        required: true
+        type: string
+        default: "3.17.7"
+
+      sundials_ver:
+        description: "SUNDIALS version"
+        required: true
+        type: string
+        default: "6.7.0"
+
+      vtk_ver:
+        description: "VTK version"
+        required: true
+        type: string
+        default: "8.2.0"
+
+      xercesc_ver:
+        description: "Xerces-C version"
+        required: true
+        type: string
+        default: "3.2.4"
+
+      xsd_ver:
+        description: "XSD version"
+        required: true
+        type: string
+        default: "4.0.0"
 
 jobs:
   docker:
     runs-on: ubuntu-latest
 
     strategy:
-      fail-fast: false
       matrix:
         include:
-          - tags: |
-              chaste/runner:jammy.portability-01
-              chaste/runner:oldest-boost
+          - tags:
+              chaste/runner:${{ github.event.inputs.ubuntu_codename }}.${{github.event.inputs.image_tag }}
             build-args: |
-              BASE=jammy
-              XSD=4.0.0
-              XERCESC=3.2.2
-              SUNDIALS=3.1.2
-              BOOST=1.67.0
-              VTK=6.3.0
-              PETSC=3.12.4
-              HDF5=1.10.4
-
+              BASE=${{ github.event.inputs.ubuntu_codename }}
+              BOOST=${{ github.event.inputs.boost_ver }}
+              XSD=${{ github.event.inputs.xsd_ver }}
+              XERCESC=${{ github.event.inputs.xercesc_ver }}
+              SUNDIALS=${{ github.event.inputs.sundials_ver }}
+              VTK=${{ github.event.inputs.vtk_ver }}
+              PETSC=${{ github.event.inputs.petsc_ver }}
+              HDF5=${{ github.event.inputs.hdf5_ver }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -41,9 +92,10 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and export to Docker
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
+          file: ./Dockerfile
           pull: true
           load: true
           tags: ${{ matrix.tags }}
@@ -57,9 +109,10 @@ jobs:
           done
 
       - name: Build and push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
+          file: ./Dockerfile
           pull: true
           push: true
           tags: ${{ matrix.tags }}
