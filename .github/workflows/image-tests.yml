@@ -59,6 +59,7 @@ jobs:
           source load_modules.sh
           cmake -DCMAKE_BUILD_TYPE=Release ..
           EOF
+        working-directory: build
 
       - name: TestChasteBuildInfo
         run: |
