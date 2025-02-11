@@ -26,8 +26,7 @@ COPY scripts/*.sh scripts/system/ /usr/local/bin/
 
 # Setup Chaste dependencies and install actions runner
 RUN useradd -r -m -d ${DEFAULT_HOME} -s /bin/bash ${DEFAULT_USER} && \
-    os_id="$(. /etc/os-release && echo ${VERSION_ID} | sed 's/\.//')" && \
-    setup_ubuntu${os_id}.sh && \
+    setup_ubuntu.sh && \
     runner_install.sh --install_dir="/tmp/tmp-runner" && \
     /tmp/tmp-runner/bin/installdependencies.sh && \
     apt-get -y clean && \

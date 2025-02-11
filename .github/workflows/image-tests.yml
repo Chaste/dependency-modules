@@ -41,6 +41,7 @@ jobs:
         run: |
           cat > init_build_env.sh << 'EOF'
           #!/bin/bash
+          module use /home/runner/modules/modulefiles
           module load boost petsc_hdf5 sundials vtk xercesc xsd
           EOF
 
