@@ -25,10 +25,6 @@ jobs:
         RUNNER_OFF: 1
       options: --user 0
 
-    defaults:
-      run:
-        shell: bash --login -e -o pipefail {0} # login for environment modules
-
     steps:
       - name: Checkout Chaste/${{ github.event.inputs.chaste_branch }}
         uses: actions/checkout@v4
@@ -44,8 +40,11 @@ jobs:
         run: |
           cat > load_modules.sh << 'EOF'
           #!/bin/bash
+          source /etc/profile.d/modules.sh
           module use /home/runner/modules/modulefiles
+          module avail
           module load boost petsc_hdf5 sundials vtk xercesc xsd
+          module list
           EOF
         working-directory: build
 
