@@ -6,6 +6,9 @@ usage()
     exit 1
 }
 
+script_dir="$(cd "$(dirname "$0")"; pwd)"
+. ${script_dir}/common.sh
+
 # Parse arguments
 version=
 base_dir=
@@ -34,10 +37,7 @@ if [ -z "${base_dir}" ]; then usage; fi
 
 parallel="${parallel:-$(nproc)}"
 
-version_arr=(${version//\./ })
-major=${version_arr[0]}
-minor=${version_arr[1]}
-patch=${version_arr[2]}
+read -r version major minor patch < <(split_version ${version})
 
 # Unsupported versions: https://chaste.github.io/docs/installguides/dependency-versions/
 if [[ (${major} -lt 3) 

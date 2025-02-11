@@ -7,6 +7,9 @@ usage()
     exit 1
 }
 
+script_dir="$(cd "$(dirname "$0")"; pwd)"
+. ${script_dir}/common.sh
+
 # Parse arguments
 petsc_version=
 petsc_arch=
@@ -50,14 +53,8 @@ if [[ ! (${petsc_arch} = 'linux-gnu'
     usage
 fi
 
-petsc_version_arr=(${petsc_version//\./ })
-petsc_major=${petsc_version_arr[0]}
-petsc_minor=${petsc_version_arr[1]}
-
-hdf5_version_arr=(${hdf5_version//\./ })
-hdf5_major=${hdf5_version_arr[0]}
-hdf5_minor=${hdf5_version_arr[1]}
-hdf5_patch=${hdf5_version_arr[2]}
+read -r petsc_version petsc_major petsc_minor _ < <(split_version ${petsc_version})
+read -r hdf5_version hdf5_major hdf5_minor hdf5_patch < <(split_version ${hdf5_version})
 
 # Unsupported versions: https://chaste.github.io/docs/installguides/dependency-versions/
 if [[ (${petsc_major} -lt 3) 

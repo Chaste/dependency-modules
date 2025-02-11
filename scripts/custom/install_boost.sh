@@ -7,6 +7,7 @@ usage()
 }
 
 script_dir="$(cd "$(dirname "$0")"; pwd)"
+. ${script_dir}/common.sh
 
 # Parse arguments
 version=
@@ -36,9 +37,8 @@ if [ -z "${base_dir}" ]; then usage; fi
 
 parallel="${parallel:-$(nproc)}"
 
-version_arr=(${version//\./ })
-major=${version_arr[0]}
-minor=${version_arr[1]}
+read -r version major minor _ < <(split_version ${version})
+
 ver_si_on=${version//\./_}  # Converts 1.74.0 to 1_74_0
 
 # Unsupported versions: https://chaste.github.io/docs/installguides/dependency-versions/
