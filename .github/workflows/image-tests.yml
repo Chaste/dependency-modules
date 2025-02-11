@@ -34,17 +34,15 @@ jobs:
       - name: Checkout Chaste/${{ github.event.inputs.chaste_branch }}
         run: |
           git clone -b ${{ github.event.inputs.chaste_branch }} https://github.com/Chaste/Chaste
-          cd Chaste && mkdir build
+          cd Chaste && mkdir -p build
         working-directory: /home/runner
 
       - name: Create build env init script
         run: |
           cat > init_build_env.sh << 'EOF'
-          module use /home/runner/modules/modulefiles
+          #!/bin/bash
           module load boost petsc_hdf5 sundials vtk xercesc xsd
           EOF
-
-          cat init_build_env.sh
 
       - name: Configure
         run: |
@@ -55,7 +53,7 @@ jobs:
         run: |
           source init_build_env.sh
           cmake --build . --target TestChasteBuildInfo --parallel $(nproc)
-          ctest -V -R TestChasteBuildInfo --output-on-failure
+          ctest -V -R TestChasteBuildInfo$ --output-on-failure
 
       - name: Build Continuous test pack
         run: |
