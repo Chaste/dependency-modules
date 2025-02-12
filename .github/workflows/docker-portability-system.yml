@@ -17,7 +17,7 @@ jobs:
       matrix:
         include:
           - tags: |
-              chaste/runner:${{ github.event.inputs.ubuntu_codename }}.portability-system
+              chaste/runner:portability-${{ github.event.inputs.ubuntu_codename }}
             build-args: BASE=${{ github.event.inputs.ubuntu_codename }}
 
     steps:

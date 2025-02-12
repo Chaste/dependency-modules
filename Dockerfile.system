@@ -1,11 +1,11 @@
 # Build the image:
-# docker build -t chaste/runner:portability-system .
+# docker build -f Dockerfile.system -t chaste/runner:system .
 
 # Run the container in interactive mode:
-# docker run --init -it -e RUNNER_OFF=1 chaste/runner:portability-system /bin/bash
+# docker run --init -it -e RUNNER_OFF=1 chaste/runner:system /bin/bash
 
-# Run the container:
-# docker run --init -it chaste/runner:portability-system
+# Run the container as a GitHub Actions runner:
+# docker run --init -it chaste/runner:system
 
 ARG BASE=jammy
 

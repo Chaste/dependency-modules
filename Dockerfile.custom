@@ -1,11 +1,11 @@
 # Build the image:
-# docker build -t chaste/runner:portability-test .
+# docker build -f Dockerfile.custom -t chaste/runner:custom .
 
 # Run the container in interactive mode:
-# docker run --init -it -e RUNNER_OFF=1 chaste/runner:portability-test /bin/bash
+# docker run --init -it -e RUNNER_OFF=1 chaste/runner:custom /bin/bash
 
-# Run the container:
-# docker run --init -it chaste/runner:portability-test
+# Run the container as a GitHub Actions runner:
+# docker run --init -it chaste/runner:custom
 
 ARG BASE=jammy
 

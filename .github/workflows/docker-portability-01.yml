@@ -3,12 +3,6 @@ name: Docker Custom Image
 on:
   workflow_dispatch:
     inputs:
-      ubuntu_codename:
-        description: "Ubuntu codename"
-        required: true
-        type: string
-        default: "jammy"
-
       image_tag:
         description: "Portability image tag"
         required: true
@@ -65,9 +59,9 @@ jobs:
       matrix:
         include:
           - tags:
-              chaste/runner:${{ github.event.inputs.ubuntu_codename }}.${{github.event.inputs.image_tag }}
+              chaste/runner:${{github.event.inputs.image_tag }}
             build-args: |
-              BASE=${{ github.event.inputs.ubuntu_codename }}
+              BASE=jammy
               BOOST=${{ github.event.inputs.boost_ver }}
               XSD=${{ github.event.inputs.xsd_ver }}
               XERCESC=${{ github.event.inputs.xercesc_ver }}
@@ -95,7 +89,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./Dockerfile
+          file: ./Dockerfile.custom
           pull: true
           load: true
           tags: ${{ matrix.tags }}
@@ -112,7 +106,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./Dockerfile
+          file: ./Dockerfile.custom
           pull: true
           push: true
           tags: ${{ matrix.tags }}
