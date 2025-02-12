@@ -1,5 +1,5 @@
 # Build the image:
-# docker build -f Dockerfile.system -t chaste/runner:system .
+# docker build -f Dockerfile.system --build-arg BASE=jammy -t chaste/runner:system .
 
 # Run the container in interactive mode:
 # docker run --init -it -e RUNNER_OFF=1 chaste/runner:system /bin/bash

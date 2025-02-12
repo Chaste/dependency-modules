@@ -1,5 +1,5 @@
 # Build the image:
-# docker build -f Dockerfile.custom -t chaste/runner:custom .
+# docker build -f Dockerfile.custom --build-arg BOOST=1.74.0 ... -t chaste/runner:custom .
 
 # Run the container in interactive mode:
 # docker run --init -it -e RUNNER_OFF=1 chaste/runner:custom /bin/bash
@@ -57,18 +57,36 @@ RUN source /etc/profile.d/modules.sh && \
         --parallel=$(nproc) \
         --modules-dir=${MODULES_DIR} && \
     module test boost && \
+    rm -rf ${MODULES_DIR}/src/* && \
+    rm -rf /tmp/*
+
+RUN source /etc/profile.d/modules.sh && \
+    module use ${MODULES_DIR}/modulefiles && \
     module load boost && \
-    install_xsd.sh \
-        --version=${XSD} \
-        --modules-dir=${MODULES_DIR} && \
-    module test xsd && \
-    module load xsd && \
     install_xercesc.sh \
         --version=${XERCESC} \
         --parallel=$(nproc) \
         --modules-dir=${MODULES_DIR} && \
     module test xercesc && \
+    rm -rf ${MODULES_DIR}/src/* && \
+    rm -rf /tmp/*
+
+RUN source /etc/profile.d/modules.sh && \
+    module use ${MODULES_DIR}/modulefiles && \
+    module load boost && \
     module load xercesc && \
+    install_xsd.sh \
+        --version=${XSD} \
+        --modules-dir=${MODULES_DIR} && \
+    module test xsd && \
+    rm -rf ${MODULES_DIR}/src/* && \
+    rm -rf /tmp/*
+
+RUN source /etc/profile.d/modules.sh && \
+    module use ${MODULES_DIR}/modulefiles && \
+    module load boost && \
+    module load xercesc && \
+    module load xsd && \
     install_petsc_hdf5.sh \
         --petsc-version=${PETSC} \
         --petsc-arch=linux-gnu \
@@ -76,12 +94,29 @@ RUN source /etc/profile.d/modules.sh && \
         --parallel=$(nproc) \
         --modules-dir=${MODULES_DIR} && \
     module test petsc_hdf5 && \
+    rm -rf ${MODULES_DIR}/src/* && \
+    rm -rf /tmp/*
+
+RUN source /etc/profile.d/modules.sh && \
+    module use ${MODULES_DIR}/modulefiles && \
+    module load boost && \
+    module load xercesc && \
+    module load xsd && \
     module load petsc_hdf5 && \
     install_sundials.sh \
         --version=${SUNDIALS} \
         --parallel=$(nproc) \
         --modules-dir=${MODULES_DIR} && \
     module test sundials && \
+    rm -rf ${MODULES_DIR}/src/* && \
+    rm -rf /tmp/*
+
+RUN source /etc/profile.d/modules.sh && \
+    module use ${MODULES_DIR}/modulefiles && \
+    module load boost && \
+    module load xercesc && \
+    module load xsd && \
+    module load petsc_hdf5 && \
     module load sundials && \
     install_vtk.sh \
         --version=${VTK} \

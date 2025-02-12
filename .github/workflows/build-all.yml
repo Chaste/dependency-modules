@@ -117,22 +117,10 @@ jobs:
 
           module test boost/${{ env.BOOST_VER }}
 
-      - name: Build XSD
-        run: |
-          module use ${{ env.MODULES_DIR }}/modulefiles
-          module load boost/${{ env.BOOST_VER }}
-
-          ./install_xsd.sh \
-            --version=${{ env.XSD_VER }} \
-            --modules-dir=${{ env.MODULES_DIR }}
-
-          module test xsd/${{ env.XSD_VER }}
-
       - name: Build Xerces-C
         run: |
           module use ${{ env.MODULES_DIR }}/modulefiles
           module load boost/${{ env.BOOST_VER }}
-          module load xsd/${{ env.XSD_VER }}
 
           ./install_xercesc.sh \
             --version=${{ env.XERCESC_VER }} \
@@ -140,12 +128,24 @@ jobs:
 
           module test xercesc/${{ env.XERCESC_VER }}
 
+      - name: Build XSD
+        run: |
+          module use ${{ env.MODULES_DIR }}/modulefiles
+          module load boost/${{ env.BOOST_VER }}
+          module load xercesc/${{ env.XERCESC_VER }}
+
+          ./install_xsd.sh \
+            --version=${{ env.XSD_VER }} \
+            --modules-dir=${{ env.MODULES_DIR }}
+
+          module test xsd/${{ env.XSD_VER }}
+
       - name: Build PETSc + HDF5
         run: |
           module use ${{ env.MODULES_DIR }}/modulefiles
           module load boost/${{ env.BOOST_VER }}
-          module load xsd/${{ env.XSD_VER }}
           module load xercesc/${{ env.XERCESC_VER }}
+          module load xsd/${{ env.XSD_VER }}
 
           ./install_petsc_hdf5.sh \
             --petsc-version=${{ env.PETSC_VER }} \
@@ -159,8 +159,8 @@ jobs:
         run: |
           module use ${{ env.MODULES_DIR }}/modulefiles
           module load boost/${{ env.BOOST_VER }}
-          module load xsd/${{ env.XSD_VER }}
           module load xercesc/${{ env.XERCESC_VER }}
+          module load xsd/${{ env.XSD_VER }}
           module load petsc_hdf5/${{ env.PETSC_VER }}_${{ env.HDF5_VER }}/${{ env.PETSC_ARCH }}
 
           ./install_sundials.sh \
@@ -173,8 +173,8 @@ jobs:
         run: |
           module use ${{ env.MODULES_DIR }}/modulefiles
           module load boost/${{ env.BOOST_VER }}
-          module load xsd/${{ env.XSD_VER }}
           module load xercesc/${{ env.XERCESC_VER }}
+          module load xsd/${{ env.XSD_VER }}
           module load petsc_hdf5/${{ env.PETSC_VER }}_${{ env.HDF5_VER }}/${{ env.PETSC_ARCH }}
           module load sundials/${{ env.SUNDIALS_VER }}
 
@@ -193,8 +193,8 @@ jobs:
         run: |
           module use ${{ env.MODULES_DIR }}/modulefiles
           module load boost/${{ env.BOOST_VER }}
-          module load xsd/${{ env.XSD_VER }}
           module load xercesc/${{ env.XERCESC_VER }}
+          module load xsd/${{ env.XSD_VER }}
           module load petsc_hdf5/${{ env.PETSC_VER }}_${{ env.HDF5_VER }}/${{ env.PETSC_ARCH }}
           module load sundials/${{ env.SUNDIALS_VER }}
           module load vtk/${{ env.VTK_VER }}
