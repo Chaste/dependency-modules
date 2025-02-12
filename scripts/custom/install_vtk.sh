@@ -157,12 +157,15 @@ if [[ ${major} -eq 8 && ${minor} -eq 2 ]]; then  # VTK == 8.2.x
     patch -t -p1 < ${script_dir}/patches/vtk/8.2/vtk8-gcc-11-exodus.patch
 fi
 
-# VTK 9.0.x patches: https://sources.debian.org/patches/vtk9/
+# VTK 9.0.x patches:
+# https://sources.debian.org/patches/vtk9/
+# https://github.com/gentoo/gentoo/tree/4893345530421b0d6168b5278d57d69fc08f7fdf/sci-libs/vtk/files
 if [[ ${major} -eq 9 && ${minor} -eq 0 ]]; then  # VTK == 9.0.x
     cd ${src_dir}
     patch -t -p1 < ${script_dir}/patches/vtk/9.0/50_fix_python-modules_path.patch
     patch -t -p1 < ${script_dir}/patches/vtk/9.0/70_fix_python_numpy_warning.patch
     patch -t -p1 < ${script_dir}/patches/vtk/9.0/fix-limits.patch
+    patch -t -p1 < ${script_dir}/patches/vtk/9.0/vtk-9.0.3-proj-api-fix-upstream-commit-03256388.patch
 fi
 
 # VTK 9.1.x patches: https://sources.debian.org/patches/vtk9/
@@ -202,7 +205,7 @@ cmake \
     -DVTK_MODULE_USE_EXTERNAL_VTK_hdf5=ON \
     -DVTK_MODULE_USE_EXTERNAL_VTK_jpeg=ON \
     -DVTK_MODULE_USE_EXTERNAL_VTK_jsoncpp=ON \
-    -DVTK_MODULE_USE_EXTERNAL_VTK_libproj=ON \
+    -DVTK_MODULE_USE_EXTERNAL_VTK_libproj4=ON \
     -DVTK_MODULE_USE_EXTERNAL_VTK_libxml2=ON \
     -DVTK_MODULE_USE_EXTERNAL_VTK_lz4=ON \
     -DVTK_MODULE_USE_EXTERNAL_VTK_lzma=ON \
