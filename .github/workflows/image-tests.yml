@@ -10,17 +10,17 @@ on:
         default: "develop"
 
       image_tag:
-        description: "Portability image tag"
+        description: "Image tag: portability-<tag>"
         required: true
         type: string
-        default: "portability-dev"
+        default: "dev"
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
     container:
-      image: "chaste/runner:${{ github.event.inputs.image_tag }}"
+      image: "chaste/runner:portability-${{ github.event.inputs.image_tag }}"
       env:
         RUNNER_OFF: 1
       options: --user 0
