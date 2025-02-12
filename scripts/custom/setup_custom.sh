@@ -1,8 +1,9 @@
 #!/bin/sh
+# Setup required libraries for building Chaste dependencies on Ubuntu 22.04 Jammy
 
 export DEBIAN_FRONTEND=noninteractive
 
-# System dependencies
+# Base dependencies
 apt-get update && \
 apt-get install -y --no-install-recommends \
   apt-transport-https \
@@ -16,7 +17,7 @@ apt-get install -y --no-install-recommends \
   rsync \
   wget
 
-# Build dependencies
+# Build/dev dependencies
 apt-get install -y --no-install-recommends \
   build-essential \
   cmake \

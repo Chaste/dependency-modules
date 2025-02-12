@@ -9,15 +9,6 @@ on:
         type: string
         default: "1.83.0"
 
-      os:
-        description: "OS"
-        required: true
-        type: choice
-        options:
-          - "ubuntu-22.04"
-          - "ubuntu-24.04"
-        default: "ubuntu-22.04"
-
 defaults:
   run:
     shell: bash --login -e -o pipefail {0} # login for environment modules
@@ -27,7 +18,7 @@ jobs:
   setup:
     name: Build Boost ${{ github.event.inputs.boost_ver }}
 
-    runs-on: ${{ github.event.inputs.os }}
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout
@@ -35,15 +26,12 @@ jobs:
 
       - name: Set env
         run: |
-          source /etc/os-release
-          OS_ID="$(echo ${ID}${VERSION_ID} | sed 's/\.//')"
-          echo "OS_ID=${OS_ID}" >> $GITHUB_ENV
           echo "MODULES_DIR=$HOME/modules" >> $GITHUB_ENV
           echo "BOOST_VER=${{ github.event.inputs.boost_ver }}" >> $GITHUB_ENV
 
       - name: Setup OS
         run: |
-          sudo ./setup_${{ env.OS_ID }}.sh
+          sudo ./setup_custom.sh
 
       - name: List environment modules
         run: |

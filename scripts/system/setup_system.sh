@@ -1,8 +1,9 @@
 #!/bin/sh
+# Setup Chaste system dependency versions on Ubuntu
 
 export DEBIAN_FRONTEND=noninteractive
 
-# System dependencies
+# Base dependencies
 apt-get update && \
 apt-get install -y --no-install-recommends \
   apt-transport-https \

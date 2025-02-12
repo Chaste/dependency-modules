@@ -7,9 +7,7 @@
 # Run the container as a GitHub Actions runner:
 # docker run --init -it chaste/runner:custom
 
-ARG BASE=jammy
-
-FROM ubuntu:${BASE}
+FROM ubuntu:jammy
 
 ARG BOOST
 ARG HDF5
@@ -34,8 +32,7 @@ COPY scripts/*.sh scripts/custom/ /usr/local/bin/
 
 # Setup base dependencies and install actions runner
 RUN useradd -r -m -d ${DEFAULT_HOME} -s /bin/bash ${DEFAULT_USER} && \
-    os_id="$(. /etc/os-release && echo ${VERSION_ID} | sed 's/\.//')" && \
-    setup_ubuntu${os_id}.sh && \
+    setup_custom.sh && \
     runner_install.sh --install_dir="/tmp/tmp-runner" && \
     /tmp/tmp-runner/bin/installdependencies.sh && \
     apt-get -y clean && \
