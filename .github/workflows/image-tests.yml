@@ -9,8 +9,8 @@ on:
         type: string
         default: "develop"
 
-      image_tag:
-        description: "Image tag: portability-<tag>"
+      tag_suffix:
+        description: "Tag suffix i.e. portability-<suffix>"
         required: true
         type: string
         default: "dev"
@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: "chaste/runner:portability-${{ github.event.inputs.image_tag }}"
+      image: "chaste/runner:portability-${{ github.event.inputs.tag_suffix }}"
       env:
         RUNNER_OFF: 1
       options: --user 0

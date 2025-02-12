@@ -3,8 +3,8 @@ name: Docker Custom Image
 on:
   workflow_dispatch:
     inputs:
-      image_tag:
-        description: "Image tag: portability-<tag>"
+      tag_suffix:
+        description: "Tag suffix i.e. portability-<suffix>"
         required: true
         type: string
         default: "dev"
@@ -58,17 +58,15 @@ jobs:
     strategy:
       matrix:
         include:
-          - tags:
-              chaste/runner:portability-${{github.event.inputs.image_tag }}
+          - tags: chaste/runner:portability-${{github.event.inputs.tag_suffix }}
             build-args: |
-              BASE=jammy
               BOOST=${{ github.event.inputs.boost_ver }}
-              XSD=${{ github.event.inputs.xsd_ver }}
-              XERCESC=${{ github.event.inputs.xercesc_ver }}
+              HDF5=${{ github.event.inputs.hdf5_ver }}
+              PETSC=${{ github.event.inputs.petsc_ver }}
               SUNDIALS=${{ github.event.inputs.sundials_ver }}
               VTK=${{ github.event.inputs.vtk_ver }}
-              PETSC=${{ github.event.inputs.petsc_ver }}
-              HDF5=${{ github.event.inputs.hdf5_ver }}
+              XERCESC=${{ github.event.inputs.xercesc_ver }}
+              XSD=${{ github.event.inputs.xsd_ver }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
