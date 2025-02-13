@@ -94,7 +94,7 @@ elif [[ (${hdf5_major} -eq 1) && (${hdf5_minor} -eq 12) && (${hdf5_patch} -lt 4)
     URL_HDF5=https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-${hdf5_ver_si_on}.tar.gz
 
 else
-    # HDF5 >=1.10.12, <1.12
+    # HDF5 >=1.10.12, <1.11
     # HDF5 >=1.12.4, <1.13
     # HDF5 >=1.14.4, <1.15
     # + catch-all
