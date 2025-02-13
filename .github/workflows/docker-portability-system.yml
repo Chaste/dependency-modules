@@ -1,33 +1,24 @@
-name: docker-portability-system
+name: Docker System Image
 
 on:
   workflow_dispatch:
     inputs:
-      ubuntu_release:
-        description: "Ubuntu release"
+      ubuntu_codename:
+        description: "Ubuntu codename"
         required: true
         type: string
-        default: "mantic"
+        default: "jammy"
 
 jobs:
   docker:
     runs-on: ubuntu-latest
 
     strategy:
-      fail-fast: false
       matrix:
         include:
           - tags: |
-              chaste/runner:${{ github.event.inputs.ubuntu_release }}.portability-system
-            build-args: |
-              BASE=${{ github.event.inputs.ubuntu_release }}
-              XSD=system
-              XERCESC=system
-              SUNDIALS=system
-              BOOST=system
-              VTK=system
-              PETSC=system
-              HDF5=system
+              chaste/runner:portability-${{ github.event.inputs.ubuntu_codename }}
+            build-args: BASE=${{ github.event.inputs.ubuntu_codename }}
 
     steps:
       - name: Checkout
@@ -46,9 +37,10 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and export to Docker
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
+          file: ./Dockerfile.system
           pull: true
           load: true
           tags: ${{ matrix.tags }}
@@ -62,9 +54,10 @@ jobs:
           done
 
       - name: Build and push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
+          file: ./Dockerfile.system
           pull: true
           push: true
           tags: ${{ matrix.tags }}

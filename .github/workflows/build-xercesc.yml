@@ -1,0 +1,51 @@
+name: Build Xerces-C
+
+on:
+  workflow_dispatch:
+    inputs:
+      xercesc_ver:
+        description: "Xerces-C version"
+        required: true
+        type: string
+        default: "3.2.4"
+
+defaults:
+  run:
+    shell: bash --login -e -o pipefail {0} # login for environment modules
+    working-directory: ./scripts/custom
+
+jobs:
+  setup:
+    name: Build Xerces-C ${{ github.event.inputs.xercesc_ver }}
+
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set env
+        run: |
+          echo "MODULES_DIR=$HOME/modules" >> $GITHUB_ENV
+          echo "XERCESC_VER=${{ github.event.inputs.xercesc_ver }}" >> $GITHUB_ENV
+
+      - name: Setup OS
+        run: |
+          sudo ./setup_custom.sh
+
+      - name: List environment modules
+        run: |
+          module avail
+
+      - name: Run build script
+        run: |
+          ./install_xercesc.sh \
+            --version=${{ env.XERCESC_VER }} \
+            --modules-dir=${{ env.MODULES_DIR }}
+
+      - name: Test
+        run: |
+          module use ${{ env.MODULES_DIR }}/modulefiles
+          module avail
+          module load xercesc/${{ env.XERCESC_VER }}
+          module test xercesc/${{ env.XERCESC_VER }}

@@ -1,0 +1,51 @@
+name: Build XSD
+
+on:
+  workflow_dispatch:
+    inputs:
+      xsd_ver:
+        description: "XSD version"
+        required: true
+        type: string
+        default: "4.0.0"
+
+defaults:
+  run:
+    shell: bash --login -e -o pipefail {0} # login for environment modules
+    working-directory: ./scripts/custom
+
+jobs:
+  setup:
+    name: Build XSD ${{ github.event.inputs.xsd_ver }}
+
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set env
+        run: |
+          echo "MODULES_DIR=$HOME/modules" >> $GITHUB_ENV
+          echo "XSD_VER=${{ github.event.inputs.xsd_ver }}" >> $GITHUB_ENV
+
+      - name: Setup OS
+        run: |
+          sudo ./setup_custom.sh
+
+      - name: List environment modules
+        run: |
+          module avail
+
+      - name: Run build script
+        run: |
+          ./install_xsd.sh \
+            --version=${{ env.XSD_VER }} \
+            --modules-dir=${{ env.MODULES_DIR }}
+
+      - name: Test
+        run: |
+          module use ${{ env.MODULES_DIR }}/modulefiles
+          module avail
+          module load xsd/${{ env.XSD_VER }}
+          module test xsd/${{ env.XSD_VER }}

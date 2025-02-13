@@ -1,0 +1,52 @@
+name: Build VTK
+
+on:
+  workflow_dispatch:
+    inputs:
+      vtk_ver:
+        description: "VTK version"
+        required: true
+        type: string
+        default: "9.1.0"
+
+defaults:
+  run:
+    shell: bash --login -e -o pipefail {0} # login for environment modules
+    working-directory: ./scripts/custom
+
+jobs:
+  setup:
+    name: Build VTK ${{ github.event.inputs.vtk_ver }}
+
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set env
+        run: |
+          echo "MODULES_DIR=$HOME/modules" >> $GITHUB_ENV
+          echo "VTK_VER=${{ github.event.inputs.vtk_ver }}" >> $GITHUB_ENV
+
+      - name: Setup OS
+        run: |
+          sudo ./setup_custom.sh && \
+          sudo apt-get install -y libboost-dev mpi-default-bin mpi-default-dev
+
+      - name: List environment modules
+        run: |
+          module avail
+
+      - name: Run build script
+        run: |
+          ./install_vtk.sh \
+            --version=${{ env.VTK_VER }} \
+            --modules-dir=${{ env.MODULES_DIR }}
+
+      - name: Test
+        run: |
+          module use ${{ env.MODULES_DIR }}/modulefiles
+          module avail
+          module load vtk/${{ env.VTK_VER }}
+          module test vtk/${{ env.VTK_VER }}

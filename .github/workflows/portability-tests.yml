@@ -1,0 +1,102 @@
+name: Portability
+
+on:
+  workflow_dispatch:
+    inputs:
+      chaste_branch:
+        description: "Chaste branch"
+        required: true
+        type: string
+        default: "develop"
+
+      tag_suffix:
+        description: "Tag suffix i.e. portability-<suffix>"
+        required: true
+        type: string
+        default: "dev"
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    container:
+      image: "chaste/runner:portability-${{ github.event.inputs.tag_suffix }}"
+      env:
+        RUNNER_OFF: 1
+      options: --user 0
+
+    steps:
+      - name: Checkout Chaste/${{ github.event.inputs.chaste_branch }}
+        uses: actions/checkout@v4
+        with:
+          repository: Chaste/Chaste
+          ref: ${{ github.event.inputs.chaste_branch }}
+
+      - name: Create build directory
+        run: |
+          mkdir -p build
+
+      - name: Create module loading script
+        run: |
+          cat > load_modules.sh << 'EOF'
+          #!/bin/bash
+          source /etc/profile.d/modules.sh
+          module use /home/runner/modules/modulefiles
+          module avail
+          module load boost petsc_hdf5 sundials vtk xercesc xsd
+          module list
+          EOF
+        working-directory: build
+
+      - name: Authorize runner user
+        run: |
+          chown -R runner:runner .
+
+      - name: Configure
+        run: |
+          su runner << 'EOF'
+          source load_modules.sh
+          cmake -DCMAKE_BUILD_TYPE=Release ..
+          EOF
+        working-directory: build
+
+      - name: TestChasteBuildInfo
+        run: |
+          su runner << 'EOF'
+          source load_modules.sh
+          cmake --build . --target TestChasteBuildInfo --parallel $(nproc)
+          ctest -V -R TestChasteBuildInfo$ --output-on-failure
+          EOF
+        working-directory: build
+
+      - name: Build Continuous test pack
+        run: |
+          su runner << 'EOF'
+          source load_modules.sh
+          cmake --build . --target Continuous --parallel $(nproc)
+          EOF
+        working-directory: build
+
+      - name: Build Nightly test pack
+        run: |
+          su runner << 'EOF'
+          source load_modules.sh
+          cmake --build . --target Nightly --parallel $(nproc)
+          EOF
+        working-directory: build
+
+      - name: Run Continuous test pack
+        run: |
+          su runner << 'EOF'
+          source load_modules.sh
+          ctest -j $(nproc) -L Continuous --output-on-failure
+          EOF
+        working-directory: build
+
+      - name: Run Nightly test pack
+        run: |
+          su runner << 'EOF'
+          source load_modules.sh
+          ctest -j $(nproc) -L Nightly --output-on-failure
+          EOF
+        working-directory: build

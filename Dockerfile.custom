@@ -1,0 +1,127 @@
+# Build the image:
+# docker build -f Dockerfile.custom --build-arg BOOST=1.74.0 ... -t chaste/runner:custom .
+
+# Run the container in interactive mode:
+# docker run --init -it -e RUNNER_OFF=1 chaste/runner:custom /bin/bash
+
+# Run the container as a GitHub Actions runner:
+# docker run --init -it chaste/runner:custom
+
+FROM ubuntu:jammy
+
+ARG BOOST
+ARG HDF5
+ARG PETSC
+ARG SUNDIALS
+ARG VTK
+ARG XERCESC
+ARG XSD
+
+SHELL ["/bin/bash", "-e", "-o", "pipefail", "-c"]
+
+USER root
+
+ENV DEFAULT_USER="runner" \
+    DEFAULT_HOME="/home/runner" \
+    RUNNER_DIR="/home/runner/actions-runner" \
+    RUNNER_WORK_DIR="/home/runner/_work" \
+    MODULES_DIR="/home/runner/modules"
+
+# Copy scripts
+COPY scripts/*.sh scripts/custom/ /usr/local/bin/
+
+# Setup base dependencies and install actions runner
+RUN useradd -r -m -d ${DEFAULT_HOME} -s /bin/bash ${DEFAULT_USER} && \
+    setup_custom.sh && \
+    runner_install.sh --install_dir="/tmp/tmp-runner" && \
+    /tmp/tmp-runner/bin/installdependencies.sh && \
+    apt-get -y clean && \
+    rm -rf /var/cache/apt && \
+    rm -rf /var/lib/apt/lists/* && \
+    rm -rf /var/tmp/* && \
+    rm -rf /tmp/*
+
+USER ${DEFAULT_USER}:${DEFAULT_USER}
+WORKDIR ${DEFAULT_HOME}
+
+# Build Chaste dependencies from source
+RUN source /etc/profile.d/modules.sh && \
+    mkdir -p ${MODULES_DIR}/modulefiles && \
+    module use ${MODULES_DIR}/modulefiles && \
+    echo "module use ${MODULES_DIR}/modulefiles" >> ${DEFAULT_HOME}/.bashrc && \
+    install_boost.sh \
+        --version=${BOOST} \
+        --parallel=$(nproc) \
+        --modules-dir=${MODULES_DIR} && \
+    module test boost && \
+    rm -rf ${MODULES_DIR}/src/* && \
+    rm -rf /tmp/*
+
+RUN source /etc/profile.d/modules.sh && \
+    module use ${MODULES_DIR}/modulefiles && \
+    module load boost && \
+    install_xercesc.sh \
+        --version=${XERCESC} \
+        --parallel=$(nproc) \
+        --modules-dir=${MODULES_DIR} && \
+    module test xercesc && \
+    rm -rf ${MODULES_DIR}/src/* && \
+    rm -rf /tmp/*
+
+RUN source /etc/profile.d/modules.sh && \
+    module use ${MODULES_DIR}/modulefiles && \
+    module load boost && \
+    module load xercesc && \
+    install_xsd.sh \
+        --version=${XSD} \
+        --modules-dir=${MODULES_DIR} && \
+    module test xsd && \
+    rm -rf ${MODULES_DIR}/src/* && \
+    rm -rf /tmp/*
+
+RUN source /etc/profile.d/modules.sh && \
+    module use ${MODULES_DIR}/modulefiles && \
+    module load boost && \
+    module load xercesc && \
+    module load xsd && \
+    install_petsc_hdf5.sh \
+        --petsc-version=${PETSC} \
+        --petsc-arch=linux-gnu \
+        --hdf5-version=${HDF5} \
+        --parallel=$(nproc) \
+        --modules-dir=${MODULES_DIR} && \
+    module test petsc_hdf5 && \
+    rm -rf ${MODULES_DIR}/src/* && \
+    rm -rf /tmp/*
+
+RUN source /etc/profile.d/modules.sh && \
+    module use ${MODULES_DIR}/modulefiles && \
+    module load boost && \
+    module load xercesc && \
+    module load xsd && \
+    module load petsc_hdf5 && \
+    install_sundials.sh \
+        --version=${SUNDIALS} \
+        --parallel=$(nproc) \
+        --modules-dir=${MODULES_DIR} && \
+    module test sundials && \
+    rm -rf ${MODULES_DIR}/src/* && \
+    rm -rf /tmp/*
+
+RUN source /etc/profile.d/modules.sh && \
+    module use ${MODULES_DIR}/modulefiles && \
+    module load boost && \
+    module load xercesc && \
+    module load xsd && \
+    module load petsc_hdf5 && \
+    module load sundials && \
+    install_vtk.sh \
+        --version=${VTK} \
+        --parallel=$(nproc) \
+        --modules-dir=${MODULES_DIR} && \
+    module test vtk && \
+    module load vtk && \
+    rm -rf ${MODULES_DIR}/src/* && \
+    rm -rf /tmp/*
+
+ENTRYPOINT ["docker-entrypoint.sh"]

@@ -1,0 +1,51 @@
+name: Build Boost
+
+on:
+  workflow_dispatch:
+    inputs:
+      boost_ver:
+        description: "Boost version"
+        required: true
+        type: string
+        default: "1.83.0"
+
+defaults:
+  run:
+    shell: bash --login -e -o pipefail {0} # login for environment modules
+    working-directory: ./scripts/custom
+
+jobs:
+  setup:
+    name: Build Boost ${{ github.event.inputs.boost_ver }}
+
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set env
+        run: |
+          echo "MODULES_DIR=$HOME/modules" >> $GITHUB_ENV
+          echo "BOOST_VER=${{ github.event.inputs.boost_ver }}" >> $GITHUB_ENV
+
+      - name: Setup OS
+        run: |
+          sudo ./setup_custom.sh
+
+      - name: List environment modules
+        run: |
+          module avail
+
+      - name: Run build script
+        run: |
+          ./install_boost.sh \
+            --version=${{ env.BOOST_VER }} \
+            --modules-dir=${{ env.MODULES_DIR }}
+
+      - name: Test
+        run: |
+          module use ${{ env.MODULES_DIR }}/modulefiles
+          module avail
+          module load boost/${{ env.BOOST_VER }}
+          module test boost/${{ env.BOOST_VER }}

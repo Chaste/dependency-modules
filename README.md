@@ -1,9 +1,9 @@
-![boost](https://github.com/Chaste/dependency-modules/actions/workflows/boost.yml/badge.svg)
-![petsc_hdf5](https://github.com/Chaste/dependency-modules/actions/workflows/petsc_hdf5.yml/badge.svg)
-![sundials](https://github.com/Chaste/dependency-modules/actions/workflows/sundials.yml/badge.svg)
-![vtk](https://github.com/Chaste/dependency-modules/actions/workflows/vtk.yml/badge.svg)
-![xercesc](https://github.com/Chaste/dependency-modules/actions/workflows/xercesc.yml/badge.svg)
-![xsd](https://github.com/Chaste/dependency-modules/actions/workflows/xsd.yml/badge.svg)
+![boost](https://github.com/Chaste/dependency-modules/actions/workflows/build-boost.yml/badge.svg)
+![petsc_hdf5](https://github.com/Chaste/dependency-modules/actions/workflows/build-petsc_hdf5.yml/badge.svg)
+![sundials](https://github.com/Chaste/dependency-modules/actions/workflows/build-sundials.yml/badge.svg)
+![vtk](https://github.com/Chaste/dependency-modules/actions/workflows/build-vtk.yml/badge.svg)
+![xercesc](https://github.com/Chaste/dependency-modules/actions/workflows/build-xercesc.yml/badge.svg)
+![xsd](https://github.com/Chaste/dependency-modules/actions/workflows/build-xsd.yml/badge.svg)
 
 # Chaste Dependency Modules
 
@@ -19,6 +19,10 @@ Installation on Ubuntu:
 
 ``` bash
 apt-get install environment-modules
+```
+
+To activate environment modules, close and open a new bash shell, or alternatively run:
+```bash
 source /etc/profile.d/modules.sh
 ```
 
@@ -39,17 +43,24 @@ The command `module use directory` prepends `directory` to `MODULEPATH`.
 
 ### 3. Install Chaste dependencies
 
+Clone the repository and navigate to the custom build scripts
 ``` bash
-./install_xsd.sh --version=4.0.0 --modules-dir=${MODULES_DIR}
-./install_xercesc.sh --version=3.2.1 --modules-dir=${MODULES_DIR}
-./install_sundials.sh --version=5.8.0 --modules-dir=${MODULES_DIR}
-./install_boost.sh --version=1.69.0 --modules-dir=${MODULES_DIR}
-./install_vtk.sh --version=9.0.0 --modules-dir=${MODULES_DIR}
-./install_petsc_hdf5.sh --petsc-version=3.12.4 --hdf5-version=1.10.4 \
-    --petsc-arch=linux-gnu --modules-dir=${MODULES_DIR}
+git clone https://github.com/Chaste/dependency-modules.git
+cd dependency-modules/scripts/custom
 ```
 
-The utility scripts follow this directory structure:
+Install the dependencies
+``` bash
+./install_xsd.sh --version=4.0.0 --modules-dir=${MODULES_DIR}
+./install_xercesc.sh --version=3.2.4 --modules-dir=${MODULES_DIR}
+./install_sundials.sh --version=6.4.0 --modules-dir=${MODULES_DIR}
+./install_boost.sh --version=1.83.0 --modules-dir=${MODULES_DIR}
+./install_vtk.sh --version=9.3.1 --modules-dir=${MODULES_DIR}
+./install_petsc_hdf5.sh --petsc-version=3.19.6 --hdf5-version=1.10.10 \
+    --petsc-arch=linux-gnu-opt --modules-dir=${MODULES_DIR}
+```
+
+The scripts will build and install dependencies following this directory structure:
 
 ``` bash
 <modules-dir>
@@ -68,11 +79,11 @@ Modulefiles are placed under `modulefiles`.
 
 ``` bash
 module load xsd/4.0.0
-module load xercesc/3.2.1
-module load sundials/5.8.0
-module load boost/1.69.0
-module load vtk/9.0.0
-module load petsc_hdf5/3.12.4_1.10.4/linux-gnu
+module load xercesc/3.2.4
+module load sundials/6.4.0
+module load boost/1.83.0
+module load vtk/9.3.1
+module load petsc_hdf5/3.19.6_1.10.10/linux-gnu-opt
 ```
 
 ### 5. Build Chaste
