@@ -56,7 +56,9 @@ fi
 parallel="${parallel:-$(nproc)}"
 
 read -r petsc_version petsc_major petsc_minor _ < <(split_version ${petsc_version})
+
 read -r hdf5_version hdf5_major hdf5_minor hdf5_patch < <(split_version ${hdf5_version})
+hdf5_ver_si_on=${hdf5_version//\./_}  # Converts 1.14.0 to 1_14_0
 
 # Unsupported versions: https://chaste.github.io/docs/installguides/dependency-versions/
 if [[ (${petsc_major} -lt 3) 
@@ -65,9 +67,12 @@ if [[ (${petsc_major} -lt 3)
     exit 1
 fi
 
-if [[ (${hdf5_major} -lt 1) 
-  || ((${hdf5_major} -eq 1) && (${hdf5_minor} -lt 10))
-  || ((${hdf5_major} -eq 1) && (${hdf5_minor} -eq 10) && (${hdf5_patch} -lt 4)) ]]; then  # HDF5 < 1.10.4
+if [[ (${hdf5_major} -lt 1)  # HDF5 < 1.x
+   || ((${hdf5_major} -eq 1) && (${hdf5_minor} -lt 10))  # HDF5 < 1.10.x
+   || ((${hdf5_major} -eq 1) && (${hdf5_minor} -eq 10) && (${hdf5_patch} -lt 4))  # HDF5 < 1.10.4
+   || ((${hdf5_major} -eq 1) && (${hdf5_minor} -eq 11))  # HDF5 == 1.11.x
+   || ((${hdf5_major} -eq 1) && (${hdf5_minor} -eq 13))  # HDF5 == 1.13.x
+   ]]; then
     echo "$(basename $0): HDF5 versions < 1.10.4 not supported"
     exit 1
 fi
@@ -77,7 +82,25 @@ mkdir -p ${base_dir}/src/petsc_hdf5
 cd ${base_dir}/src/petsc_hdf5
 
 download_hdf5=1
-URL_HDF5=https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-${hdf5_major}.${hdf5_minor}/hdf5-${hdf5_version}/src/hdf5-${hdf5_version}.tar.gz
+URL_HDF5=
+if [[ ((${hdf5_major} -eq 1) && (${hdf5_minor} -eq 10) && (${hdf5_patch} -lt 12))  # HDF5 >=1.10.0, <1.10.12
+   || ((${hdf5_major} -eq 1) && (${hdf5_minor} -eq 12) && (${hdf5_patch} -lt 2))   # HDF5 >=1.12.0, <1.12.2
+   ]]; then
+    URL_HDF5=https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-${hdf5_major}.${hdf5_minor}/hdf5-${hdf5_version}/src/hdf5-${hdf5_version}.tar.gz
+
+elif [[ (${hdf5_major} -eq 1) && (${hdf5_minor} -eq 12) && (${hdf5_patch} -lt 4) # HDF5 >=1.12.2, <1.12.4
+     || (${hdf5_major} -eq 1) && (${hdf5_minor} -eq 14) && (${hdf5_patch} -lt 4) # HDF5 >=1.14.0, <1.14.4
+     ]]; then
+    URL_HDF5=https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-${hdf5_ver_si_on}.tar.gz
+
+else
+    # HDF5 >=1.10.12, <1.12
+    # HDF5 >=1.12.4, <1.13
+    # HDF5 >=1.14.4, <1.15
+    # + catch-all
+    URL_HDF5=https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-${hdf5_version}.tar.gz
+fi
+
 wget -nc ${URL_HDF5}
 download_hdf5=$(pwd)/$(basename ${URL_HDF5})
 
