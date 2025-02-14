@@ -40,8 +40,7 @@ parallel="${parallel:-$(nproc)}"
 read -r version major minor _ < <(split_version ${version})
 
 # Unsupported versions: https://chaste.github.io/docs/installguides/dependency-versions/
-if [[ (${major} -lt 6) 
-  || ((${major} -eq 6) && (${minor} -lt 3)) ]]; then  # VTK < 6.3.x
+if version_lt "${version}" '6.3'; then  # VTK < 6.3.x
     echo "$(basename $0): VTK versions < 6.3 not supported"
     exit 1
 fi

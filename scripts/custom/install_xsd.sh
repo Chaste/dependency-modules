@@ -34,7 +34,7 @@ if [ -z "${base_dir}" ]; then usage; fi
 read -r version major minor _ < <(split_version ${version})
 
 # Unsupported versions: https://chaste.github.io/docs/installguides/dependency-versions/
-if [ ${major} -lt 4 ]; then  # XSD < 4.0.x
+if version_lt "${version}" '4.0.0'; then  # XSD < 4.0.0
     echo "$(basename $0): XSD versions < 4.0 not supported"
     exit 1
 fi

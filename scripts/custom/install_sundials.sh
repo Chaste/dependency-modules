@@ -37,11 +37,10 @@ if [ -z "${base_dir}" ]; then usage; fi
 
 parallel="${parallel:-$(nproc)}"
 
-read -r version major minor _ < <(split_version ${version})
+read -r version _ < <(split_version ${version})
 
 # Unsupported versions: https://chaste.github.io/docs/installguides/dependency-versions/
-if [[ (${major} -lt 3) 
-  || ((${major} -eq 3) && (${minor} -lt 1)) ]]; then  # Sundials < 3.1.x
+if version_lt "${version}" '3.1'; then  # Sundials < 3.1.x
     echo "$(basename $0): Sundials versions < 3.1 not supported"
     exit 1
 fi
