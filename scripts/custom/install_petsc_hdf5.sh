@@ -71,12 +71,12 @@ if version_lt "${hdf5_version}" '1.10.4'; then  # HDF5 < 1.10.4
     exit 1
 fi
 
-if [[ ${hdf5_major} -eq 1 && ${hdf5_minor} -eq 11 ]]; then  # HDF5 == 1.11.x
+if version_eq "${hdf5_major}.${hdf5_minor}" '1.11'; then  # HDF5 == 1.11.x
     echo "$(basename $0): HDF5 1.11.x not supported"
     exit 1
 fi
 
-if [[ ${hdf5_major} -eq 1 && ${hdf5_minor} -eq 13 ]]; then  # HDF5 == 1.13.x
+if version_eq "${hdf5_major}.${hdf5_minor}" '1.13'; then  # HDF5 == 1.13.x
     echo "$(basename $0): HDF5 1.13.x not supported"
     exit 1
 fi

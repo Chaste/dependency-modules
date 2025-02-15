@@ -4,23 +4,22 @@
 #
 # Usage: split_version <version>
 #
-# Returns: version major minor patch
+# Returns: version major minor patch[ rc]
 #
 # Examples:
-# `split_version 1.2.3` -> 1.2.3 1 2 3
 # `split_version 1` -> 1.0.0 1 0 0
+# `split_version 1.2` -> 1.2.0 1 2 0
+# `split_version 1.2.3` -> 1.2.3 1 2 3
+# `split_version 1.2.3-rc1` -> 1.2.3-rc1 1 2 3 rc1
 split_version()
 {
-  local version varr major minor patch rc
-  version=$1
-  varr=(${version//\./ })
+  local varr parr major minor=0 patch=0 rc
+  varr=(${1//\./ })  # split version string on '.'
   major=${varr[0]}
-  minor=0
-  patch=0
   if [ ${#varr[@]} -ge 2 ]; then
     minor=${varr[1]}
     if [ ${#varr[@]} -ge 3 ]; then
-      parr=(${varr[2]//-/ })
+      parr=(${varr[2]//-/ })  # split patch substring on '-'
       patch=${parr[0]}
       if [ ${#parr[@]} -ge 2 ]; then
         rc=${parr[1]}
@@ -49,8 +48,8 @@ split_version()
 # `compare_version 1.2.4 1.2.3` -> 1
 compare_version()
 {
-  local maj_x min_x patch_x arr_x
-  local maj_y min_y patch_y arr_y
+  local arr_x maj_x min_x patch_x
+  local arr_y maj_y min_y patch_y
 
   read -r _ maj_x min_x patch_x _ < <(split_version $1)
   read -r _ maj_y min_y patch_y _ < <(split_version $2)
@@ -69,7 +68,6 @@ compare_version()
   done
 
   echo 0
-  return
 }
 
 # Check if version_x is equal to version_y.
