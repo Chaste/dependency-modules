@@ -37,12 +37,11 @@ if [ -z "${base_dir}" ]; then usage; fi
 
 parallel="${parallel:-$(nproc)}"
 
-read -r version major minor _ < <(split_version ${version})
+read -r version _ < <(split_version ${version})
 
 # Unsupported versions: https://chaste.github.io/docs/installguides/dependency-versions/
-if [[ (${major} -lt 3) 
-  || ((${major} -eq 3) && (${minor} -lt 8)) ]]; then  # Python < 3.8.x
-    echo "$(basename $0): Python3 versions < 3.8 not supported"
+if version_lt "${version}" '3.9'; then  # Python < 3.9.x
+    echo "$(basename $0): Python3 versions < 3.9 not supported"
     exit 1
 fi
 
