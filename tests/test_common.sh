@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 script_dir="$(cd "$(dirname "$0")"; pwd)"
-. ${script_dir}/../scripts/custom/common.sh
+. ${script_dir}/../scripts/common.sh
 
 test_split_version()
 {
@@ -27,7 +27,7 @@ test_compare_version()
 {
   while read -r x y expected; do
     result="$(compare_version $x $y)"
-    if [ ${result} -ne ${expected} ]; then
+    if [ "${result}" -ne "${expected}" ]; then
       echo "FAIL: compare_version $x $y -> ${result} != ${expected}"
       exit 1
     fi
