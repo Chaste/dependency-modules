@@ -7,30 +7,34 @@
 
 # Chaste Dependency Modules
 
-Utility scripts for building and installing Chaste's software dependencies as environment modules.
+This repository contains utility scripts for building and installing Chaste's software dependencies as environment modules. It also contains Dockerfiles for building GitHub runner Docker images with specified dependency versions.
 
 ## Usage
 
 ### 1. Install Environment Modules
 
-[Environment Modules](https://modules.readthedocs.io/) enables switching between software versions by reconfiguring the shell environment.
+The [Environment Modules](https://modules.readthedocs.io/) system allows users to switch between different software versions installed on the same system by reconfiguring the shell environment.
 
-Installation on Ubuntu:
+See the Environment Modules [documentation](https://modules.readthedocs.io/en/latest/INSTALL.html) for installation instructions on different systems. On Ubuntu, `environment-modules` can be installed from the `apt` repository:
 
 ``` bash
 apt-get install environment-modules
 ```
 
-To activate environment modules, exit the current shell and open a new one. Alternatively it can be loaded into the current shell:
-```bash
-source /etc/profile.d/modules.sh
-```
+> [!IMPORTANT]
+> To activate the Environment Modules system after installation, close the current shell and start a new session. Alternatively, load the activation script directly into the current shell:
+> ```bash
+> source /etc/profile.d/modules.sh
+> ```
 
-See [Installing modules on Unix](https://modules.readthedocs.io/en/latest/INSTALL.html) for more details.
+### 2. Create a modules directory
 
-### 2. Prepare modulefiles location
+[Modulefiles](https://modules.readthedocs.io/en/latest/modulefile.html) are recipes used to reconfigure the shell environment for alternative software versions. The `MODULEPATH` environment variable is a list of locations where modulefiles are stored on the system.
 
-[Modulefiles](https://modules.readthedocs.io/en/latest/modulefile.html) are recipes for configuring the shell environment for alternative software builds. The `MODULEPATH` environment variable is a list of locations where modulefiles are stored. New locations can be added to `MODULEPATH` using the command `module use <path/to/modulefiles>`.
+> [!TIP]
+> Directories containing modulefiles can be added to `MODULEPATH` using the command `module use <path/to/modulefiles>`.
+
+The commands below create a directory for modules and adds it to the `MODULEPATH`.
 
 ```sh
 # Create a directory for storing modulefiles
@@ -53,56 +57,65 @@ git clone https://github.com/Chaste/dependency-modules.git
 cd dependency-modules/scripts/custom
 ```
 
-Running the build scripts will build and install software in this directory structure:
+> [!NOTE]
+> Running the build scripts will build and install software in this directory structure:
+>```
+><MODULES_DIR>
+>|-- modulefiles/
+>|-- opt/
+>`-- src/
+>```
+> Software will be downloaded and built in `src/` and installed in `opt/`.
+> A modulefile for each software built will be created in `modulefiles/`.
 
-```
-<MODULES_DIR>
-|-- modulefiles/
-|-- opt/
-`-- src/
-```
-
-Software will be downloaded and built in `src/` and installed in `opt/`.
-A modulefile for each software built will be created in `modulefiles/`.
-
-
-Run the build scripts to install the software:
-
+Install XSD
 ```sh
 ./install_xsd.sh --version=4.0.0 --modules-dir=${MODULES_DIR}
 ```
 
+Install Xerces-C
 ```sh
 ./install_xercesc.sh --version=3.2.4 --modules-dir=${MODULES_DIR}
 ```
 
+Install SUNDIALS
 ```sh
 ./install_sundials.sh --version=6.4.0 --modules-dir=${MODULES_DIR}
 ```
 
+Install Boost
 ```sh
 ./install_boost.sh --version=1.83.0 --modules-dir=${MODULES_DIR}
 ```
 
+Install VTK
 ```sh
 ./install_vtk.sh --version=9.3.1 --modules-dir=${MODULES_DIR}
 ```
 
+Install PETSc + HDF5
 ```sh
-./install_petsc_hdf5.sh --petsc-version=3.19.6 --hdf5-version=1.10.10 \
-    --petsc-arch=linux-gnu-opt --modules-dir=${MODULES_DIR}
+./install_petsc_hdf5.sh --petsc-version=3.19.6 --hdf5-version=1.10.10 --petsc-arch=linux-gnu-opt --modules-dir=${MODULES_DIR}
 ```
 
-Cleanup the `src/` directory as the build files are no longer needed
+> [!TIP]
+> After installation empty the `src/` directory as the build files are no longer needed.
+> ```sh
+> cd ${MODULES_DIR} && rm -rI src/*
+> ```
 
-```sh
-cd ${MODULES_DIR} && rm -rI src/*
+### 4. Load installed software modules
+
+Use `module avail` to show available software modules
+```
+---------------- /home/<user>/modules/modulefiles ----------------
+boost/1.83.0                                    vtk/9.3.1
+petsc_hdf5/3.19.6_1.10.810/linux-gnu-opt        xercesc/3.2.4
+sundials/6.4.0                                  xsd/4.0.0
 ```
 
-### 4. Load the installed software
-
+Use `module load` to activate software modules
 ``` bash
-module purge
 module load xsd/4.0.0
 module load xercesc/3.2.4
 module load sundials/6.4.0
@@ -115,7 +128,9 @@ module load petsc_hdf5/3.19.6_1.10.10/linux-gnu-opt
 
 Configure and build Chaste as normal following the instructions in the [documentation](https://chaste.github.io/docs/installguides/).
 
-## Environment Module Commands
+## Module commands
+
+Below is a subset of commonly used `module` commands. See the environment modules [documentation](https://modules.readthedocs.io/en/latest/module.html) for a more comprehensive manual.
 
 | Command                                     |  Description                                                      |
 | ------------------------------------------- | ----------------------------------------------------------------- |
@@ -136,5 +151,3 @@ Configure and build Chaste as normal following the instructions in the [document
 | `module switch <module/ver0> <module/ver1>` |  Unload `module/ver0` and load `module/ver1`.                     |
 |                                             |                                                                   |
 | `module show <module>`                      |  Show the environment settings for a module.                      |
-
-See the [environment modules documentation](https://modules.readthedocs.io/en/latest/module.html) for more commands and options.
