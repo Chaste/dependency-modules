@@ -7,7 +7,7 @@
 
 # Chaste Dependency Modules
 
-Utility scripts for installing Chaste dependencies as Environment Modules.
+Utility scripts for building and installing Chaste's software dependencies as environment modules.
 
 ## Usage
 
@@ -21,63 +21,88 @@ Installation on Ubuntu:
 apt-get install environment-modules
 ```
 
-To activate environment modules, close and open a new bash shell, or alternatively run:
+To activate environment modules, exit the current shell and open a new one. Alternatively it can be loaded into the current shell:
 ```bash
 source /etc/profile.d/modules.sh
 ```
 
-See [Installing Modules on Unix](https://modules.readthedocs.io/en/latest/INSTALL.html) for more details.
+See [Installing modules on Unix](https://modules.readthedocs.io/en/latest/INSTALL.html) for more details.
 
 ### 2. Prepare modulefiles location
 
-[Modulefiles](https://modules.readthedocs.io/en/latest/modulefile.html) are recipes for configuring the shell environment to access specific software versions. Environment Modules uses modulefiles from locations on `MODULEPATH`.
+[Modulefiles](https://modules.readthedocs.io/en/latest/modulefile.html) are recipes for configuring the shell environment for alternative software builds. The `MODULEPATH` environment variable is a list of locations where modulefiles are stored. New locations can be added to `MODULEPATH` using the command `module use <path/to/modulefiles>`.
 
-``` bash
+```sh
+# Create a directory for storing modulefiles
 MODULES_DIR=${HOME}/modules
 mkdir -p ${MODULES_DIR}/modulefiles
+
+# Add the directory to MODULEPATH
 module use ${MODULES_DIR}/modulefiles
+
+# Add the directory to MODULEPATH automatically in future bash sessions
 echo "module use ${MODULES_DIR}/modulefiles" >> ${HOME}/.bashrc
 ```
 
-The command `module use directory` prepends `directory` to `MODULEPATH`.
-
 ### 3. Install Chaste dependencies
 
-Clone the repository and navigate to the custom build scripts
-``` bash
+Clone this repository and navigate to the build scripts
+
+```sh
 git clone https://github.com/Chaste/dependency-modules.git
 cd dependency-modules/scripts/custom
 ```
 
-Install the dependencies
-``` bash
+Running the build scripts will build and install software in this directory structure:
+
+```
+<MODULES_DIR>
+|-- modulefiles/
+|-- opt/
+`-- src/
+```
+
+Software will be downloaded and built in `src/` and installed in `opt/`.
+A modulefile for each software built will be created in `modulefiles/`.
+
+
+Run the build scripts to install the software:
+
+```sh
 ./install_xsd.sh --version=4.0.0 --modules-dir=${MODULES_DIR}
+```
+
+```sh
 ./install_xercesc.sh --version=3.2.4 --modules-dir=${MODULES_DIR}
+```
+
+```sh
 ./install_sundials.sh --version=6.4.0 --modules-dir=${MODULES_DIR}
+```
+
+```sh
 ./install_boost.sh --version=1.83.0 --modules-dir=${MODULES_DIR}
+```
+
+```sh
 ./install_vtk.sh --version=9.3.1 --modules-dir=${MODULES_DIR}
+```
+
+```sh
 ./install_petsc_hdf5.sh --petsc-version=3.19.6 --hdf5-version=1.10.10 \
     --petsc-arch=linux-gnu-opt --modules-dir=${MODULES_DIR}
 ```
 
-The scripts will build and install dependencies following this directory structure:
+Cleanup the `src/` directory as the build files are no longer needed
 
-``` bash
-<modules-dir>
-|-- modulefiles
-|-- opt
-`-- src
+```sh
+cd ${MODULES_DIR} && rm -rI src/*
 ```
 
-Builds are done from `src`.
-
-Software versions are installed to `opt`.
-
-Modulefiles are placed under `modulefiles`.
-
-### 4. Load installed dependencies
+### 4. Load the installed software
 
 ``` bash
+module purge
 module load xsd/4.0.0
 module load xercesc/3.2.4
 module load sundials/6.4.0
@@ -88,26 +113,28 @@ module load petsc_hdf5/3.19.6_1.10.10/linux-gnu-opt
 
 ### 5. Build Chaste
 
-See the [Chaste Guides](https://chaste.github.io/docs/installguides/ubuntu-package/) for detailed instructions on building Chaste.
+Configure and build Chaste as normal following the instructions in the [documentation](https://chaste.github.io/docs/installguides/).
 
-## Useful commands
+## Environment Module Commands
 
-`module use directory` enables using modulefiles located in `directory`.
+| Command                                     |  Description                                                      |
+| ------------------------------------------- | ----------------------------------------------------------------- |
+| `module use <path/to/modulefiles>`          |  Make software modules located on the specified path available.   |
+|                                             |                                                                   |
+| `module avail`                              |  List all available software modules.                             |
+|                                             |                                                                   |
+| `module avail <search_string>`              |  Search for software modules that match the search string.        |
+|                                             |                                                                   |
+| `module load <module>`                      |  Load a software module into the environment.                     |
+|                                             |                                                                   |
+| `module list`                               |  List all currently loaded software modules.                      |
+|                                             |                                                                   |
+| `module unload <module>`                    |  Unload a software module from the environment.                   |
+|                                             |                                                                   |
+| `module purge`                              |  Unload all currently loaded software modules.                    |
+|                                             |                                                                   |
+| `module switch <module/ver0> <module/ver1>` |  Unload `module/ver0` and load `module/ver1`.                     |
+|                                             |                                                                   |
+| `module show <module>`                      |  Show the environment settings for a module.                      |
 
-`module load modulefile` loads modulefile into the environment.
-
-`module unload modulefile` unloads modulefile from the environment.
-
-`module switch [modulefile1] modulefile2` switches version to modulefile2.
-
-`module list` lists all currently loaded modulefiles.
-
-`module purge` unloads all currently loaded modulefiles.
-
-`module avail` lists all installed modulefiles.
-
-`module avail string` searches for modulefiles that contain `string`.
-
-`module show modulefile` prints the environment changes prescribed by modulefile.
-
-See the [module command help](https://modules.readthedocs.io/en/latest/module.html) for more details.
+See the [environment modules documentation](https://modules.readthedocs.io/en/latest/module.html) for more commands and options.
