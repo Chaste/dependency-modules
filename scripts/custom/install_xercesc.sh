@@ -7,7 +7,7 @@ usage()
 }
 
 script_dir="$(cd "$(dirname "$0")"; pwd)"
-. ${script_dir}/common.sh
+. ${script_dir}/../common.sh
 
 # Parse arguments
 version=
@@ -37,14 +37,12 @@ if [ -z "${base_dir}" ]; then usage; fi
 
 parallel="${parallel:-$(nproc)}"
 
-read -r version major minor patch < <(split_version ${version})
+read -r version major _ < <(split_version ${version})
 
 ver_si_on=${version//\./_}  # Converts 3.1.1 to 3_1_1
 
 # Unsupported versions: https://chaste.github.io/docs/installguides/dependency-versions/
-if [[ (${major} -lt 3) 
-  || ((${major} -eq 3) && (${minor} -lt 2))
-  || ((${major} -eq 3) && (${minor} -eq 2) && (${patch} -lt 1)) ]]; then  # Xerces-C < 3.2.1
+if version_lt "${version}" '3.2.1'; then  # Xerces-C < 3.2.1
     echo "$(basename $0): Xerces-C versions < 3.2.1 not supported"
     exit 1
 fi

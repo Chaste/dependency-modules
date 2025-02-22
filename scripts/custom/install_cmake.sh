@@ -7,7 +7,7 @@ usage()
 }
 
 script_dir="$(cd "$(dirname "$0")"; pwd)"
-. ${script_dir}/common.sh
+. ${script_dir}/../common.sh
 
 # Parse arguments
 version=
@@ -37,12 +37,10 @@ if [ -z "${base_dir}" ]; then usage; fi
 
 parallel="${parallel:-$(nproc)}"
 
-read -r version major minor patch < <(split_version ${version})
+read -r version major minor _ < <(split_version ${version})
 
 # Unsupported versions: https://chaste.github.io/docs/installguides/dependency-versions/
-if [[ (${major} -lt 3) 
-  || ((${major} -eq 3) && (${minor} -lt 16)) 
-  || ((${major} -eq 3) && (${minor} -eq 16) && (${patch} -lt 3)) ]]; then  # CMake < 3.16.3
+if version_lt "${version}" '3.16.3'; then  # CMake < 3.16.3
     echo "$(basename $0): CMake versions < 3.16.3 not supported"
     exit 1
 fi
