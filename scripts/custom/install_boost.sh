@@ -42,8 +42,8 @@ read -r version major minor _ < <(split_version ${version})
 ver_si_on=${version//\./_}  # Converts 1.74.0 to 1_74_0
 
 # Unsupported versions: https://chaste.github.io/docs/installguides/dependency-versions/
-if [[ (${major} -lt 1) || ((${major} -eq 1) && (${minor} -lt 67)) ]]; then  # Boost < 1.67.x
-    echo "$(basename $0): Boost versions < 1.67 not supported"
+if [[ (${major} -lt 1) || ((${major} -eq 1) && (${minor} -lt 73)) ]]; then  # Boost < 1.73.x
+    echo "$(basename $0): Boost versions < 1.73 not supported"
     exit 1
 fi
 
