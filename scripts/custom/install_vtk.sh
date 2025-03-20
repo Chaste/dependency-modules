@@ -7,7 +7,7 @@ usage()
 }
 
 script_dir="$(cd "$(dirname "$0")"; pwd)"
-. ${script_dir}/common.sh
+. ${script_dir}/../common.sh
 
 # Parse arguments
 version=
@@ -40,8 +40,7 @@ parallel="${parallel:-$(nproc)}"
 read -r version major minor _ < <(split_version ${version})
 
 # Unsupported versions: https://chaste.github.io/docs/installguides/dependency-versions/
-if [[ (${major} -lt 6) 
-  || ((${major} -eq 6) && (${minor} -lt 3)) ]]; then  # VTK < 6.3.x
+if version_lt "${version}" '6.3'; then  # VTK < 6.3.x
     echo "$(basename $0): VTK versions < 6.3 not supported"
     exit 1
 fi
@@ -57,7 +56,7 @@ wget -nc https://github.com/Kitware/VTK/archive/v${version}.tar.gz
 tar -xzf v${version}.tar.gz -C ${src_dir} --strip-components=1
 
 # VTK 6.3.x patches: https://sources.debian.org/patches/vtk6/
-if [[ ${major} -eq 6 && ${minor} -eq 3 ]]; then  # VTK == 6.3.x
+if version_eq "${major}.${minor}" '6.3'; then  # VTK == 6.3.x
     cd ${src_dir}
     patch -t -p1 < ${script_dir}/patches/vtk/6.3/10_allpatches.patch
     patch -t -p1 < ${script_dir}/patches/vtk/6.3/20_soversion-sharedlib.patch
@@ -83,7 +82,7 @@ if [[ ${major} -eq 6 && ${minor} -eq 3 ]]; then  # VTK == 6.3.x
 fi
 
 # VTK 7.1.x patches: https://sources.debian.org/patches/vtk7/
-if [[ ${major} -eq 7 && ${minor} -eq 1 ]]; then  # VTK == 7.1.x
+if version_eq "${major}.${minor}" '7.1'; then  # VTK == 7.1.x
     cd ${src_dir}
     patch -t -p1 < ${script_dir}/patches/vtk/7.1/10_allpatches.patch
     patch -t -p1 < ${script_dir}/patches/vtk/7.1/20_soversion-sharedlib.patch
@@ -112,7 +111,7 @@ if [[ ${major} -eq 7 && ${minor} -eq 1 ]]; then  # VTK == 7.1.x
 fi
 
 # VTK 8.1.x patches
-if [[ ${major} -eq 8 && ${minor} -eq 1 ]]; then  # VTK == 8.1.x
+if version_eq "${major}.${minor}" '8.1'; then  # VTK == 8.1.x
     cd ${src_dir}
     patch -t -p1 < ${script_dir}/patches/vtk/8.1/20_soversion-sharedlib.patch
     patch -t -p1 < ${script_dir}/patches/vtk/8.1/30_matplotlib.patch
@@ -135,7 +134,7 @@ if [[ ${major} -eq 8 && ${minor} -eq 1 ]]; then  # VTK == 8.1.x
 fi
 
 # VTK 8.2.x patches
-if [[ ${major} -eq 8 && ${minor} -eq 2 ]]; then  # VTK == 8.2.x
+if version_eq "${major}.${minor}" '8.2'; then  # VTK == 8.2.x
     cd ${src_dir}
     patch -t -p1 < ${script_dir}/patches/vtk/8.2/20_soversion-sharedlib.patch
     patch -t -p1 < ${script_dir}/patches/vtk/8.2/30_matplotlib.patch
@@ -160,7 +159,7 @@ fi
 # VTK 9.0.x patches:
 # https://sources.debian.org/patches/vtk9/
 # https://github.com/gentoo/gentoo/tree/4893345530421b0d6168b5278d57d69fc08f7fdf/sci-libs/vtk/files
-if [[ ${major} -eq 9 && ${minor} -eq 0 ]]; then  # VTK == 9.0.x
+if version_eq "${major}.${minor}" '9.0'; then  # VTK == 9.0.x
     cd ${src_dir}
     patch -t -p1 < ${script_dir}/patches/vtk/9.0/50_fix_python-modules_path.patch
     patch -t -p1 < ${script_dir}/patches/vtk/9.0/70_fix_python_numpy_warning.patch
@@ -169,13 +168,13 @@ if [[ ${major} -eq 9 && ${minor} -eq 0 ]]; then  # VTK == 9.0.x
 fi
 
 # VTK 9.1.x patches: https://sources.debian.org/patches/vtk9/
-if [[ ${major} -eq 9 && ${minor} -eq 1 ]]; then  # VTK == 9.1.x
+if version_eq "${major}.${minor}" '9.1'; then  # VTK == 9.1.x
     cd ${src_dir}
     patch -t -p1 < ${script_dir}/patches/vtk/9.1/gcc-13.patch
 fi
 
 # VTK 9.2.x patches
-if [[ ${major} -eq 9 && ${minor} -eq 2 ]]; then  # VTK == 9.2.x
+if version_eq "${major}.${minor}" '9.2'; then  # VTK == 9.2.x
     cd ${src_dir}
     patch -t -p1 < ${script_dir}/patches/vtk/9.2/gcc-13.patch
 fi
