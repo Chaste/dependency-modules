@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 
 script_dir="$(cd "$(dirname "$0")"; pwd)"
 . ${script_dir}/../scripts/common.sh
@@ -224,3 +224,5 @@ test_version_gt
 test_version_lt
 test_version_ge
 test_version_le
+
+echo "DONE"

@@ -13,7 +13,7 @@
 # `split_version 1.2.3-rc1` -> 1.2.3-rc1 1 2 3 rc1
 split_version()
 {
-  local varr parr major minor=0 patch=0 rc
+  local varr="" parr="" major="" minor="0" patch="0" rc=""
   varr=(${1//\./ })  # split version string on '.'
   major=${varr[0]}
   if [ ${#varr[@]} -ge 2 ]; then
