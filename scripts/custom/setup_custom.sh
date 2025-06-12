@@ -4,18 +4,18 @@
 export DEBIAN_FRONTEND=noninteractive
 
 # Base dependencies
-apt-get update && \
-apt-get install -y --no-install-recommends \
-  apt-transport-https \
-  apt-utils \
-  ca-certificates \
-  curl \
-  environment-modules \
-  gnupg \
-  jq \
-  openssl \
-  rsync \
-  wget
+apt-get update &&
+  apt-get install -y --no-install-recommends \
+    apt-transport-https \
+    apt-utils \
+    ca-certificates \
+    curl \
+    environment-modules \
+    gnupg \
+    jq \
+    openssl \
+    rsync \
+    wget
 
 # Build/dev dependencies
 apt-get install -y --no-install-recommends \
@@ -34,7 +34,9 @@ apt-get install -y --no-install-recommends \
 apt-get install -y --no-install-recommends \
   libfftw3-3 \
   libfftw3-bin \
-  libfftw3-dev
+  libfftw3-dev \
+  mpi-default-bin \
+  mpi-default-dev
 
 # VTK dependencies
 apt-get install -y --no-install-recommends \
