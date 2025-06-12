@@ -85,6 +85,14 @@ jobs:
           EOF
         working-directory: build
 
+      - name: Build Parallel test pack
+        run: |
+          su runner << 'EOF'
+          source load_modules.sh
+          cmake --build . --target Parallel --parallel $(nproc)
+          EOF
+        working-directory: build
+
       - name: Run Continuous test pack
         run: |
           su runner << 'EOF'
@@ -98,5 +106,13 @@ jobs:
           su runner << 'EOF'
           source load_modules.sh
           ctest -j $(nproc) -L Nightly --output-on-failure
+          EOF
+        working-directory: build
+
+      - name: Run Parallel test pack
+        run: |
+          su runner << 'EOF'
+          source load_modules.sh
+          ctest -L Parallel --output-on-failure
           EOF
         working-directory: build
