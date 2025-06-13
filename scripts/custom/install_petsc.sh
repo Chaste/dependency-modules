@@ -103,8 +103,8 @@ case ${arch} in
             --download-hypre=1 \
             --download-metis=1 \
             --download-parmetis=1 \
-            --with-cc=gcc \
-            --with-cxx=g++ \
+            --with-cc=mpicc \
+            --with-cxx=mpicxx \
             --with-debugging=1 \
             --with-fc=0 \
             --with-shared-libraries \
@@ -120,8 +120,8 @@ case ${arch} in
             --download-hypre=1 \
             --download-metis=1 \
             --download-parmetis=1 \
-            --with-cc=gcc \
-            --with-cxx=g++ \
+            --with-cc=mpicc \
+            --with-cxx=mpicxx \
             --with-fc=0 \
             --with-shared-libraries \
             --with-ssl=false \
@@ -144,7 +144,6 @@ proc ModulesTest { } {
     set paths "[getenv PETSC_DIR]
                [getenv PETSC_DIR]/[getenv PETSC_ARCH]
                [getenv PETSC_DIR]/[getenv PETSC_ARCH]/bin
-               [getenv PETSC_DIR]/[getenv PETSC_ARCH]/bin/h5pcc
                [getenv PETSC_DIR]/[getenv PETSC_ARCH]/include
                [getenv PETSC_DIR]/[getenv PETSC_ARCH]/lib
                [getenv PETSC_DIR]/[getenv PETSC_ARCH]/lib/libpetsc.so"
