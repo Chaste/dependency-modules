@@ -107,6 +107,19 @@ RUN source /etc/profile.d/modules.sh && \
     rm -rf ${MODULES_DIR}/src/* && \
     rm -rf /tmp/*
 
+# TODO: This RUN section is a temporary workaround for backwards compatibility.
+# Remove once the combined PETSc/HDF5 module is no longer needed.
+RUN source /etc/profile.d/modules.sh && \
+    module use ${MODULES_DIR}/modulefiles && \
+    install_petsc_hdf5.sh \
+        --petsc-version=${PETSC} \
+        --petsc-arch=linux-gnu \
+        --hdf5-version=${HDF5} \
+        --modules-dir=${MODULES_DIR} && \
+    module test petsc_hdf5 && \
+    rm -rf ${MODULES_DIR}/src/* && \
+    rm -rf /tmp/*
+
 RUN source /etc/profile.d/modules.sh && \
     module use ${MODULES_DIR}/modulefiles && \
     module load boost && \
