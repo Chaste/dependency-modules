@@ -42,17 +42,14 @@ module test sundials/6.4.0
 ./install_boost.sh --version=1.83.0 --modules-dir=${modules_dir} --parallel=${parallel}
 module test boost/1.83.0
 
+./install_hdf5.sh --version=1.10.10 --modules-dir=${modules_dir} --parallel=${parallel}
+module test hdf5/1.10.10
+
+./install_petsc.sh --version=3.19.6 --arch=linux-gnu --modules-dir=${modules_dir} --parallel=${parallel}
+module test petsc/3.19.6/linux-gnu
+
 ./install_vtk.sh --version=9.3.1 --modules-dir=${modules_dir} --parallel=${parallel}
 module test vtk/9.3.1
-
-./install_petsc_hdf5.sh \
-    --petsc-version=3.19.6 \
-    --hdf5-version=1.10.10 \
-    --petsc-arch=linux-gnu \
-    --modules-dir=${modules_dir} \
-    --parallel=${parallel}
-
-module test petsc_hdf5/3.19.6_1.10.10/linux-gnu
 
 # Cleanup
 cd -

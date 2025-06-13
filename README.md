@@ -89,14 +89,19 @@ Install Boost
 ./install_boost.sh --version=1.83.0 --modules-dir=${MODULES_DIR}
 ```
 
+Install HDF5
+```sh
+./install_hdf5.sh --version=1.10.10 --modules-dir=${MODULES_DIR}
+```
+
+Install PETSc
+```sh
+./install_petsc.sh --version=3.19.6 --arch=linux-gnu-opt --modules-dir=${MODULES_DIR}
+```
+
 Install VTK
 ```sh
 ./install_vtk.sh --version=9.3.1 --modules-dir=${MODULES_DIR}
-```
-
-Install PETSc + HDF5
-```sh
-./install_petsc_hdf5.sh --petsc-version=3.19.6 --hdf5-version=1.10.10 --petsc-arch=linux-gnu-opt --modules-dir=${MODULES_DIR}
 ```
 
 > [!TIP]
@@ -111,8 +116,9 @@ Use `module avail` to show available software modules
 ```
 ---------------- /home/<user>/modules/modulefiles ----------------
 boost/1.83.0                                    vtk/9.3.1
-petsc_hdf5/3.19.6_1.10.810/linux-gnu-opt        xercesc/3.2.4
-sundials/6.4.0                                  xsd/4.0.0
+hdf5/1.10.10                                    xercesc/3.2.4
+petsc/3.19.6/linux-gnu-opt                      xsd/4.0.0
+sundials/6.4.0
 ```
 
 Use `module load` to activate software modules
@@ -121,8 +127,9 @@ module load xsd/4.0.0
 module load xercesc/3.2.4
 module load sundials/6.4.0
 module load boost/1.83.0
+module load hdf5/1.10.10
+module load petsc/3.19.6/linux-gnu-opt
 module load vtk/9.3.1
-module load petsc_hdf5/3.19.6_1.10.10/linux-gnu-opt
 ```
 
 ### 5. Build Chaste
