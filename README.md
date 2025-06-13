@@ -1,5 +1,6 @@
 ![boost](https://github.com/Chaste/dependency-modules/actions/workflows/build-boost.yml/badge.svg)
-![petsc_hdf5](https://github.com/Chaste/dependency-modules/actions/workflows/build-petsc_hdf5.yml/badge.svg)
+![hdf5](https://github.com/Chaste/dependency-modules/actions/workflows/build-hdf5.yml/badge.svg)
+![petsc](https://github.com/Chaste/dependency-modules/actions/workflows/build-petsc.yml/badge.svg)
 ![sundials](https://github.com/Chaste/dependency-modules/actions/workflows/build-sundials.yml/badge.svg)
 ![vtk](https://github.com/Chaste/dependency-modules/actions/workflows/build-vtk.yml/badge.svg)
 ![xercesc](https://github.com/Chaste/dependency-modules/actions/workflows/build-xercesc.yml/badge.svg)

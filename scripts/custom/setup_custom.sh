@@ -4,18 +4,18 @@
 export DEBIAN_FRONTEND=noninteractive
 
 # Base dependencies
-apt-get update &&
-  apt-get install -y --no-install-recommends \
-    apt-transport-https \
-    apt-utils \
-    ca-certificates \
-    curl \
-    environment-modules \
-    gnupg \
-    jq \
-    openssl \
-    rsync \
-    wget
+apt-get update
+apt-get install -y --no-install-recommends \
+  apt-transport-https \
+  apt-utils \
+  ca-certificates \
+  curl \
+  environment-modules \
+  gnupg \
+  jq \
+  openssl \
+  rsync \
+  wget
 
 # Build/dev dependencies
 apt-get install -y --no-install-recommends \
@@ -117,9 +117,6 @@ apt-get install -y --no-install-recommends \
   x11proto-core-dev \
   zlib1g \
   zlib1g-dev
-
-# mpi-default-bin mpi-default-dev:
-# To be supplied by custom PETSc build for better compatibility.
 
 # libexpat1-dev libexpat1:
 # To be supplied by custom VTK build due to version conflicts.

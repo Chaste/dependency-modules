@@ -128,20 +128,33 @@ jobs:
 
           module test xsd/${{ env.XSD_VER }}
 
-      - name: Build PETSc + HDF5
+      - name: Build HDF5
         run: |
           module use ${{ env.MODULES_DIR }}/modulefiles
           module load boost/${{ env.BOOST_VER }}
           module load xercesc/${{ env.XERCESC_VER }}
           module load xsd/${{ env.XSD_VER }}
 
-          ./install_petsc_hdf5.sh \
-            --petsc-version=${{ env.PETSC_VER }} \
-            --petsc-arch=${{ env.PETSC_ARCH }} \
-            --hdf5-version=${{ env.HDF5_VER }} \
+          ./install_hdf5.sh \
+            --version=${{ env.HDF5_VER }} \
             --modules-dir=${{ env.MODULES_DIR }}
 
-          module test petsc_hdf5/${{ env.PETSC_VER }}_${{ env.HDF5_VER }}/${{ env.PETSC_ARCH }}
+          module test hdf5/${{ env.HDF5_VER }}
+
+      - name: Build PETSc
+        run: |
+          module use ${{ env.MODULES_DIR }}/modulefiles
+          module load boost/${{ env.BOOST_VER }}
+          module load xercesc/${{ env.XERCESC_VER }}
+          module load xsd/${{ env.XSD_VER }}
+          module load hdf5/${{ env.HDF5_VER }}
+
+          ./install_petsc.sh \
+            --version=${{ env.PETSC_VER }} \
+            --arch=${{ env.PETSC_ARCH }} \
+            --modules-dir=${{ env.MODULES_DIR }}
+
+          module test petsc/${{ env.PETSC_VER }}/${{ env.PETSC_ARCH }}
 
       - name: Build SUNDIALS
         run: |
@@ -149,7 +162,8 @@ jobs:
           module load boost/${{ env.BOOST_VER }}
           module load xercesc/${{ env.XERCESC_VER }}
           module load xsd/${{ env.XSD_VER }}
-          module load petsc_hdf5/${{ env.PETSC_VER }}_${{ env.HDF5_VER }}/${{ env.PETSC_ARCH }}
+          module load hdf5/${{ env.HDF5_VER }}
+          module load petsc/${{ env.PETSC_VER }}/${{ env.PETSC_ARCH }}
 
           ./install_sundials.sh \
             --version=${{ env.SUNDIALS_VER }} \
@@ -163,7 +177,8 @@ jobs:
           module load boost/${{ env.BOOST_VER }}
           module load xercesc/${{ env.XERCESC_VER }}
           module load xsd/${{ env.XSD_VER }}
-          module load petsc_hdf5/${{ env.PETSC_VER }}_${{ env.HDF5_VER }}/${{ env.PETSC_ARCH }}
+          module load hdf5/${{ env.HDF5_VER }}
+          module load petsc/${{ env.PETSC_VER }}/${{ env.PETSC_ARCH }}
           module load sundials/${{ env.SUNDIALS_VER }}
 
           ./install_vtk.sh \
@@ -183,7 +198,8 @@ jobs:
           module load boost/${{ env.BOOST_VER }}
           module load xercesc/${{ env.XERCESC_VER }}
           module load xsd/${{ env.XSD_VER }}
-          module load petsc_hdf5/${{ env.PETSC_VER }}_${{ env.HDF5_VER }}/${{ env.PETSC_ARCH }}
+          module load hdf5/${{ env.HDF5_VER }}
+          module load petsc/${{ env.PETSC_VER }}/${{ env.PETSC_ARCH }}
           module load sundials/${{ env.SUNDIALS_VER }}
           module load vtk/${{ env.VTK_VER }}
 

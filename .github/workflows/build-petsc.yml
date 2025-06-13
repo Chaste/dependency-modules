@@ -1,4 +1,4 @@
-name: Build PETSc + HDF5
+name: Build PETSc
 
 on:
   workflow_dispatch:
@@ -18,12 +18,6 @@ on:
           - "linux-gnu-opt"
         default: "linux-gnu"
 
-      hdf5_ver:
-        description: "HDF5 version"
-        required: true
-        type: string
-        default: "1.10.10"
-
 defaults:
   run:
     shell: bash --login -e -o pipefail {0} # login for environment modules
@@ -31,7 +25,7 @@ defaults:
 
 jobs:
   setup:
-    name: Build PETSc ${{ github.event.inputs.petsc_ver }} + HDF5 ${{github.event.inputs.hdf5_ver }}
+    name: Build PETSc ${{ github.event.inputs.petsc_ver }}/${{github.event.inputs.petsc_arch }}
 
     runs-on: ubuntu-22.04
 
@@ -44,7 +38,6 @@ jobs:
           echo "MODULES_DIR=$HOME/modules" >> $GITHUB_ENV
           echo "PETSC_VER=${{ github.event.inputs.petsc_ver }}" >> $GITHUB_ENV
           echo "PETSC_ARCH=${{ github.event.inputs.petsc_arch }}" >> $GITHUB_ENV
-          echo "HDF5_VER=${{ github.event.inputs.hdf5_ver }}" >> $GITHUB_ENV
 
       - name: Setup OS
         run: |
@@ -56,15 +49,14 @@ jobs:
 
       - name: Run build script
         run: |
-          ./install_petsc_hdf5.sh \
-            --petsc-version=${{ env.PETSC_VER }} \
-            --petsc-arch=${{ env.PETSC_ARCH }} \
-            --hdf5-version=${{ env.HDF5_VER }} \
+          ./install_petsc.sh \
+            --version=${{ env.PETSC_VER }} \
+            --arch=${{ env.PETSC_ARCH }} \
             --modules-dir=${{ env.MODULES_DIR }}
 
       - name: Test
         run: |
           module use ${{ env.MODULES_DIR }}/modulefiles
           module avail
-          module load petsc_hdf5/${{ env.PETSC_VER }}_${{ env.HDF5_VER }}/${{ env.PETSC_ARCH }}
-          module test petsc_hdf5/${{ env.PETSC_VER }}_${{ env.HDF5_VER }}/${{ env.PETSC_ARCH }}
+          module load petsc/${{ env.PETSC_VER }}/${{ env.PETSC_ARCH }}
+          module test petsc/${{ env.PETSC_VER }}/${{ env.PETSC_ARCH }}

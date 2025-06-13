@@ -43,7 +43,7 @@ jobs:
           source /etc/profile.d/modules.sh
           module use /home/runner/modules/modulefiles
           module avail
-          module load boost petsc_hdf5 sundials vtk xercesc xsd
+          module load boost hdf5 petsc sundials vtk xercesc xsd
           module list
           EOF
         working-directory: build

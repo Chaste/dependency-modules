@@ -47,7 +47,8 @@ RUN source /etc/profile.d/modules.sh && \
     module test boost && \
     module test xsd && \
     module test xercesc && \
-    module test petsc_hdf5 && \
+    module test hdf5 && \
+    module test petsc && \
     module test sundials && \
     module test vtk
 
