@@ -76,32 +76,32 @@ Install XSD
 
 Install Xerces-C
 ```sh
-./install_xercesc.sh --version=3.2.4 --modules-dir=${MODULES_DIR}
+./install_xercesc.sh --version=3.2.4 --modules-dir=${MODULES_DIR} --parallel=4
 ```
 
 Install SUNDIALS
 ```sh
-./install_sundials.sh --version=6.4.0 --modules-dir=${MODULES_DIR}
+./install_sundials.sh --version=6.4.0 --modules-dir=${MODULES_DIR} --parallel=4
 ```
 
 Install Boost
 ```sh
-./install_boost.sh --version=1.83.0 --modules-dir=${MODULES_DIR}
+./install_boost.sh --version=1.83.0 --modules-dir=${MODULES_DIR} --parallel=4
 ```
 
 Install HDF5
 ```sh
-./install_hdf5.sh --version=1.10.10 --modules-dir=${MODULES_DIR}
+./install_hdf5.sh --version=1.10.10 --modules-dir=${MODULES_DIR} --parallel=4
 ```
 
 Install PETSc
 ```sh
-./install_petsc.sh --version=3.19.6 --arch=linux-gnu-opt --modules-dir=${MODULES_DIR}
+./install_petsc.sh --version=3.19.6 --arch=linux-gnu-opt --modules-dir=${MODULES_DIR} --parallel=4
 ```
 
 Install VTK
 ```sh
-./install_vtk.sh --version=9.3.1 --modules-dir=${MODULES_DIR}
+./install_vtk.sh --version=9.3.1 --modules-dir=${MODULES_DIR} --parallel=4
 ```
 
 > [!TIP]
