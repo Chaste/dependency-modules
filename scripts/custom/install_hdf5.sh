@@ -88,14 +88,17 @@ else
     URL_HDF5=https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-${version}.tar.gz
 fi
 
+src_dir=$(pwd)/hdf5-${version}
+mkdir -p ${src_dir}
+
 wget -nc ${URL_HDF5}
-tar -xzf $(basename ${URL_HDF5})
+tar -xzf $(basename ${URL_HDF5}) -C ${src_dir} --strip-components=1
 
 # Build and install
 install_dir=${base_dir}/opt/hdf5/${version}
 mkdir -p ${install_dir}
 
-cd hdf5-${version}  # TODO: check if this is the correct path for all versions
+cd ${src_dir}
 mkdir -p build
 cd build
 
@@ -105,8 +108,7 @@ cmake \
     -DHDF5_BUILD_TOOLS=OFF \
     -DHDF5_ENABLE_PARALLEL=ON \
     -DHDF5_ENABLE_Z_LIB_SUPPORT=ON \
-    -DHDF5_ENABLE_SZIP_SUPPORT=OFF \
-    -DHDF5_ENABLE_THREADSAFE=ON \
+    -DHDF5_ENABLE_SZIP_SUPPORT=ON \
     -DHDF5_ENABLE_UNSUPPORTED=OFF .. && \
 make -j ${parallel} && \
 make install
