@@ -102,7 +102,7 @@ cd ${src_dir}
 mkdir -p build
 cd build
 
-cmake \
+CC=mpicc cmake \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=${install_dir} \
     -DHDF5_BUILD_TOOLS=OFF \
@@ -114,8 +114,8 @@ make -j ${parallel} && \
 make install
 
 # Add modulefile
-mkdir -p ${base_dir}/modulefiles/hdf5/${version}
-cd  ${base_dir}/modulefiles/hdf5/${version}
+mkdir -p ${base_dir}/modulefiles/hdf5
+cd  ${base_dir}/modulefiles/hdf5
 cat <<EOF > ${version}
 #%Module1.0#####################################################################
 ###
