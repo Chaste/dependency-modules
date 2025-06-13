@@ -1,5 +1,14 @@
 #!/bin/bash -eu
 
+# Installs Sundials from source and creates a modulefile for it.
+# Arguments:
+#   --version=version: The Sundials version to install (e.g., 5.7.0).
+#   --modules-dir=path: The base directory for the installation and modulefile.
+#   --parallel=value: The number of parallel jobs to use for building (default: number of CPU cores).
+# Example usage:
+#   ./install_sundials.sh --version=5.7.0 --modules-dir=/path/to/modules --parallel=4
+#   module load sundials/5.7.0
+
 usage()
 {
     echo 'Usage: '"$(basename $0)"' --version=version --modules-dir=path [--parallel=value]'

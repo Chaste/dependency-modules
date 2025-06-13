@@ -1,5 +1,14 @@
 #!/bin/bash -eu
 
+# Installs HDF5 from source and creates a modulefile for it.
+# Arguments:
+#   --version=version: The HDF5 version to install (e.g., 1.12.0).
+#   --modules-dir=path: The base directory for the installation and modulefile.
+#   --parallel=value: The number of parallel jobs to use for building (default: number of CPU cores).
+# Example usage:
+#   ./install_hdf5.sh --version=1.12.0 --modules-dir=/path/to/modules --parallel=4
+#   module load hdf5/1.12.0
+
 usage()
 {
     echo 'Usage: '"$(basename $0)"' --version=version --modules-dir=path [--parallel=value]'

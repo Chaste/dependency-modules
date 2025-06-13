@@ -1,5 +1,14 @@
 #!/bin/bash -eu
 
+# Installs CMake from source and creates a modulefile for it.
+# Arguments:
+#   --version=version: The CMake version to install (e.g., 3.21.2).
+#   --modules-dir=path: The base directory for the installation and modulefile.
+#   --parallel=value: The number of parallel jobs to use for building (default: number of CPU cores).
+# Example usage:
+#   ./install_cmake.sh --version=3.21.2 --modules-dir=/path/to/modules --parallel=4
+#   module load cmake/3.21.2
+
 usage()
 {
     echo 'Usage: '"$(basename $0)"' --version=version --modules-dir=path [--parallel=value]'

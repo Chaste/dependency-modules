@@ -1,4 +1,5 @@
 #!/bin/sh
+
 # Setup required libraries for building Chaste dependencies on Ubuntu 22.04 Jammy
 
 export DEBIAN_FRONTEND=noninteractive

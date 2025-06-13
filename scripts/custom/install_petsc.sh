@@ -1,5 +1,15 @@
 #!/bin/bash -eu
 
+# Installs PETSc from source and adds a modulefile for it.
+# Arguments:
+#   --version=version: The PETSc version to install (e.g., 3.15.0).
+#   --arch=[{linux-gnu|linux-gnu-opt}]: The build type (default: linux-gnu).
+#   --modules-dir=path: The base directory for the installation and modulefile.
+#   --parallel=value: The number of parallel jobs to use for building (default: number of CPU cores).
+# Example usage:
+#   ./install_petsc.sh --version=3.15.0 --arch=linux-gnu --modules-dir=/path/to/modules --parallel=4
+#   module load petsc/3.15.0/linux-gnu
+
 usage()
 {
     echo 'Usage: '"$(basename $0)"' --version=version --arch=[{linux-gnu|linux-gnu-opt}]'

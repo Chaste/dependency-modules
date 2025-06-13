@@ -1,5 +1,14 @@
 #!/bin/bash -eu
 
+# Installs Xerces-C++ from source and creates a modulefile for it.
+# Arguments:
+#   --version=version: Version of Xerces-C++ to install (e.g., 3.2.3)
+#   --modules-dir=path: The base directory for the installation and modulefile.
+#   --parallel=value: Number of parallel jobs for building (default: number of CPU cores)
+# Example usage:
+#   ./install_xercesc.sh --version=3.2.3 --modules-dir=/path/to/modules --parallel=4
+#   module load xercesc/3.2.3
+
 usage()
 {
     echo 'Usage: '"$(basename $0)"' --version=version --modules-dir=path [--parallel=value]'
