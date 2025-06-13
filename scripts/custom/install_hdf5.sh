@@ -99,11 +99,9 @@ cd hdf5-${version}  # TODO: check if this is the correct path for all versions
 mkdir -p build
 cd build
 
-# TODO: check cmake for HDF5 with MPI support
 cmake \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=${install_dir} \
-    -DHDF5_BUILD_HL_LIB=ON \
     -DHDF5_BUILD_TOOLS=OFF \
     -DHDF5_ENABLE_PARALLEL=ON \
     -DHDF5_ENABLE_Z_LIB_SUPPORT=ON \
