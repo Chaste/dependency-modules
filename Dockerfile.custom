@@ -28,7 +28,7 @@ ENV DEFAULT_USER="runner" \
     MODULES_DIR="/home/runner/modules"
 
 # Copy scripts
-COPY scripts/*.sh scripts/custom/ /usr/local/bin/
+COPY scripts/custom/ scripts/*.sh /usr/local/bin/
 
 # Setup base dependencies and install actions runner
 RUN useradd -r -m -d ${DEFAULT_HOME} -s /bin/bash ${DEFAULT_USER} && \
