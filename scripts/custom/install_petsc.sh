@@ -68,9 +68,15 @@ if version_lt "${version}" '3.12'; then  # PETSc < 3.12.x
     exit 1
 fi
 
-# Download and extract source
+# Get tarballs to prevent download errors
 mkdir -p ${base_dir}/src/petsc
 cd ${base_dir}/src/petsc
+
+download_f2cblaslapack=1
+if (version_eq "${major}.${minor}" '3.17'); then # PETSc == 3.17.x
+    wget -nc https://www.mcs.anl.gov/petsc/mirror/externalpackages/f2cblaslapack-3.4.2.q4.tar.gz
+    download_f2cblaslapack=$(pwd)/f2cblaslapack-3.4.2.q4.tar.gz
+fi
 
 # Download and extract PETSc
 URL_PETSC=https://web.cels.anl.gov/projects/petsc/download/release-snapshots/petsc-lite-${version}.tar.gz
@@ -99,7 +105,7 @@ case ${arch} in
         python3 ./configure \
             --COPTFLAGS=-Og \
             --CXXOPTFLAGS=-Og \
-            --download-f2cblaslapack=1 \
+            --download-f2cblaslapack=${download_f2cblaslapack} \
             --download-hypre=1 \
             --download-metis=1 \
             --download-parmetis=1 \
@@ -116,7 +122,7 @@ case ${arch} in
     linux-gnu-opt)
         export PETSC_ARCH=linux-gnu-opt
         python3 ./configure \
-            --download-f2cblaslapack=1 \
+            --download-f2cblaslapack=${download_f2cblaslapack} \
             --download-hypre=1 \
             --download-metis=1 \
             --download-parmetis=1 \
