@@ -109,6 +109,7 @@ RUN source /etc/profile.d/modules.sh && \
 
 # TODO: This RUN section is a temporary workaround for backwards compatibility.
 # Remove once the combined PETSc/HDF5 module is no longer needed.
+# See https://github.com/Chaste/dependency-modules/issues/84
 RUN source /etc/profile.d/modules.sh && \
     module use ${MODULES_DIR}/modulefiles && \
     install_petsc_hdf5.sh \
