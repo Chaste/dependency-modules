@@ -2,6 +2,7 @@
 
 # TODO: This script adds a PETSc/HDF5 modulefile as a temporary workaround for backwards compatibility.
 # Remove once the combined PETSc/HDF5 module is no longer needed.
+# See https://github.com/Chaste/dependency-modules/issues/84
 
 usage()
 {
