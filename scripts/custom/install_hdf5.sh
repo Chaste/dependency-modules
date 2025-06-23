@@ -69,30 +69,29 @@ fi
 mkdir -p ${base_dir}/src/hdf5
 cd ${base_dir}/src/hdf5
 
-URL_HDF5=
+src_dir=$(pwd)/hdf5-${version}
+mkdir -p ${src_dir}
+
 if (version_ge "${version}" '1.10.0' && version_lt "${version}" '1.10.12') ||  # HDF5 >=1.10.0, <1.10.12
    (version_ge "${version}" '1.12.0' && version_lt "${version}" '1.12.2')      # HDF5 >=1.12.0, <1.12.2
 then
-    URL_HDF5=https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-${major}.${minor}/hdf5-${version}/src/hdf5-${version}.tar.gz
+    wget -nc https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-${major}.${minor}/hdf5-${version}/src/hdf5-${version}.tar.gz
+    tar -xzf hdf5-${version}.tar.gz
 
 elif (version_ge "${version}" '1.12.2' && version_lt "${version}" '1.12.4') ||  # HDF5 >=1.12.2, <1.12.4
      (version_ge "${version}" '1.14.0' && version_lt "${version}" '1.14.4')     # HDF5 >=1.14.0, <1.14.4
 then
-    URL_HDF5=https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-${ver_si_on}.tar.gz
+    wget -nc https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-${ver_si_on}.tar.gz
+    tar -xzf hdf5-${ver_si_on}.tar.gz -C ${src_dir} --strip-components=1
 
 else
     # HDF5 >=1.10.12, <1.11
     # HDF5 >=1.12.4, <1.13
     # HDF5 >=1.14.4, <1.15
     # + catch-all
-    URL_HDF5=https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-${version}.tar.gz
+    wget -nc https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-${version}.tar.gz
+    tar -xzf hdf5-${version}.tar.gz -C ${src_dir} --strip-components=1
 fi
-
-src_dir=$(pwd)/hdf5-${version}
-mkdir -p ${src_dir}
-
-wget -nc ${URL_HDF5}
-tar -xzf $(basename ${URL_HDF5}) -C ${src_dir} --strip-components=1
 
 # Build and install
 install_dir=${base_dir}/opt/hdf5/${version}
@@ -105,6 +104,7 @@ cd build
 CC=mpicc cmake \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=${install_dir} \
+    -DHDF5_BUILD_HL_LIB=OFF \
     -DHDF5_BUILD_TOOLS=OFF \
     -DHDF5_ENABLE_PARALLEL=ON \
     -DHDF5_ENABLE_Z_LIB_SUPPORT=ON \

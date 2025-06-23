@@ -128,6 +128,7 @@ case ${arch} in
             --download-parmetis=1 \
             --with-cc=mpicc \
             --with-cxx=mpicxx \
+            --with-debugging=0 \
             --with-fc=0 \
             --with-shared-libraries \
             --with-ssl=false \
