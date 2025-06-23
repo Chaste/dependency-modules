@@ -22,7 +22,7 @@ ENV DEFAULT_USER="runner" \
     MODULES_DIR="/home/runner/modules"
 
 # Copy scripts
-COPY scripts/*.sh scripts/system/ /usr/local/bin/
+COPY scripts/system/ scripts/*.sh /usr/local/bin/
 
 # Setup Chaste dependencies and install actions runner
 RUN useradd -r -m -d ${DEFAULT_HOME} -s /bin/bash ${DEFAULT_USER} && \
@@ -47,7 +47,8 @@ RUN source /etc/profile.d/modules.sh && \
     module test boost && \
     module test xsd && \
     module test xercesc && \
-    module test petsc_hdf5 && \
+    module test hdf5 && \
+    module test petsc && \
     module test sundials && \
     module test vtk
 

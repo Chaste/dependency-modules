@@ -28,7 +28,7 @@ ENV DEFAULT_USER="runner" \
     MODULES_DIR="/home/runner/modules"
 
 # Copy scripts
-COPY scripts/*.sh scripts/custom/ /usr/local/bin/
+COPY scripts/custom/ scripts/*.sh /usr/local/bin/
 
 # Setup base dependencies and install actions runner
 RUN useradd -r -m -d ${DEFAULT_HOME} -s /bin/bash ${DEFAULT_USER} && \
@@ -84,11 +84,37 @@ RUN source /etc/profile.d/modules.sh && \
     module load boost && \
     module load xercesc && \
     module load xsd && \
+    install_hdf5.sh \
+        --version=${HDF5} \
+        --parallel=$(nproc) \
+        --modules-dir=${MODULES_DIR} && \
+    module test hdf5 && \
+    rm -rf ${MODULES_DIR}/src/* && \
+    rm -rf /tmp/*
+
+RUN source /etc/profile.d/modules.sh && \
+    module use ${MODULES_DIR}/modulefiles && \
+    module load boost && \
+    module load xercesc && \
+    module load xsd && \
+    module load hdf5 && \
+    install_petsc.sh \
+        --version=${PETSC} \
+        --arch=linux-gnu \
+        --parallel=$(nproc) \
+        --modules-dir=${MODULES_DIR} && \
+    module test petsc && \
+    rm -rf ${MODULES_DIR}/src/* && \
+    rm -rf /tmp/*
+
+# TODO: This RUN section is a temporary workaround for backwards compatibility.
+# Remove once the combined PETSc/HDF5 module is no longer needed.
+RUN source /etc/profile.d/modules.sh && \
+    module use ${MODULES_DIR}/modulefiles && \
     install_petsc_hdf5.sh \
         --petsc-version=${PETSC} \
         --petsc-arch=linux-gnu \
         --hdf5-version=${HDF5} \
-        --parallel=$(nproc) \
         --modules-dir=${MODULES_DIR} && \
     module test petsc_hdf5 && \
     rm -rf ${MODULES_DIR}/src/* && \
@@ -99,7 +125,8 @@ RUN source /etc/profile.d/modules.sh && \
     module load boost && \
     module load xercesc && \
     module load xsd && \
-    module load petsc_hdf5 && \
+    module load hdf5 && \
+    module load petsc && \
     install_sundials.sh \
         --version=${SUNDIALS} \
         --parallel=$(nproc) \
@@ -113,7 +140,8 @@ RUN source /etc/profile.d/modules.sh && \
     module load boost && \
     module load xercesc && \
     module load xsd && \
-    module load petsc_hdf5 && \
+    module load hdf5 && \
+    module load petsc && \
     module load sundials && \
     install_vtk.sh \
         --version=${VTK} \

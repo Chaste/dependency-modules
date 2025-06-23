@@ -1,5 +1,13 @@
 #!/bin/bash -eu
 
+# Installs XSD from source and creates a modulefile for it.
+# Arguments:
+#   --version=version: Version of XSD to install (e.g., 4.0.0)
+#   --modules-dir=path: The base directory for the installation and modulefile.
+# Example usage:
+#   ./install_xsd.sh --version=4.0.0 --modules-dir=/path/to/modules
+#   module load xsd/4.0.0
+
 usage()
 {
     echo 'Usage: '"$(basename $0)"' --version=version --modules-dir=path'
@@ -7,7 +15,7 @@ usage()
 }
 
 script_dir="$(cd "$(dirname "$0")"; pwd)"
-. ${script_dir}/../common.sh
+. ${script_dir}/common.sh
 
 # Parse arguments
 version=

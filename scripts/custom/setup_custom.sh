@@ -1,10 +1,11 @@
 #!/bin/sh
+
 # Setup required libraries for building Chaste dependencies on Ubuntu 22.04 Jammy
 
 export DEBIAN_FRONTEND=noninteractive
 
 # Base dependencies
-apt-get update && \
+apt-get update
 apt-get install -y --no-install-recommends \
   apt-transport-https \
   apt-utils \
@@ -34,7 +35,9 @@ apt-get install -y --no-install-recommends \
 apt-get install -y --no-install-recommends \
   libfftw3-3 \
   libfftw3-bin \
-  libfftw3-dev
+  libfftw3-dev \
+  mpi-default-bin \
+  mpi-default-dev
 
 # VTK dependencies
 apt-get install -y --no-install-recommends \
@@ -115,9 +118,6 @@ apt-get install -y --no-install-recommends \
   x11proto-core-dev \
   zlib1g \
   zlib1g-dev
-
-# mpi-default-bin mpi-default-dev:
-# To be supplied by custom PETSc build for better compatibility.
 
 # libexpat1-dev libexpat1:
 # To be supplied by custom VTK build due to version conflicts.

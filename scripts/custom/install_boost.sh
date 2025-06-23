@@ -1,5 +1,14 @@
 #!/bin/bash -eu
 
+# Installs Boost from source and creates a modulefile for it.
+# Arguments:
+#   --version=version: The Boost version to install (e.g., 1.74.0).
+#   --modules-dir=path: The base directory for the installation and modulefile.
+#   --parallel=value: The number of parallel jobs to use for building (default: number of CPU cores).
+# Example usage:
+#   ./install_boost.sh --version=1.74.0 --modules-dir=/path/to/modules --parallel=4
+#   module load boost/1.74.0
+
 usage()
 {
     echo 'Usage: '"$(basename $0)"' --version=version --modules-dir=path [--parallel=value]'
@@ -7,7 +16,7 @@ usage()
 }
 
 script_dir="$(cd "$(dirname "$0")"; pwd)"
-. ${script_dir}/../common.sh
+. ${script_dir}/common.sh
 
 # Parse arguments
 version=
