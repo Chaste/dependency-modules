@@ -107,8 +107,7 @@ cat <<EOF > linux-gnu
 ##
 proc ModulesTest { } {
     set paths "/usr/include/petsc
-               /usr/lib/x86_64-linux-gnu/libpetsc.so
-               /usr/lib/libparmetis.so"
+               /usr/lib/x86_64-linux-gnu/libpetsc.so"
 
     foreach path \$paths {
         if { ![file exists \$path] } {
