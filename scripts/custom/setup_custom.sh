@@ -22,6 +22,7 @@ apt-get install -y --no-install-recommends \
 apt-get install -y --no-install-recommends \
   build-essential \
   cmake \
+  cmake-curses-gui \
   doxygen \
   git \
   lcov \
