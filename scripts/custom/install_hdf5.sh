@@ -90,8 +90,8 @@ else
     # HDF5 >=1.12.4, <1.13
     # HDF5 >=1.14.4, <1.15
     # + catch-all
-    wget -nc https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-${version}.tar.gz
-    tar -xzf hdf5-${version}.tar.gz -C ${src_dir} --strip-components=1
+    wget -nc https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5_${version}.tar.gz
+    tar -xzf hdf5_${version}.tar.gz -C ${src_dir} --strip-components=1
 fi
 
 # Build and install
