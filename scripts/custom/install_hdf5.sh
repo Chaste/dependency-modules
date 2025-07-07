@@ -99,20 +99,18 @@ install_dir=${base_dir}/opt/hdf5/${version}
 mkdir -p ${install_dir}
 
 cd ${src_dir}
-mkdir -p build
-cd build
 
-CC=$(which mpicc) CXX=$(which mpic++) cmake \
-    -DCMAKE_BUILD_SHARED_LIBS=ON \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=${install_dir} \
-    -DHDF5_BUILD_HL_LIB=ON \
-    -DHDF5_BUILD_TOOLS=OFF \
-    -DHDF5_ENABLE_PARALLEL=ON \
-    -DHDF5_ENABLE_Z_LIB_SUPPORT=ON \
-    -DHDF5_ENABLE_SZIP_SUPPORT=ON \
-    -DHDF5_ENABLE_UNSUPPORTED=OFF .. &&
-    make -j ${parallel} &&
+./configure \
+    --prefix=${install_dir} \
+    --enable-parallel \
+    --enable-shared \
+    CFLAGS=-fPIC \
+    LDFLAGS=-fPIC \
+    CPPFLAGS=-fPIC \
+    CXXFLAGS=-fPIC \
+    CC=mpicc \
+    CXX=mpic++ &&
+    make -j $parallel all &&
     make install
 
 # Add modulefile
