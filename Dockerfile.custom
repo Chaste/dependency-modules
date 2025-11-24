@@ -107,8 +107,9 @@ RUN source /etc/profile.d/modules.sh && \
     rm -rf ${MODULES_DIR}/src/* && \
     rm -rf /tmp/*
 
-# TODO: This RUN section is a temporary workaround for backwards compatibility.
-# Remove once the combined PETSc/HDF5 module is no longer needed.
+# TODO: This RUN section adds an additional petsc_hdf5 environment module which 
+# is a temporary workaround for backwards compatibility.
+# It can be removed once a combined PETSc/HDF5 module is no longer needed.
 # See https://github.com/Chaste/dependency-modules/issues/84
 RUN source /etc/profile.d/modules.sh && \
     module use ${MODULES_DIR}/modulefiles && \

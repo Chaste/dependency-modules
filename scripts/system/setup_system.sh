@@ -36,7 +36,27 @@ apt-get install -y --no-install-recommends \
 codename="$(. /etc/os-release && echo ${VERSION_CODENAME} | sed 's/\.//')"
 
 if [ "${codename}" = 'plucky' ]; then
-  # Install manually: Ubuntu Plucky repository not yet available
+  # Install manually: Ubuntu 25.04 Plucky Puffin repository not yet available
+  apt-get install -y --no-install-recommends \
+    hdf5-tools \
+    libboost-serialization-dev \
+    libboost-filesystem-dev \
+    libboost-program-options-dev \
+    libhdf5-openmpi-dev \
+    libmetis-dev \
+    libopenmpi-dev \
+    libpetsc-real3.22 \
+    libpetsc-real3.22-dbg \
+    libpetsc-real3.22-dev \
+    libscotchparmetis-dev \
+    libsundials-dev \
+    libvtk9.3 \
+    libvtk9-dev \
+    libxerces-c-dev \
+    petsc-dev \
+    xsdcxx
+elif [ "${codename}" = 'questing' ]; then
+  # Install manually: Ubuntu 25.10 Questing Quokka repository not yet available
   apt-get install -y --no-install-recommends \
     hdf5-tools \
     libboost-serialization-dev \

@@ -127,8 +127,9 @@ module-whatis "This adds the environment variables for petsc ${petsc_version} wi
 conflict petsc
 EOF
 
-# TODO: This adds PETSc/HDF5 modulefile stub as a temporary workaround for backwards compatibility.
-# Remove once the combined PETSc/HDF5 module is no longer needed.
+# TODO: This next sections adds a combined petsc_hdf5 modulefile stub as a temporary
+# workaround for backwards compatibility.
+# It can be removed once a combined PETSc/HDF5 module is no longer needed.
 # See https://github.com/Chaste/dependency-modules/issues/84
 
 mkdir -p ${base_dir}/modulefiles/petsc_hdf5/${petsc_version}_${hdf5_version}
