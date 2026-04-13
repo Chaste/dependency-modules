@@ -54,6 +54,9 @@ if version_lt "${version}" '3.1'; then  # Sundials < 3.1.x
     exit 1
 fi
 
+# Check for cmake
+cmake --version
+
 # Download and extract source
 mkdir -p ${base_dir}/src/sundials
 cd ${base_dir}/src/sundials

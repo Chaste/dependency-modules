@@ -54,6 +54,9 @@ if version_lt "${version}" '6.3'; then  # VTK < 6.3.x
     exit 1
 fi
 
+# Check for cmake
+cmake --version
+
 # Download and extract source
 mkdir -p ${base_dir}/src/vtk
 cd ${base_dir}/src/vtk
