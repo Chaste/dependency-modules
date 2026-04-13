@@ -134,6 +134,7 @@ setenv          BOOST_DIR            ${install_dir}
 
 prepend-path    LIBRARY_PATH         ${install_dir}/lib
 prepend-path    LD_LIBRARY_PATH      ${install_dir}/lib
+prepend-path    DYLD_LIBRARY_PATH    ${install_dir}/lib
 prepend-path    LD_RUN_PATH          ${install_dir}/lib
 
 prepend-path    INCLUDE              ${install_dir}/include
