@@ -67,10 +67,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Checkout Chaste
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: Chaste/Chaste
           path: Chaste
