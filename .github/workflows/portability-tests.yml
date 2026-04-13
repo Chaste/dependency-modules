@@ -27,7 +27,7 @@ jobs:
 
     steps:
       - name: Checkout Chaste/${{ github.event.inputs.chaste_branch }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: Chaste/Chaste
           ref: ${{ github.event.inputs.chaste_branch }}

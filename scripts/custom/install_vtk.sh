@@ -54,6 +54,9 @@ if version_lt "${version}" '6.3'; then  # VTK < 6.3.x
     exit 1
 fi
 
+# Check for cmake
+cmake --version
+
 # Download and extract source
 mkdir -p ${base_dir}/src/vtk
 cd ${base_dir}/src/vtk
@@ -261,6 +264,7 @@ setenv          VTK_ROOT             ${install_dir}
 
 prepend-path    LIBRARY_PATH         ${install_dir}/lib
 prepend-path    LD_LIBRARY_PATH      ${install_dir}/lib
+prepend-path    DYLD_LIBRARY_PATH    ${install_dir}/lib
 prepend-path    LD_RUN_PATH          ${install_dir}/lib
 
 prepend-path    INCLUDE              ${install_dir}/include/vtk-${major}.${minor}

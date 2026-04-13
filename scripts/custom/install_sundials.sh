@@ -54,6 +54,9 @@ if version_lt "${version}" '3.1'; then  # Sundials < 3.1.x
     exit 1
 fi
 
+# Check for cmake
+cmake --version
+
 # Download and extract source
 mkdir -p ${base_dir}/src/sundials
 cd ${base_dir}/src/sundials
@@ -108,6 +111,7 @@ setenv          SUNDIALS_ROOT        ${install_dir}
 
 prepend-path    LIBRARY_PATH         ${install_dir}/lib
 prepend-path    LD_LIBRARY_PATH      ${install_dir}/lib
+prepend-path    DYLD_LIBRARY_PATH    ${install_dir}/lib
 prepend-path    LD_RUN_PATH          ${install_dir}/lib
 
 prepend-path    INCLUDE              ${install_dir}/include
