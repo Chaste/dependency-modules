@@ -62,7 +62,7 @@ mkdir -p ${install_dir}
 if version_lt "${version}" '4.2.0'; then
     tar -xjf xsd-${version}-x86_64-linux-gnu.tar.bz2 -C ${install_dir} --strip-components=1
 else
-    tar -xJf xsd-${version}-x86_64-linux-glibc2.31.tar.xz -C ${install_dir} --strip-components=1
+    tar -xJf xsd-${version}-x86_64-linux-glibc2.31.tar.xz -C ${install_dir} --strip-components=3
 fi
 
 # Add modulefile
@@ -75,8 +75,7 @@ cat <<EOF > ${version}
 ##
 proc ModulesTest { } {
     set paths "[getenv XSD_ROOT]
-               [getenv XSD_ROOT]/bin
-               [getenv XSD_ROOT]/libxsd"
+               [getenv XSD_ROOT]/bin"
 
     foreach path \$paths {
         if { ![file exists \$path] } {
@@ -96,10 +95,6 @@ module-whatis "This adds the environment variables for xsd ${version}"
 setenv          XSD_ROOT             ${install_dir}
 
 prepend-path    PATH                 ${install_dir}/bin
-
-prepend-path    INCLUDE              ${install_dir}/libxsd
-prepend-path    C_INCLUDE_PATH       ${install_dir}/libxsd
-prepend-path    CPLUS_INCLUDE_PATH   ${install_dir}/libxsd
 
 prepend-path    CMAKE_PREFIX_PATH    ${install_dir}
 
