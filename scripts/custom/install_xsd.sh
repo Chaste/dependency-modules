@@ -50,7 +50,11 @@ fi
 # Download and install
 mkdir -p ${base_dir}/src/xsd
 cd ${base_dir}/src/xsd
-wget -nc https://www.codesynthesis.com/download/xsd/${major}.${minor}/linux-gnu/x86_64/xsd-${version}-x86_64-linux-gnu.tar.bz2
+if version_lt "${version}" '4.2.0'; then
+    wget -nc https://www.codesynthesis.com/download/xsd/${major}.${minor}/linux-gnu/x86_64/xsd-${version}-x86_64-linux-gnu.tar.bz2
+else
+    wget -nc https://codesynthesis.com/download/xsd/${major}.${minor}/linux/xsd-${version}-x86_64-linux-gnu.tar.bz2
+fi
 
 install_dir=${base_dir}/opt/xsd/${version}
 mkdir -p ${install_dir}
