@@ -53,13 +53,17 @@ cd ${base_dir}/src/xsd
 if version_lt "${version}" '4.2.0'; then
     wget -nc https://www.codesynthesis.com/download/xsd/${major}.${minor}/linux-gnu/x86_64/xsd-${version}-x86_64-linux-gnu.tar.bz2
 else
-    wget -nc https://codesynthesis.com/download/xsd/${major}.${minor}/linux/xsd-${version}-x86_64-linux-gnu.tar.bz2
+    wget -nc https://www.codesynthesis.com/download/xsd/${major}.${minor}/linux/linux-glibc2.31/x86_64/xsd-${version}-x86_64-linux-glibc2.31.tar.xz
 fi
 
 install_dir=${base_dir}/opt/xsd/${version}
 mkdir -p ${install_dir}
 
-tar -xjf xsd-${version}-x86_64-linux-gnu.tar.bz2 -C ${install_dir} --strip-components=1
+if version_lt "${version}" '4.2.0'; then
+    tar -xjf xsd-${version}-x86_64-linux-gnu.tar.bz2 -C ${install_dir} --strip-components=1
+else
+    tar -xJf xsd-${version}-x86_64-linux-glibc2.31.tar.xz -C ${install_dir} --strip-components=1
+fi
 
 # Add modulefile
 mkdir -p ${base_dir}/modulefiles/xsd
