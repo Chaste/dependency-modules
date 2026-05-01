@@ -62,7 +62,7 @@ mkdir -p ${install_dir}
 if version_lt "${version}" '4.2.0'; then
     tar -xjf xsd-${version}-x86_64-linux-gnu.tar.bz2 -C ${install_dir} --strip-components=1
 else
-    tar -xJf xsd-${version}-x86_64-linux-glibc2.31.tar.xz -C ${install_dir} --strip-components=1
+    tar -xJf xsd-${version}-x86_64-linux-glibc2.31.tar.xz -C ${install_dir} --strip-components=3
 fi
 
 # Add modulefile
