@@ -54,15 +54,20 @@ if version_lt "${version}" '4.2.0'; then
     wget -nc https://www.codesynthesis.com/download/xsd/${major}.${minor}/linux-gnu/x86_64/xsd-${version}-x86_64-linux-gnu.tar.bz2
 else
     wget -nc https://www.codesynthesis.com/download/xsd/${major}.${minor}/linux/linux-glibc2.31/x86_64/xsd-${version}-x86_64-linux-glibc2.31.tar.xz
+    wget -nc https://www.codesynthesis.com/download/xsd/${major}.${minor}/linux/linux-glibc2.31/x86_64/libxsd-${version}-linux.tar.xz
 fi
 
 install_dir=${base_dir}/opt/xsd/${version}
 mkdir -p ${install_dir}
 
+include_dir=
 if version_lt "${version}" '4.2.0'; then
     tar -xjf xsd-${version}-x86_64-linux-gnu.tar.bz2 -C ${install_dir} --strip-components=1
+    include_dir=${install_dir}/libxsd
 else
     tar -xJf xsd-${version}-x86_64-linux-glibc2.31.tar.xz -C ${install_dir} --strip-components=3
+    tar -xJf libxsd-${version}-linux.tar.xz -C ${install_dir} --strip-components=3
+    include_dir=${install_dir}/include
 fi
 
 # Add modulefile
@@ -76,7 +81,7 @@ cat <<EOF > ${version}
 proc ModulesTest { } {
     set paths "[getenv XSD_ROOT]
                [getenv XSD_ROOT]/bin
-               [getenv XSD_ROOT]/libxsd"
+               ${include_dir}"
 
     foreach path \$paths {
         if { ![file exists \$path] } {
@@ -97,9 +102,9 @@ setenv          XSD_ROOT             ${install_dir}
 
 prepend-path    PATH                 ${install_dir}/bin
 
-prepend-path    INCLUDE              ${install_dir}/libxsd
-prepend-path    C_INCLUDE_PATH       ${install_dir}/libxsd
-prepend-path    CPLUS_INCLUDE_PATH   ${install_dir}/libxsd
+prepend-path    INCLUDE              ${include_dir}
+prepend-path    C_INCLUDE_PATH       ${include_dir}
+prepend-path    CPLUS_INCLUDE_PATH   ${include_dir}
 
 prepend-path    CMAKE_PREFIX_PATH    ${install_dir}
 
