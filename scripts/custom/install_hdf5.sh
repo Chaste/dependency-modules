@@ -85,13 +85,17 @@ elif (version_ge "${version}" '1.12.2' && version_lt "${version}" '1.12.4') ||  
     wget -nc https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-${ver_si_on}.tar.gz
     tar -xzf hdf5-${ver_si_on}.tar.gz -C ${src_dir} --strip-components=1
 
-else
-    # HDF5 >=1.10.12, <1.11
-    # HDF5 >=1.12.4, <1.13
-    # HDF5 >=1.14.4, <1.15
-    # + catch-all
+elif (version_ge "${version}" '1.10.12' && version_lt "${version}" '1.11') ||   # HDF5 >=1.10.12, <1.11
+    (version_ge "${version}" '1.12.4' && version_lt "${version}" '1.13') || # HDF5 >=1.12.4, <1.13
+    (version_ge "${version}" '1.14.4' && version_lt "${version}" '1.15'); then # HDF5 >=1.14.4, <1.15
     wget -nc https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5_${version}.tar.gz
     tar -xzf hdf5_${version}.tar.gz -C ${src_dir} --strip-components=1
+
+else
+    # HDF5 >=2.0.0
+    # + catch-all
+    wget -nc https://github.com/HDFGroup/hdf5/archive/refs/tags/${version}.tar.gz
+    tar -xzf ${version}.tar.gz -C ${src_dir} --strip-components=1
 fi
 
 # Build and install
