@@ -100,18 +100,34 @@ mkdir -p ${install_dir}
 
 cd ${src_dir}
 
-./configure \
-    --prefix=${install_dir} \
-    --enable-parallel \
-    --enable-shared \
-    CFLAGS=-fPIC \
-    LDFLAGS=-fPIC \
-    CPPFLAGS=-fPIC \
-    CXXFLAGS=-fPIC \
-    CC=mpicc \
-    CXX=mpic++ &&
-    make -j $parallel all &&
-    make install
+if version_lt "${version}" '2.0.0'; then # HDF5 < 2.0.0
+    ./configure \
+        --prefix=${install_dir} \
+        --enable-parallel \
+        --enable-shared \
+        CFLAGS=-fPIC \
+        LDFLAGS=-fPIC \
+        CPPFLAGS=-fPIC \
+        CXXFLAGS=-fPIC \
+        CC=mpicc \
+        CXX=mpic++ &&
+        make -j $parallel all &&
+        make install
+
+else # HDF5 >= 2.0.0
+    CC=mpicc CXX=mpic++ cmake \
+        -DCMAKE_BUILD_SHARED_LIBS=ON \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=${install_dir} \
+        -DHDF5_BUILD_HL_LIB=ON \
+        -DHDF5_BUILD_TOOLS=OFF \
+        -DHDF5_ENABLE_PARALLEL=ON \
+        -DHDF5_ENABLE_Z_LIB_SUPPORT=ON \
+        -DHDF5_ENABLE_SZIP_SUPPORT=ON \
+        -DHDF5_ENABLE_UNSUPPORTED=OFF .. &&
+        make -j ${parallel} &&
+        make install
+fi
 
 # Add modulefile
 mkdir -p ${base_dir}/modulefiles/hdf5
