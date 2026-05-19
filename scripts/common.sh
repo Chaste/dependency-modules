@@ -141,3 +141,6 @@ version_ge()
 {
   ! version_lt $1 $2
 }
+
+OS_VERSION_ID="$(. /etc/os-release && echo ${VERSION_ID})"
+OS_VERSION_CODENAME="$(. /etc/os-release && echo ${VERSION_CODENAME})"

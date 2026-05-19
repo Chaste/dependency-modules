@@ -1,6 +1,8 @@
 #!/bin/sh
 
 # Setup Chaste system dependency versions on Ubuntu
+script_dir="$(cd "$(dirname "$0")"; pwd)"
+. ${script_dir}/common.sh
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -33,9 +35,8 @@ apt-get install -y --no-install-recommends \
   valgrind
 
 # Chaste dependencies
-codename="$(. /etc/os-release && echo ${VERSION_CODENAME} | sed 's/\.//')"
 
-if [ "${codename}" = 'plucky' ]; then
+if [ "${OS_VERSION_CODENAME}" = 'plucky' ]; then
   # Install manually: Ubuntu 25.04 Plucky Puffin repository not yet available
   apt-get install -y --no-install-recommends \
     hdf5-tools \
@@ -55,7 +56,7 @@ if [ "${codename}" = 'plucky' ]; then
     libxerces-c-dev \
     petsc-dev \
     xsdcxx
-elif [ "${codename}" = 'questing' ]; then
+elif [ "${OS_VERSION_CODENAME}" = 'questing' ]; then
   # Install manually: Ubuntu 25.10 Questing Quokka repository not yet available
   apt-get install -y --no-install-recommends \
     hdf5-tools \
@@ -78,14 +79,14 @@ elif [ "${codename}" = 'questing' ]; then
 else
   # Install from repository
   wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
-  repo="deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu ${codename}/"
+  repo="deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu ${OS_VERSION_CODENAME}/"
   echo "${repo}" >/etc/apt/sources.list.d/chaste.list
   apt-get update && apt-get install -y --no-install-recommends chaste-dependencies
 fi
 
 # Workaround for libexpat1 issue on Ubuntu Jammy
 # https://bugs.launchpad.net/ubuntu/+source/expat/+bug/2058415
-if [ "${codename}" = 'jammy' ]; then
+if [ "${OS_VERSION_CODENAME}" = 'jammy' ]; then
   apt-get install -y --allow-downgrades libexpat1=2.4.7-1 libexpat1-dev=2.4.7-1
   apt-mark hold libexpat1 libexpat1-dev
 fi
