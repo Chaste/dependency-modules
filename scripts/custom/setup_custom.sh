@@ -32,6 +32,11 @@ apt-get install -y --no-install-recommends \
   python3-venv \
   valgrind
 
+cmake_ver=$(cmake --version | awk '/version/{print $3; exit}')
+if dpkg --compare-versions "${cmake_ver}" lt 3.26.0; then
+  python3 -m pip install --no-cache-dir "cmake>=3.26,<4"
+fi
+
 # Chaste dependencies
 apt-get install -y --no-install-recommends \
   libfftw3-3 \
