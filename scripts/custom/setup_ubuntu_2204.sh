@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Setup required libraries for building Chaste dependencies on Ubuntu 22.04 Jammy LTS
 

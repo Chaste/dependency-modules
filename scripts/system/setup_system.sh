@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Setup Chaste system dependency versions on Ubuntu
 script_dir="$(cd "$(dirname "$0")"; pwd)"

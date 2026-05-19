@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Setup required libraries for building Chaste dependencies on Ubuntu LTS
 script_dir="$(cd "$(dirname "$0")"; pwd)"
