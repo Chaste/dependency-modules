@@ -36,6 +36,9 @@ cmake_ver=
 if command -v cmake >/dev/null 2>&1; then
   cmake_ver=$(cmake --version | awk 'NR==1{print $3; exit}')
 fi
+if ! echo "${cmake_ver}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+  cmake_ver=
+fi
 if [ -z "${cmake_ver}" ] || dpkg --compare-versions "${cmake_ver}" lt 3.26.0; then
   python3 -m pip install --no-cache-dir "cmake>=3.26,<4"
 fi
