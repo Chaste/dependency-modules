@@ -89,7 +89,7 @@ jobs:
 
       - name: Setup OS
         run: |
-          sudo ./setup_custom.sh
+          ./setup_custom.sh
 
       - name: List environment modules
         run: |

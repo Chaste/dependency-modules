@@ -1,5 +1,5 @@
 # Build the image:
-# docker build -f Dockerfile.custom --build-arg BOOST=1.74.0 ... -t chaste/runner:custom .
+# docker build -f Dockerfile.custom --build-arg BASE=resolute --build-arg BOOST=1.74.0 ... -t chaste/runner:custom .
 
 # Run the container in interactive mode:
 # docker run --init -it -e RUNNER_OFF=1 chaste/runner:custom /bin/bash
@@ -7,7 +7,9 @@
 # Run the container as a GitHub Actions runner:
 # docker run --init -it chaste/runner:custom
 
-FROM ubuntu:jammy
+ARG BASE=resolute
+
+FROM ubuntu:${BASE}
 
 ARG BOOST
 ARG HDF5

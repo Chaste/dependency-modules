@@ -9,6 +9,12 @@ on:
         type: string
         default: "dev"
 
+      ubuntu_codename:
+        description: "Ubuntu codename"
+        required: true
+        type: string
+        default: "resolute"
+
       boost_ver:
         description: "Boost version"
         required: true

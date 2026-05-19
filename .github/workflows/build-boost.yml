@@ -9,6 +9,16 @@ on:
         type: string
         default: "1.83.0"
 
+      ubuntu_codename:
+        description: "Ubuntu LTS"
+        required: true
+        type: choice
+        default: "resolute"
+        options:
+          - "jammy"
+          - "noble"
+          - "resolute"
+
 defaults:
   run:
     shell: bash --login -e -o pipefail {0} # login for environment modules
@@ -18,7 +28,13 @@ jobs:
   setup:
     name: Build Boost ${{ github.event.inputs.boost_ver }}
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+
+    container:
+      image: "ubuntu:${{ github.event.inputs.ubuntu_codename }}"
+      env:
+        RUNNER_OFF: 1
+      options: --user 0
 
     steps:
       - name: Checkout
@@ -31,7 +47,7 @@ jobs:
 
       - name: Setup OS
         run: |
-          sudo ./setup_custom.sh
+          ./setup_custom.sh
 
       - name: List environment modules
         run: |
