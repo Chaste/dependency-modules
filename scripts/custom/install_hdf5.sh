@@ -91,9 +91,13 @@ elif (version_ge "${version}" '1.10.12' && version_lt "${version}" '1.11') ||   
     wget -nc https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5_${version}.tar.gz
     tar -xzf hdf5_${version}.tar.gz -C ${src_dir} --strip-components=1
 
+elif version_lt "${version}" '2.0.0'; then
+    # + catch-all for remaining HDF5 1.x versions
+    wget -nc https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5_${version}.tar.gz
+    tar -xzf hdf5_${version}.tar.gz -C ${src_dir} --strip-components=1
+
 else
     # HDF5 >=2.0.0
-    # + catch-all
     wget -nc https://github.com/HDFGroup/hdf5/archive/refs/tags/${version}.tar.gz
     tar -xzf ${version}.tar.gz -C ${src_dir} --strip-components=1
 fi
@@ -115,7 +119,7 @@ if version_lt "${version}" '2.0.0'; then # HDF5 < 2.0.0
         CXXFLAGS=-fPIC \
         CC=mpicc \
         CXX=mpic++ &&
-        make -j $parallel all &&
+        make -j ${parallel} all &&
         make install
 
 else # HDF5 >= 2.0.0
