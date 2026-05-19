@@ -132,7 +132,6 @@ else # HDF5 >= 2.0.0
         -DHDF5_BUILD_TOOLS=OFF \
         -DHDF5_ENABLE_PARALLEL=ON \
         -DHDF5_ENABLE_Z_LIB_SUPPORT=ON \
-        -DHDF5_ENABLE_SZIP_SUPPORT=ON \
         -DHDF5_ENABLE_UNSUPPORTED=OFF .. &&
         make -j ${parallel} &&
         make install
