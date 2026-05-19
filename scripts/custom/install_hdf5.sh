@@ -139,9 +139,10 @@ else # HDF5 >= 2.0.0
     for cmake_config in \
         "${install_dir}/cmake/hdf5-config.cmake" \
         "${install_dir}/lib/cmake/hdf5/hdf5-config.cmake"; do
-        if [ -f "${cmake_config}" ] && ! grep -q "HDF5_PROVIDES_PARALLEL AND NOT DEFINED HDF5_IS_PARALLEL" "${cmake_config}"; then
+        if [ -f "${cmake_config}" ] && ! grep -q "HDF5_IS_PARALLEL_COMPAT_SHIM" "${cmake_config}"; then
             cat <<'EOF' >> "${cmake_config}"
 
+# HDF5_IS_PARALLEL_COMPAT_SHIM
 # Backward compatibility for consumers expecting HDF5_IS_PARALLEL.
 if(DEFINED HDF5_PROVIDES_PARALLEL AND NOT DEFINED HDF5_IS_PARALLEL)
   set(HDF5_IS_PARALLEL "${HDF5_PROVIDES_PARALLEL}")

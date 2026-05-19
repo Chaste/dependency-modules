@@ -32,8 +32,11 @@ apt-get install -y --no-install-recommends \
   python3-venv \
   valgrind
 
-cmake_ver=$(cmake --version | awk '/version/{print $3; exit}')
-if dpkg --compare-versions "${cmake_ver}" lt 3.26.0; then
+cmake_ver=
+if command -v cmake >/dev/null 2>&1; then
+  cmake_ver=$(cmake --version | awk '/version/{print $3; exit}')
+fi
+if [ -z "${cmake_ver}" ] || dpkg --compare-versions "${cmake_ver}" lt 3.26.0; then
   python3 -m pip install --no-cache-dir "cmake>=3.26,<4"
 fi
 
