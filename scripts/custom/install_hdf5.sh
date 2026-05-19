@@ -123,6 +123,9 @@ if version_lt "${version}" '2.0.0'; then # HDF5 < 2.0.0
         make install
 
 else # HDF5 >= 2.0.0
+    # Check cmake version (HDF5 2.0+ requires cmake >= 3.26)
+    cmake --version
+
     mkdir -p build && cd build
     CC=mpicc CXX=mpic++ cmake \
         -DBUILD_SHARED_LIBS=ON \
@@ -130,9 +133,7 @@ else # HDF5 >= 2.0.0
         -DCMAKE_INSTALL_PREFIX=${install_dir} \
         -DHDF5_BUILD_HL_LIB=ON \
         -DHDF5_BUILD_TOOLS=ON \
-        -DHDF5_ENABLE_PARALLEL=ON \
-        -DHDF5_ENABLE_Z_LIB_SUPPORT=ON \
-        -DHDF5_ENABLE_UNSUPPORTED=OFF .. &&
+        -DHDF5_ENABLE_PARALLEL=ON .. &&
         make -j ${parallel} &&
         make install
 fi
