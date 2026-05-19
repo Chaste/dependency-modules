@@ -136,6 +136,7 @@ else # HDF5 >= 2.0.0
         make -j ${parallel} &&
         make install
 
+    shim_applied=false
     for cmake_config in \
         "${install_dir}/cmake/hdf5-config.cmake" \
         "${install_dir}/lib/cmake/hdf5/hdf5-config.cmake"; do
@@ -148,6 +149,7 @@ if(DEFINED HDF5_PROVIDES_PARALLEL AND NOT DEFINED HDF5_IS_PARALLEL)
   set(HDF5_IS_PARALLEL "${HDF5_PROVIDES_PARALLEL}")
 endif()
 EOF
+            shim_applied=true
             break
         fi
     done
