@@ -119,6 +119,7 @@ if version_lt "${version}" '2.0.0'; then # HDF5 < 2.0.0
         make install
 
 else # HDF5 >= 2.0.0
+    mkdir -p build && cd build
     CC=mpicc CXX=mpic++ cmake \
         -DCMAKE_BUILD_SHARED_LIBS=ON \
         -DCMAKE_BUILD_TYPE=Release \
