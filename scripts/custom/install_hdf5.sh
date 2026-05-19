@@ -85,13 +85,21 @@ elif (version_ge "${version}" '1.12.2' && version_lt "${version}" '1.12.4') ||  
     wget -nc https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-${ver_si_on}.tar.gz
     tar -xzf hdf5-${ver_si_on}.tar.gz -C ${src_dir} --strip-components=1
 
-else
-    # HDF5 >=1.10.12, <1.11
-    # HDF5 >=1.12.4, <1.13
-    # HDF5 >=1.14.4, <1.15
-    # + catch-all
+elif (version_ge "${version}" '1.10.12' && version_lt "${version}" '1.11') ||   # HDF5 >=1.10.12, <1.11
+    (version_ge "${version}" '1.12.4' && version_lt "${version}" '1.13') || # HDF5 >=1.12.4, <1.13
+    (version_ge "${version}" '1.14.4' && version_lt "${version}" '1.15'); then # HDF5 >=1.14.4, <1.15
     wget -nc https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5_${version}.tar.gz
     tar -xzf hdf5_${version}.tar.gz -C ${src_dir} --strip-components=1
+
+elif version_lt "${version}" '2.0.0'; then
+    # + catch-all for remaining HDF5 1.x versions
+    wget -nc https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5_${version}.tar.gz
+    tar -xzf hdf5_${version}.tar.gz -C ${src_dir} --strip-components=1
+
+else
+    # HDF5 >=2.0.0
+    wget -nc https://github.com/HDFGroup/hdf5/archive/refs/tags/${version}.tar.gz
+    tar -xzf ${version}.tar.gz -C ${src_dir} --strip-components=1
 fi
 
 # Build and install
@@ -100,18 +108,35 @@ mkdir -p ${install_dir}
 
 cd ${src_dir}
 
-./configure \
-    --prefix=${install_dir} \
-    --enable-parallel \
-    --enable-shared \
-    CFLAGS=-fPIC \
-    LDFLAGS=-fPIC \
-    CPPFLAGS=-fPIC \
-    CXXFLAGS=-fPIC \
-    CC=mpicc \
-    CXX=mpic++ &&
-    make -j $parallel all &&
-    make install
+if version_lt "${version}" '2.0.0'; then # HDF5 < 2.0.0
+    ./configure \
+        --prefix=${install_dir} \
+        --enable-parallel \
+        --enable-shared \
+        CFLAGS=-fPIC \
+        LDFLAGS=-fPIC \
+        CPPFLAGS=-fPIC \
+        CXXFLAGS=-fPIC \
+        CC=mpicc \
+        CXX=mpic++ &&
+        make -j ${parallel} all &&
+        make install
+
+else # HDF5 >= 2.0.0
+    # Check cmake version (HDF5 2.0+ requires cmake >= 3.26)
+    cmake --version
+
+    mkdir -p build && cd build
+    CC=mpicc CXX=mpic++ cmake \
+        -DBUILD_SHARED_LIBS=ON \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=${install_dir} \
+        -DHDF5_BUILD_HL_LIB=ON \
+        -DHDF5_BUILD_TOOLS=ON \
+        -DHDF5_ENABLE_PARALLEL=ON .. &&
+        make -j ${parallel} &&
+        make install
+fi
 
 # Add modulefile
 mkdir -p ${base_dir}/modulefiles/hdf5

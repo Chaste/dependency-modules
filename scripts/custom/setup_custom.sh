@@ -21,8 +21,6 @@ apt-get install -y --no-install-recommends \
 # Build/dev dependencies
 apt-get install -y --no-install-recommends \
   build-essential \
-  cmake \
-  cmake-curses-gui \
   doxygen \
   git \
   lcov \
@@ -31,6 +29,9 @@ apt-get install -y --no-install-recommends \
   python3-pip \
   python3-venv \
   valgrind
+
+# Install cmake 3.26+ for HDF5 2.0+ (Ubuntu 22.04 has cmake 3.22)
+python3 -m pip install --no-cache-dir "cmake>=3.26,<5"
 
 # Chaste dependencies
 apt-get install -y --no-install-recommends \
