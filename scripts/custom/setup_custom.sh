@@ -1,131 +1,23 @@
 #!/bin/sh
 
-# Setup required libraries for building Chaste dependencies on Ubuntu 22.04 Jammy
+# Setup required libraries for building Chaste dependencies on Ubuntu LTS
+script_dir="$(
+    cd "$(dirname "$0")"
+    pwd
+)"
 
-export DEBIAN_FRONTEND=noninteractive
+codename="$(. /etc/os-release && echo ${VERSION_CODENAME} | sed 's/\.//')"
 
-# Base dependencies
-apt-get update
-apt-get install -y --no-install-recommends \
-  apt-transport-https \
-  apt-utils \
-  ca-certificates \
-  curl \
-  environment-modules \
-  gnupg \
-  jq \
-  openssl \
-  rsync \
-  wget
+if [ "${codename}" = 'jammy' ]; then
+  ${script_dir}/setup_ubuntu_2204.sh
 
-# Build/dev dependencies
-apt-get install -y --no-install-recommends \
-  build-essential \
-  doxygen \
-  git \
-  lcov \
-  python3 \
-  python3-dev \
-  python3-pip \
-  python3-venv \
-  valgrind
+elif [ "${codename}" = 'noble' ]; then
+  ${script_dir}/setup_ubuntu_2404.sh
 
-# Install cmake 3.26+ for HDF5 2.0+ (Ubuntu 22.04 has cmake 3.22)
-python3 -m pip install --no-cache-dir "cmake>=3.26,<5"
+elif [ "${codename}" = 'resolute' ]; then
+  ${script_dir}/setup_ubuntu_2604.sh
 
-# Chaste dependencies
-apt-get install -y --no-install-recommends \
-  libfftw3-3 \
-  libfftw3-bin \
-  libfftw3-dev \
-  mpi-default-bin \
-  mpi-default-dev
-
-# VTK dependencies
-apt-get install -y --no-install-recommends \
-  freeglut3 \
-  freeglut3-dev \
-  libavcodec-dev \
-  libavcodec58 \
-  libavformat-dev \
-  libavformat58 \
-  libavutil-dev \
-  libavutil56 \
-  libdouble-conversion-dev \
-  libdouble-conversion3 \
-  libeigen3-dev \
-  libfmt-dev \
-  libfmt8 \
-  libfontconfig1 \
-  libfreetype6 \
-  libfreetype6-dev \
-  libgl1-mesa-dev \
-  libgl1-mesa-glx \
-  libgl2ps-dev \
-  libgl2ps1.4 \
-  libglew-dev \
-  libglew2.2 \
-  libglu1-mesa \
-  libglu1-mesa-dev \
-  libglx0 \
-  libjpeg-dev \
-  libjpeg8 \
-  libjsoncpp-dev \
-  libjsoncpp25 \
-  liblz4-1 \
-  liblz4-dev \
-  liblzma5 \
-  libmysqlclient-dev \
-  libmysqlclient21 \
-  libnetcdf-c++4 \
-  libnetcdf-cxx-legacy-dev \
-  libnetcdf-dev \
-  libnetcdf19 \
-  libodbc2 \
-  libogg-dev \
-  libogg0 \
-  libopengl0 \
-  libpng-dev \
-  libpng16-16 \
-  libpq-dev \
-  libpq5 \
-  libproj-dev \
-  libproj22 \
-  libsqlite3-0 \
-  libsqlite3-dev \
-  libswscale-dev \
-  libswscale5 \
-  libtbb-dev \
-  libtbb12 \
-  libtcl8.6 \
-  libtheora-dev \
-  libtheora0 \
-  libtiff-dev \
-  libtiff5 \
-  libtk8.6 \
-  libutfcpp-dev \
-  libx11-6 \
-  libx11-dev \
-  libxcursor-dev \
-  libxcursor1 \
-  libxft-dev \
-  libxml2 \
-  libxml2-dev \
-  libxss-dev \
-  libxt-dev \
-  libxt6 \
-  sqlite3 \
-  tcl-dev \
-  tk-dev \
-  x11proto-core-dev \
-  zlib1g \
-  zlib1g-dev
-
-# libexpat1-dev libexpat1:
-# To be supplied by custom VTK build due to version conflicts.
-
-# libgdal-dev libgdal30:
-# To be supplied by custom VTK build due to reliance on system boost.
-
-update-alternatives --install /usr/local/bin/python python /usr/bin/python3 10
-update-alternatives --install /usr/local/bin/pip pip /usr/bin/pip3 10
+else
+  echo "Unsupported Ubuntu version: ${codename}"
+  exit 1
+fi
