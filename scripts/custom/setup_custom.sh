@@ -31,7 +31,7 @@ apt-get install -y --no-install-recommends \
   valgrind
 
 # Install cmake 3.26+ for HDF5 2.0+ (Ubuntu 22.04 has cmake 3.22)
-python3 -m pip install --no-cache-dir "cmake>=3.26,<4"
+python3 -m pip install --no-cache-dir "cmake>=3.26,<5"
 
 # Chaste dependencies
 apt-get install -y --no-install-recommends \
