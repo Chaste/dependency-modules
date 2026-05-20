@@ -43,24 +43,22 @@ apt-get install -y --no-install-recommends \
 
 # VTK dependencies
 apt-get install -y --no-install-recommends \
-  freeglut3 \
   freeglut3-dev \
   libavcodec-dev \
-  libavcodec58 \
+  libavcodec60 \
   libavformat-dev \
-  libavformat58 \
+  libavformat60 \
   libavutil-dev \
-  libavutil56 \
+  libavutil58 \
   libdouble-conversion-dev \
   libdouble-conversion3 \
   libeigen3-dev \
   libfmt-dev \
-  libfmt8 \
+  libfmt9 \
   libfontconfig1 \
   libfreetype6 \
-  libfreetype6-dev \
+  libfreetype-dev \
   libgl1-mesa-dev \
-  libgl1-mesa-glx \
   libgl2ps-dev \
   libgl2ps1.4 \
   libglew-dev \
@@ -77,31 +75,30 @@ apt-get install -y --no-install-recommends \
   liblzma5 \
   libmysqlclient-dev \
   libmysqlclient21 \
-  libnetcdf-c++4 \
-  libnetcdf-cxx-legacy-dev \
+  libnetcdf-c++4-1 \
   libnetcdf-dev \
-  libnetcdf19 \
+  libnetcdf19t64 \
   libodbc2 \
   libogg-dev \
   libogg0 \
   libopengl0 \
   libpng-dev \
-  libpng16-16 \
+  libpng16-16t64 \
   libpq-dev \
   libpq5 \
   libproj-dev \
-  libproj22 \
+  libproj25 \
   libsqlite3-0 \
   libsqlite3-dev \
   libswscale-dev \
-  libswscale5 \
+  libswscale7 \
   libtbb-dev \
   libtbb12 \
   libtcl8.6 \
   libtheora-dev \
   libtheora0 \
   libtiff-dev \
-  libtiff5 \
+  libtiff6 \
   libtk8.6 \
   libutfcpp-dev \
   libx11-6 \
@@ -113,7 +110,7 @@ apt-get install -y --no-install-recommends \
   libxml2-dev \
   libxss-dev \
   libxt-dev \
-  libxt6 \
+  libxt6t64 \
   sqlite3 \
   tcl-dev \
   tk-dev \

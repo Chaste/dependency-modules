@@ -2,7 +2,7 @@
 
 # Installs Sundials from source and creates a modulefile for it.
 # Arguments:
-#   --version=version: The Sundials version to install (e.g., 5.7.0).
+#   --version=version: The Sundials version to install (e.g. 5.7.0).
 #   --modules-dir=path: The base directory for the installation and modulefile.
 #   --parallel=value: The number of parallel jobs to use for building (default: number of CPU cores).
 # Example usage:

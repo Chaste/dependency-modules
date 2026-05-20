@@ -2,7 +2,7 @@
 
 # Installs XSD from source and creates a modulefile for it.
 # Arguments:
-#   --version=version: Version of XSD to install (e.g., 4.0.0)
+#   --version=version: Version of XSD to install (e.g. 4.0.0)
 #   --modules-dir=path: The base directory for the installation and modulefile.
 # Example usage:
 #   ./install_xsd.sh --version=4.0.0 --modules-dir=/path/to/modules
