@@ -3,6 +3,16 @@ name: Build all
 on:
   workflow_dispatch:
     inputs:
+      ubuntu_codename:
+        description: "Ubuntu LTS"
+        required: true
+        type: choice
+        default: "resolute"
+        options:
+          - "jammy"
+          - "noble"
+          - "resolute"
+
       boost_ver:
         description: "Boost version"
         required: true
@@ -63,7 +73,13 @@ jobs:
   setup:
     name: Build all dependencies
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+
+    container:
+      image: "ubuntu:${{ github.event.inputs.ubuntu_codename }}"
+      env:
+        RUNNER_OFF: 1
+      options: --user 0
 
     steps:
       - name: Checkout

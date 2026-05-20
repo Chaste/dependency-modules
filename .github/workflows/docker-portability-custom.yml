@@ -10,10 +10,14 @@ on:
         default: "dev"
 
       ubuntu_codename:
-        description: "Ubuntu codename"
+        description: "Ubuntu LTS"
         required: true
-        type: string
+        type: choice
         default: "resolute"
+        options:
+          - "jammy"
+          - "noble"
+          - "resolute"
 
       boost_ver:
         description: "Boost version"
@@ -66,6 +70,7 @@ jobs:
         include:
           - tags: chaste/runner:portability-${{github.event.inputs.tag_suffix }}
             build-args: |
+              BASE=${{ github.event.inputs.ubuntu_codename }}
               BOOST=${{ github.event.inputs.boost_ver }}
               HDF5=${{ github.event.inputs.hdf5_ver }}
               PETSC=${{ github.event.inputs.petsc_ver }}
