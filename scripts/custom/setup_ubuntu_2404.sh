@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Setup required libraries for building Chaste dependencies on Ubuntu 22.04 Noble LTS
+# Setup required libraries for building Chaste dependencies on Ubuntu 24.04 Noble LTS
 
 export DEBIAN_FRONTEND=noninteractive
 

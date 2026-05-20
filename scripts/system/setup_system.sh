@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Setup Chaste system dependency versions on Ubuntu
-script_dir="$(cd "$(dirname "$0")"; pwd)"
-. ${script_dir}/common.sh
+script_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd ) # https://stackoverflow.com/a/246128
+. ${script_dir}/../common.sh
 
 export DEBIAN_FRONTEND=noninteractive
 

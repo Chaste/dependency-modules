@@ -76,7 +76,6 @@ apt-get install -y --no-install-recommends \
   libmysqlclient24 \
   libnetcdf-c++4-1 \
   libnetcdf-dev \
-  libnetcdf-dev \
   libnetcdf22 \
   libodbc2 \
   libogg-dev \

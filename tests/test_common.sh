@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 
-script_dir="$(cd "$(dirname "$0")"; pwd)"
+script_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 . ${script_dir}/../scripts/common.sh
 
 test_split_version()
