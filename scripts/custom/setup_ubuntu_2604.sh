@@ -26,6 +26,7 @@ apt-get install -y --no-install-recommends \
   doxygen \
   git \
   lcov \
+  python-is-python3 \
   python3 \
   python3-dev \
   python3-pip \
@@ -122,6 +123,3 @@ apt-get install -y --no-install-recommends \
 
 # libgdal-dev libgdal30:
 # To be supplied by custom VTK build due to reliance on system boost.
-
-update-alternatives --install /usr/local/bin/python python /usr/bin/python3 10
-update-alternatives --install /usr/local/bin/pip pip /usr/bin/pip3 10

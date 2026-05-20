@@ -28,6 +28,7 @@ apt-get install -y --no-install-recommends \
   doxygen \
   git \
   lcov \
+  python-is-python3 \
   python3 \
   python3-dev \
   python3-pip \
@@ -90,6 +91,3 @@ if [ "${OS_VERSION_CODENAME}" = 'jammy' ]; then
   apt-get install -y --allow-downgrades libexpat1=2.4.7-1 libexpat1-dev=2.4.7-1
   apt-mark hold libexpat1 libexpat1-dev
 fi
-
-update-alternatives --install /usr/local/bin/python python /usr/bin/python3 10
-update-alternatives --install /usr/local/bin/pip pip /usr/bin/pip3 10
