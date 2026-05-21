@@ -34,6 +34,7 @@ COPY scripts/ /usr/local/bin/
 RUN ln -s \
     /usr/local/bin/custom/install_boost.sh \
     /usr/local/bin/custom/install_hdf5.sh \
+    /usr/local/bin/custom/install_petsc_hdf5.sh \
     /usr/local/bin/custom/install_petsc.sh \
     /usr/local/bin/custom/install_sundials.sh \
     /usr/local/bin/custom/install_vtk.sh \
