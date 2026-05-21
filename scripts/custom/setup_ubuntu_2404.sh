@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -eu
 
 # Setup required libraries for building Chaste dependencies on Ubuntu 24.04 Noble LTS
 
