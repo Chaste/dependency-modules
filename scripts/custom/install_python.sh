@@ -6,7 +6,7 @@ usage()
     exit 1
 }
 
-script_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd ) # https://stackoverflow.com/a/246128
+script_dir="$( dirname "$( readlink -f "${BASH_SOURCE[0]}" )" )" # https://stackoverflow.com/a/246128
 . ${script_dir}/../common.sh
 
 # Parse arguments

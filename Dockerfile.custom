@@ -30,7 +30,19 @@ ENV DEFAULT_USER="runner" \
     MODULES_DIR="/home/runner/modules"
 
 # Copy scripts
-COPY scripts/custom/ scripts/*.sh /usr/local/bin/
+COPY scripts/ /usr/local/bin/
+RUN ln -s \
+    /usr/local/bin/custom/install_boost.sh \
+    /usr/local/bin/custom/install_hdf5.sh \
+    /usr/local/bin/custom/install_petsc.sh \
+    /usr/local/bin/custom/install_sundials.sh \
+    /usr/local/bin/custom/install_vtk.sh \
+    /usr/local/bin/custom/install_xercesc.sh \
+    /usr/local/bin/custom/install_xsd.sh \
+    /usr/local/bin/custom/setup_custom.sh \
+    /usr/local/bin/system/install_modulefiles.sh \
+    /usr/local/bin/system/setup_system.sh \
+    /usr/local/bin/
 
 # Setup base dependencies and install actions runner
 RUN useradd -r -m -d ${DEFAULT_HOME} -s /bin/bash ${DEFAULT_USER} && \
