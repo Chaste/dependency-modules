@@ -79,6 +79,19 @@ jobs:
               XERCESC=${{ github.event.inputs.xercesc_ver }}
               XSD=${{ github.event.inputs.xsd_ver }}
     steps:
+      - name: Print selected options
+        run: |
+          echo "Selected workflow inputs:"
+          echo "  tag_suffix: ${{ github.event.inputs.tag_suffix }}"
+          echo "  ubuntu_codename: ${{ github.event.inputs.ubuntu_codename }}"
+          echo "  boost_ver: ${{ github.event.inputs.boost_ver }}"
+          echo "  hdf5_ver: ${{ github.event.inputs.hdf5_ver }}"
+          echo "  petsc_ver: ${{ github.event.inputs.petsc_ver }}"
+          echo "  sundials_ver: ${{ github.event.inputs.sundials_ver }}"
+          echo "  vtk_ver: ${{ github.event.inputs.vtk_ver }}"
+          echo "  xercesc_ver: ${{ github.event.inputs.xercesc_ver }}"
+          echo "  xsd_ver: ${{ github.event.inputs.xsd_ver }}"
+
       - name: Checkout
         uses: actions/checkout@v6
 
