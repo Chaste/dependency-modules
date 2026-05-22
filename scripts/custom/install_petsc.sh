@@ -2,7 +2,7 @@
 
 # Installs PETSc from source and adds a modulefile for it.
 # Arguments:
-#   --version=version: The PETSc version to install (e.g., 3.15.0).
+#   --version=version: The PETSc version to install (e.g. 3.15.0).
 #   --arch=[{linux-gnu|linux-gnu-opt}]: The build type (default: linux-gnu).
 #   --modules-dir=path: The base directory for the installation and modulefile.
 #   --parallel=value: The number of parallel jobs to use for building (default: number of CPU cores).
@@ -17,8 +17,8 @@ usage()
     exit 1
 }
 
-script_dir="$(cd "$(dirname "$0")"; pwd)"
-. ${script_dir}/common.sh
+script_dir="$( dirname "$( readlink -f "${BASH_SOURCE[0]}" )" )" # https://stackoverflow.com/a/246128
+. ${script_dir}/../common.sh
 
 # Parse arguments
 version=

@@ -2,7 +2,7 @@
 
 # Installs Xerces-C++ from source and creates a modulefile for it.
 # Arguments:
-#   --version=version: Version of Xerces-C++ to install (e.g., 3.2.3)
+#   --version=version: Version of Xerces-C++ to install (e.g. 3.2.3)
 #   --modules-dir=path: The base directory for the installation and modulefile.
 #   --parallel=value: Number of parallel jobs for building (default: number of CPU cores)
 # Example usage:
@@ -15,8 +15,8 @@ usage()
     exit 1
 }
 
-script_dir="$(cd "$(dirname "$0")"; pwd)"
-. ${script_dir}/common.sh
+script_dir="$( dirname "$( readlink -f "${BASH_SOURCE[0]}" )" )" # https://stackoverflow.com/a/246128
+. ${script_dir}/../common.sh
 
 # Parse arguments
 version=

@@ -1,5 +1,5 @@
 # Build the image:
-# docker build -f Dockerfile.system --build-arg BASE=jammy -t chaste/runner:system .
+# docker build -f Dockerfile.system --build-arg BASE=resolute -t chaste/runner:system .
 
 # Run the container in interactive mode:
 # docker run --init -it -e RUNNER_OFF=1 chaste/runner:system /bin/bash
@@ -7,7 +7,7 @@
 # Run the container as a GitHub Actions runner:
 # docker run --init -it chaste/runner:system
 
-ARG BASE=jammy
+ARG BASE=resolute
 
 FROM ubuntu:${BASE}
 
@@ -22,7 +22,20 @@ ENV DEFAULT_USER="runner" \
     MODULES_DIR="/home/runner/modules"
 
 # Copy scripts
-COPY scripts/system/ scripts/*.sh /usr/local/bin/
+COPY scripts/ /usr/local/bin/
+RUN ln -s \
+    /usr/local/bin/custom/install_boost.sh \
+    /usr/local/bin/custom/install_hdf5.sh \
+    /usr/local/bin/custom/install_petsc_hdf5.sh \
+    /usr/local/bin/custom/install_petsc.sh \
+    /usr/local/bin/custom/install_sundials.sh \
+    /usr/local/bin/custom/install_vtk.sh \
+    /usr/local/bin/custom/install_xercesc.sh \
+    /usr/local/bin/custom/install_xsd.sh \
+    /usr/local/bin/custom/setup_custom.sh \
+    /usr/local/bin/system/install_modulefiles.sh \
+    /usr/local/bin/system/setup_system.sh \
+    /usr/local/bin/
 
 # Setup Chaste dependencies and install actions runner
 RUN useradd -r -m -d ${DEFAULT_HOME} -s /bin/bash ${DEFAULT_USER} && \
