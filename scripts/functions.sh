@@ -141,3 +141,112 @@ version_ge()
 {
   ! version_lt $1 $2
 }
+
+is_semver()
+{
+  [[ "$1" =~ ^[0-9]+(\.[0-9]+){0,2}(-[A-Za-z0-9.]+)?$ ]]
+}
+
+normalize_boost_version()
+{
+  local version="$1"
+  version="${version#boost-}"
+  version="${version#v}"
+  if is_semver "${version}"; then
+    read -r version _ < <(split_version "${version}")
+    echo "${version}"
+  fi
+}
+
+normalize_hdf5_tag()
+{
+  local tag="$1"
+  local version=""
+
+  case "${tag}" in
+    hdf5-[0-9]*.[0-9]*.[0-9]*)
+      version="${tag#hdf5-}"
+      ;;
+    hdf5_[0-9]*.[0-9]*.[0-9]*)
+      version="${tag#hdf5_}"
+      ;;
+    hdf5-[0-9]*.[0-9]*)
+      version="${tag#hdf5-}"
+      ;;
+    [0-9]*.[0-9]*.[0-9]*)
+      version="${tag}"
+      ;;
+  esac
+
+  if [ -n "${version}" ] && is_semver "${version}"; then
+    read -r version _ < <(split_version "${version}")
+    echo "${version}"
+  fi
+}
+
+normalize_petsc_tag()
+{
+  local tag="$1"
+  local version="${tag#v}"
+
+  if is_semver "${version}"; then
+    read -r version _ < <(split_version "${version}")
+    echo "${version}"
+  fi
+}
+
+normalize_sundials_tag()
+{
+  local tag="$1"
+  local version="${tag#v}"
+
+  if is_semver "${version}"; then
+    read -r version _ < <(split_version "${version}")
+    echo "${version}"
+  fi
+}
+
+normalize_vtk_tag()
+{
+  local tag="$1"
+  local version="${tag#v}"
+
+  if [[ "${version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    echo "${version}"
+  fi
+}
+
+normalize_xercesc_tag()
+{
+  local tag="$1"
+  local version=""
+
+  case "${tag}" in
+    Xerces-C_*)
+      version="${tag#Xerces-C_}"
+      version="${version//_/.}"
+      ;;
+    v[0-9]*.[0-9]*.[0-9]*)
+      version="${tag#v}"
+      ;;
+    [0-9]*.[0-9]*.[0-9]*)
+      version="${tag}"
+      ;;
+  esac
+
+  if [ -n "${version}" ] && is_semver "${version}"; then
+    read -r version _ < <(split_version "${version}")
+    echo "${version}"
+  fi
+}
+
+normalize_xsd_tag()
+{
+  local tag="$1"
+  local version="${tag#v}"
+
+  if is_semver "${version}"; then
+    read -r version _ < <(split_version "${version}")
+    echo "${version}"
+  fi
+}

@@ -217,6 +217,93 @@ EOF
 EOF
 }
 
+test_normalize_hdf5_tag()
+{
+  while read -r tag expected; do
+    result="$(normalize_hdf5_tag "${tag}" || true)"
+    if [ "${result}" != "${expected}" ]; then
+      echo "FAIL: normalize_hdf5_tag ${tag} -> '${result}' != '${expected}'"
+      exit 1
+    fi
+  done <<EOF
+hdf5-1.14.6 1.14.6
+hdf5_1.12.3 1.12.3
+hdf5-1.10.10 1.10.10
+vms_last_support_1_8 
+EOF
+}
+
+test_normalize_vtk_tag()
+{
+  while read -r tag expected; do
+    result="$(normalize_vtk_tag "${tag}" || true)"
+    if [ "${result}" != "${expected}" ]; then
+      echo "FAIL: normalize_vtk_tag ${tag} -> '${result}' != '${expected}'"
+      exit 1
+    fi
+  done <<EOF
+v9.3.1 9.3.1
+v9.6.2 9.6.2
+vms_last_support_trunk 
+EOF
+}
+
+test_normalize_petsc_tag()
+{
+  while read -r tag expected; do
+    result="$(normalize_petsc_tag "${tag}" || true)"
+    if [ "${result}" != "${expected}" ]; then
+      echo "FAIL: normalize_petsc_tag ${tag} -> '${result}' != '${expected}'"
+      exit 1
+    fi
+  done <<EOF
+v3.19.6 3.19.6
+v3.25.2 3.25.2
+EOF
+}
+
+test_normalize_xercesc_tag()
+{
+  while read -r tag expected; do
+    result="$(normalize_xercesc_tag "${tag}" || true)"
+    if [ "${result}" != "${expected}" ]; then
+      echo "FAIL: normalize_xercesc_tag ${tag} -> '${result}' != '${expected}'"
+      exit 1
+    fi
+  done <<EOF
+v3.2.4 3.2.4
+Xerces-C_3_2_4 3.2.4
+EOF
+}
+
+test_normalize_sundials_tag()
+{
+  while read -r tag expected; do
+    result="$(normalize_sundials_tag "${tag}" || true)"
+    if [ "${result}" != "${expected}" ]; then
+      echo "FAIL: normalize_sundials_tag ${tag} -> '${result}' != '${expected}'"
+      exit 1
+    fi
+  done <<EOF
+v6.4.1 6.4.1
+v7.7.0 7.7.0
+EOF
+}
+
+test_normalize_xsd_tag()
+{
+  while read -r tag expected; do
+    result="$(normalize_xsd_tag "${tag}" || true)"
+    if [ "${result}" != "${expected}" ]; then
+      echo "FAIL: normalize_xsd_tag ${tag} -> '${result}' != '${expected}'"
+      exit 1
+    fi
+  done <<EOF
+v4.0.0 4.0.0
+v4.2.1 4.2.1
+EOF
+}
+
 test_split_version
 test_compare_version
 test_version_eq
@@ -224,5 +311,11 @@ test_version_gt
 test_version_lt
 test_version_ge
 test_version_le
+test_normalize_hdf5_tag
+test_normalize_vtk_tag
+test_normalize_petsc_tag
+test_normalize_xercesc_tag
+test_normalize_sundials_tag
+test_normalize_xsd_tag
 
 echo "DONE"

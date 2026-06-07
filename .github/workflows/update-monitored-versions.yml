@@ -1,0 +1,59 @@
+name: Update monitored versions
+
+on:
+  workflow_run:
+    workflows:
+      - Build Boost
+      - Build HDF5
+      - Build PETSc
+      - Build SUNDIALS
+      - Build VTK
+      - Build Xerces-C
+      - Build XSD
+    types: [completed]
+
+jobs:
+  update:
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      (github.event.workflow_run.event == 'workflow_dispatch' ||
+       github.event.workflow_run.event == 'workflow_call')
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      actions: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Parse build run
+        id: parse
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          RUN_ID="${{ github.event.workflow_run.id }}"
+          JOB_NAME=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/jobs" --jq '.jobs[0].name')
+          echo "Resolved job name: ${JOB_NAME}"
+          while IFS= read -r line; do
+            echo "${line}" >> $GITHUB_OUTPUT
+          done < <(bash infra/parse_build_run_name.sh "${JOB_NAME}")
+
+      - name: Update manifest
+        run: |
+          bash infra/update_monitored_version.sh \
+            --dependency=${{ steps.parse.outputs.dependency }} \
+            --version=${{ steps.parse.outputs.version }}
+
+      - name: Commit manifest update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add infra/monitored-versions.json
+          if git diff --staged --quiet; then
+            echo "No manifest changes to commit."
+            exit 0
+          fi
+          git commit -m "chore: record successful ${{ steps.parse.outputs.dependency }} ${{ steps.parse.outputs.version }} build"
+          git push

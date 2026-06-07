@@ -1,0 +1,119 @@
+name: Monitor dependency versions
+
+on:
+  schedule:
+    - cron: "0 6 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  check:
+    name: Check for new dependency versions
+    runs-on: ubuntu-latest
+
+    outputs:
+      any_build: ${{ steps.check.outputs.any_build }}
+      matrix: ${{ steps.check.outputs.matrix }}
+      boost_build: ${{ steps.check.outputs.boost_build }}
+      boost_version: ${{ steps.check.outputs.boost_version }}
+      hdf5_build: ${{ steps.check.outputs.hdf5_build }}
+      hdf5_version: ${{ steps.check.outputs.hdf5_version }}
+      petsc_build: ${{ steps.check.outputs.petsc_build }}
+      petsc_version: ${{ steps.check.outputs.petsc_version }}
+      sundials_build: ${{ steps.check.outputs.sundials_build }}
+      sundials_version: ${{ steps.check.outputs.sundials_version }}
+      vtk_build: ${{ steps.check.outputs.vtk_build }}
+      vtk_version: ${{ steps.check.outputs.vtk_version }}
+      xercesc_build: ${{ steps.check.outputs.xercesc_build }}
+      xercesc_version: ${{ steps.check.outputs.xercesc_version }}
+      xsd_build: ${{ steps.check.outputs.xsd_build }}
+      xsd_version: ${{ steps.check.outputs.xsd_version }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Check latest versions
+        id: check
+        run: |
+          bash infra/check_latest_versions.sh
+
+      - name: Print selected options
+        run: |
+          echo "Dependencies requiring builds:"
+          echo "  any_build: ${{ steps.check.outputs.any_build }}"
+          echo "  matrix: ${{ steps.check.outputs.matrix }}"
+          echo "  boost: ${{ steps.check.outputs.boost_build }} (${{ steps.check.outputs.boost_version }})"
+          echo "  hdf5: ${{ steps.check.outputs.hdf5_build }} (${{ steps.check.outputs.hdf5_version }})"
+          echo "  petsc: ${{ steps.check.outputs.petsc_build }} (${{ steps.check.outputs.petsc_version }})"
+          echo "  sundials: ${{ steps.check.outputs.sundials_build }} (${{ steps.check.outputs.sundials_version }})"
+          echo "  vtk: ${{ steps.check.outputs.vtk_build }} (${{ steps.check.outputs.vtk_version }})"
+          echo "  xercesc: ${{ steps.check.outputs.xercesc_build }} (${{ steps.check.outputs.xercesc_version }})"
+          echo "  xsd: ${{ steps.check.outputs.xsd_build }} (${{ steps.check.outputs.xsd_version }})"
+
+  build-boost:
+    name: Build Boost ${{ needs.check.outputs.boost_version }}
+    needs: check
+    if: needs.check.outputs.boost_build == 'true'
+    uses: ./.github/workflows/build-boost.yml
+    with:
+      boost_ver: ${{ needs.check.outputs.boost_version }}
+      ubuntu_codename: resolute
+
+  build-hdf5:
+    name: Build HDF5 ${{ needs.check.outputs.hdf5_version }}
+    needs: check
+    if: needs.check.outputs.hdf5_build == 'true'
+    uses: ./.github/workflows/build-hdf5.yml
+    with:
+      hdf5_ver: ${{ needs.check.outputs.hdf5_version }}
+      ubuntu_codename: resolute
+
+  build-petsc:
+    name: Build PETSc ${{ needs.check.outputs.petsc_version }}
+    needs: check
+    if: needs.check.outputs.petsc_build == 'true'
+    uses: ./.github/workflows/build-petsc.yml
+    with:
+      petsc_ver: ${{ needs.check.outputs.petsc_version }}
+      petsc_arch: linux-gnu
+      ubuntu_codename: resolute
+
+  build-sundials:
+    name: Build SUNDIALS ${{ needs.check.outputs.sundials_version }}
+    needs: check
+    if: needs.check.outputs.sundials_build == 'true'
+    uses: ./.github/workflows/build-sundials.yml
+    with:
+      sundials_ver: ${{ needs.check.outputs.sundials_version }}
+      ubuntu_codename: resolute
+
+  build-vtk:
+    name: Build VTK ${{ needs.check.outputs.vtk_version }}
+    needs: check
+    if: needs.check.outputs.vtk_build == 'true'
+    uses: ./.github/workflows/build-vtk.yml
+    with:
+      vtk_ver: ${{ needs.check.outputs.vtk_version }}
+      ubuntu_codename: resolute
+
+  build-xercesc:
+    name: Build Xerces-C ${{ needs.check.outputs.xercesc_version }}
+    needs: check
+    if: needs.check.outputs.xercesc_build == 'true'
+    uses: ./.github/workflows/build-xercesc.yml
+    with:
+      xercesc_ver: ${{ needs.check.outputs.xercesc_version }}
+      ubuntu_codename: resolute
+
+  build-xsd:
+    name: Build XSD ${{ needs.check.outputs.xsd_version }}
+    needs: check
+    if: needs.check.outputs.xsd_build == 'true'
+    uses: ./.github/workflows/build-xsd.yml
+    with:
+      xsd_ver: ${{ needs.check.outputs.xsd_version }}
+      ubuntu_codename: resolute
