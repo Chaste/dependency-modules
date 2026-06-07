@@ -10,15 +10,14 @@ on:
       - Build VTK
       - Build Xerces-C
       - Build XSD
+    branches: [ main ]
     types: [completed]
 
 jobs:
   update:
     if: >
       github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.head_branch == github.event.repository.default_branch &&
-      (github.event.workflow_run.event == 'workflow_dispatch' ||
-       github.event.workflow_run.event == 'workflow_call')
+      github.event.workflow_run.event == 'workflow_dispatch'
     runs-on: ubuntu-latest
 
     permissions:
@@ -41,17 +40,29 @@ jobs:
             echo "${line}" >> "${GITHUB_OUTPUT}"
           done < <(bash infra/parse_build_run_name.sh "${JOB_NAME}")
 
+      - name: Check if update is needed
+        id: check
+        run: |
+          . infra/shared.sh
+          if check_dependency "${{ steps.parse.outputs.dependency }}" "${{ steps.parse.outputs.version }}"; then
+            echo "needed=true" >> "${GITHUB_OUTPUT}"
+          else
+            echo "needed=false" >> "${GITHUB_OUTPUT}"
+          fi
+
       - name: Update manifest
+        if: steps.check.outputs.needed == 'true'
         run: |
           bash infra/update_monitored_version.sh \
             --dependency=${{ steps.parse.outputs.dependency }} \
             --version=${{ steps.parse.outputs.version }}
 
       - name: Commit manifest update
+        if: steps.check.outputs.needed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add infra/monitored-versions.json
+          git add "infra/versions/${{ steps.parse.outputs.dependency }}.json"
           if git diff --staged --quiet; then
             echo "No manifest changes to commit."
             exit 0

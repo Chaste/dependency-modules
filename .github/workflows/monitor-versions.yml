@@ -66,7 +66,7 @@ jobs:
         run: |
           gh workflow run build-boost.yml \
             --repo ${{ github.repository }} \
-            --ref ${{ github.ref_name }} \
+            --ref main \
             --field boost_ver=${{ needs.check.outputs.boost_version }} \
             --field ubuntu_codename=resolute
 
@@ -75,7 +75,7 @@ jobs:
         run: |
           gh workflow run build-hdf5.yml \
             --repo ${{ github.repository }} \
-            --ref ${{ github.ref_name }} \
+            --ref main \
             --field hdf5_ver=${{ needs.check.outputs.hdf5_version }} \
             --field ubuntu_codename=resolute
 
@@ -84,7 +84,7 @@ jobs:
         run: |
           gh workflow run build-petsc.yml \
             --repo ${{ github.repository }} \
-            --ref ${{ github.ref_name }} \
+            --ref main \
             --field petsc_ver=${{ needs.check.outputs.petsc_version }} \
             --field petsc_arch=linux-gnu \
             --field ubuntu_codename=resolute
@@ -94,7 +94,7 @@ jobs:
         run: |
           gh workflow run build-sundials.yml \
             --repo ${{ github.repository }} \
-            --ref ${{ github.ref_name }} \
+            --ref main \
             --field sundials_ver=${{ needs.check.outputs.sundials_version }} \
             --field ubuntu_codename=resolute
 
@@ -103,7 +103,7 @@ jobs:
         run: |
           gh workflow run build-vtk.yml \
             --repo ${{ github.repository }} \
-            --ref ${{ github.ref_name }} \
+            --ref main \
             --field vtk_ver=${{ needs.check.outputs.vtk_version }} \
             --field ubuntu_codename=resolute
 
@@ -112,7 +112,7 @@ jobs:
         run: |
           gh workflow run build-xercesc.yml \
             --repo ${{ github.repository }} \
-            --ref ${{ github.ref_name }} \
+            --ref main \
             --field xercesc_ver=${{ needs.check.outputs.xercesc_version }} \
             --field ubuntu_codename=resolute
 
@@ -121,6 +121,6 @@ jobs:
         run: |
           gh workflow run build-xsd.yml \
             --repo ${{ github.repository }} \
-            --ref ${{ github.ref_name }} \
+            --ref main \
             --field xsd_ver=${{ needs.check.outputs.xsd_version }} \
             --field ubuntu_codename=resolute
