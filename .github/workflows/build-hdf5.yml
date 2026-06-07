@@ -19,15 +19,6 @@ on:
           - "noble"
           - "resolute"
 
-  workflow_call:
-    inputs:
-      hdf5_ver:
-        type: string
-        required: true
-      ubuntu_codename:
-        type: string
-        default: "resolute"
-
 defaults:
   run:
     shell: bash --login -e -o pipefail {0} # login for environment modules
@@ -35,12 +26,12 @@ defaults:
 
 jobs:
   setup:
-    name: Build HDF5 ${{ inputs.hdf5_ver || github.event.inputs.hdf5_ver }}
+    name: Build HDF5 ${{ inputs.hdf5_ver }}
 
     runs-on: ubuntu-latest
 
     container:
-      image: "ubuntu:${{ inputs.ubuntu_codename || github.event.inputs.ubuntu_codename }}"
+      image: "ubuntu:${{ inputs.ubuntu_codename }}"
       env:
         RUNNER_OFF: 1
       options: --user 0
@@ -52,7 +43,7 @@ jobs:
       - name: Set env
         run: |
           echo "MODULES_DIR=$HOME/modules" >> $GITHUB_ENV
-          echo "HDF5_VER=${{ inputs.hdf5_ver || github.event.inputs.hdf5_ver }}" >> $GITHUB_ENV
+          echo "HDF5_VER=${{ inputs.hdf5_ver }}" >> $GITHUB_ENV
 
       - name: Setup OS
         run: |

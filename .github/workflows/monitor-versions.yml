@@ -16,7 +16,6 @@ jobs:
 
     outputs:
       any_build: ${{ steps.check.outputs.any_build }}
-      matrix: ${{ steps.check.outputs.matrix }}
       boost_build: ${{ steps.check.outputs.boost_build }}
       boost_version: ${{ steps.check.outputs.boost_version }}
       hdf5_build: ${{ steps.check.outputs.hdf5_build }}
@@ -45,7 +44,6 @@ jobs:
         run: |
           echo "Dependencies requiring builds:"
           echo "  any_build: ${{ steps.check.outputs.any_build }}"
-          echo "  matrix: ${{ steps.check.outputs.matrix }}"
           echo "  boost: ${{ steps.check.outputs.boost_build }} (${{ steps.check.outputs.boost_version }})"
           echo "  hdf5: ${{ steps.check.outputs.hdf5_build }} (${{ steps.check.outputs.hdf5_version }})"
           echo "  petsc: ${{ steps.check.outputs.petsc_build }} (${{ steps.check.outputs.petsc_version }})"
@@ -54,66 +52,75 @@ jobs:
           echo "  xercesc: ${{ steps.check.outputs.xercesc_build }} (${{ steps.check.outputs.xercesc_version }})"
           echo "  xsd: ${{ steps.check.outputs.xsd_build }} (${{ steps.check.outputs.xsd_version }})"
 
-  build-boost:
-    name: Build Boost ${{ needs.check.outputs.boost_version }}
+  dispatch:
+    name: Dispatch builds
     needs: check
-    if: needs.check.outputs.boost_build == 'true'
-    uses: ./.github/workflows/build-boost.yml
-    with:
-      boost_ver: ${{ needs.check.outputs.boost_version }}
-      ubuntu_codename: resolute
+    if: needs.check.outputs.any_build == 'true'
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
 
-  build-hdf5:
-    name: Build HDF5 ${{ needs.check.outputs.hdf5_version }}
-    needs: check
-    if: needs.check.outputs.hdf5_build == 'true'
-    uses: ./.github/workflows/build-hdf5.yml
-    with:
-      hdf5_ver: ${{ needs.check.outputs.hdf5_version }}
-      ubuntu_codename: resolute
+    steps:
+      - name: Dispatch Boost build
+        if: needs.check.outputs.boost_build == 'true'
+        run: |
+          gh workflow run build-boost.yml \
+            --repo ${{ github.repository }} \
+            --ref ${{ github.ref_name }} \
+            --field boost_ver=${{ needs.check.outputs.boost_version }} \
+            --field ubuntu_codename=resolute
 
-  build-petsc:
-    name: Build PETSc ${{ needs.check.outputs.petsc_version }}
-    needs: check
-    if: needs.check.outputs.petsc_build == 'true'
-    uses: ./.github/workflows/build-petsc.yml
-    with:
-      petsc_ver: ${{ needs.check.outputs.petsc_version }}
-      petsc_arch: linux-gnu
-      ubuntu_codename: resolute
+      - name: Dispatch HDF5 build
+        if: needs.check.outputs.hdf5_build == 'true'
+        run: |
+          gh workflow run build-hdf5.yml \
+            --repo ${{ github.repository }} \
+            --ref ${{ github.ref_name }} \
+            --field hdf5_ver=${{ needs.check.outputs.hdf5_version }} \
+            --field ubuntu_codename=resolute
 
-  build-sundials:
-    name: Build SUNDIALS ${{ needs.check.outputs.sundials_version }}
-    needs: check
-    if: needs.check.outputs.sundials_build == 'true'
-    uses: ./.github/workflows/build-sundials.yml
-    with:
-      sundials_ver: ${{ needs.check.outputs.sundials_version }}
-      ubuntu_codename: resolute
+      - name: Dispatch PETSc build
+        if: needs.check.outputs.petsc_build == 'true'
+        run: |
+          gh workflow run build-petsc.yml \
+            --repo ${{ github.repository }} \
+            --ref ${{ github.ref_name }} \
+            --field petsc_ver=${{ needs.check.outputs.petsc_version }} \
+            --field petsc_arch=linux-gnu \
+            --field ubuntu_codename=resolute
 
-  build-vtk:
-    name: Build VTK ${{ needs.check.outputs.vtk_version }}
-    needs: check
-    if: needs.check.outputs.vtk_build == 'true'
-    uses: ./.github/workflows/build-vtk.yml
-    with:
-      vtk_ver: ${{ needs.check.outputs.vtk_version }}
-      ubuntu_codename: resolute
+      - name: Dispatch SUNDIALS build
+        if: needs.check.outputs.sundials_build == 'true'
+        run: |
+          gh workflow run build-sundials.yml \
+            --repo ${{ github.repository }} \
+            --ref ${{ github.ref_name }} \
+            --field sundials_ver=${{ needs.check.outputs.sundials_version }} \
+            --field ubuntu_codename=resolute
 
-  build-xercesc:
-    name: Build Xerces-C ${{ needs.check.outputs.xercesc_version }}
-    needs: check
-    if: needs.check.outputs.xercesc_build == 'true'
-    uses: ./.github/workflows/build-xercesc.yml
-    with:
-      xercesc_ver: ${{ needs.check.outputs.xercesc_version }}
-      ubuntu_codename: resolute
+      - name: Dispatch VTK build
+        if: needs.check.outputs.vtk_build == 'true'
+        run: |
+          gh workflow run build-vtk.yml \
+            --repo ${{ github.repository }} \
+            --ref ${{ github.ref_name }} \
+            --field vtk_ver=${{ needs.check.outputs.vtk_version }} \
+            --field ubuntu_codename=resolute
 
-  build-xsd:
-    name: Build XSD ${{ needs.check.outputs.xsd_version }}
-    needs: check
-    if: needs.check.outputs.xsd_build == 'true'
-    uses: ./.github/workflows/build-xsd.yml
-    with:
-      xsd_ver: ${{ needs.check.outputs.xsd_version }}
-      ubuntu_codename: resolute
+      - name: Dispatch Xerces-C build
+        if: needs.check.outputs.xercesc_build == 'true'
+        run: |
+          gh workflow run build-xercesc.yml \
+            --repo ${{ github.repository }} \
+            --ref ${{ github.ref_name }} \
+            --field xercesc_ver=${{ needs.check.outputs.xercesc_version }} \
+            --field ubuntu_codename=resolute
+
+      - name: Dispatch XSD build
+        if: needs.check.outputs.xsd_build == 'true'
+        run: |
+          gh workflow run build-xsd.yml \
+            --repo ${{ github.repository }} \
+            --ref ${{ github.ref_name }} \
+            --field xsd_ver=${{ needs.check.outputs.xsd_version }} \
+            --field ubuntu_codename=resolute
