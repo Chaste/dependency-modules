@@ -1,10 +1,10 @@
-![boost](https://github.com/Chaste/dependency-modules/actions/workflows/build-boost.yml/badge.svg)
-![hdf5](https://github.com/Chaste/dependency-modules/actions/workflows/build-hdf5.yml/badge.svg)
-![petsc](https://github.com/Chaste/dependency-modules/actions/workflows/build-petsc.yml/badge.svg)
-![sundials](https://github.com/Chaste/dependency-modules/actions/workflows/build-sundials.yml/badge.svg)
-![vtk](https://github.com/Chaste/dependency-modules/actions/workflows/build-vtk.yml/badge.svg)
-![xercesc](https://github.com/Chaste/dependency-modules/actions/workflows/build-xercesc.yml/badge.svg)
-![xsd](https://github.com/Chaste/dependency-modules/actions/workflows/build-xsd.yml/badge.svg)
+![boost](https://github.com/Chaste/dependency-modules/actions/workflows/build-boost.yml/badge.svg) ![boost version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FChaste%2Fdependency-modules%2Fmain%2Finfra%2Fmonitored-versions.json&query=%24.boost.last_built&label=boost)
+![hdf5](https://github.com/Chaste/dependency-modules/actions/workflows/build-hdf5.yml/badge.svg) ![hdf5 version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FChaste%2Fdependency-modules%2Fmain%2Finfra%2Fmonitored-versions.json&query=%24.hdf5.last_built&label=hdf5)
+![petsc](https://github.com/Chaste/dependency-modules/actions/workflows/build-petsc.yml/badge.svg) ![petsc version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FChaste%2Fdependency-modules%2Fmain%2Finfra%2Fmonitored-versions.json&query=%24.petsc.last_built&label=petsc)
+![sundials](https://github.com/Chaste/dependency-modules/actions/workflows/build-sundials.yml/badge.svg) ![sundials version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FChaste%2Fdependency-modules%2Fmain%2Finfra%2Fmonitored-versions.json&query=%24.sundials.last_built&label=sundials)
+![vtk](https://github.com/Chaste/dependency-modules/actions/workflows/build-vtk.yml/badge.svg) ![vtk version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FChaste%2Fdependency-modules%2Fmain%2Finfra%2Fmonitored-versions.json&query=%24.vtk.last_built&label=vtk)
+![xercesc](https://github.com/Chaste/dependency-modules/actions/workflows/build-xercesc.yml/badge.svg) ![xercesc version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FChaste%2Fdependency-modules%2Fmain%2Finfra%2Fmonitored-versions.json&query=%24.xercesc.last_built&label=xercesc)
+![xsd](https://github.com/Chaste/dependency-modules/actions/workflows/build-xsd.yml/badge.svg) ![xsd version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FChaste%2Fdependency-modules%2Fmain%2Finfra%2Fmonitored-versions.json&query=%24.xsd.last_built&label=xsd)
 
 # Chaste Dependency Modules
 
@@ -159,3 +159,15 @@ Below is a subset of commonly used `module` commands. See the environment module
 | `module switch <module/ver0> <module/ver1>` |  Unload `module/ver0` and load `module/ver1`.                     |
 |                                             |                                                                   |
 | `module show <module>`                      |  Show the environment settings for a module.                      |
+
+## Automated version monitoring
+
+This repository monitors upstream dependency releases and automatically attempts to build newer versions.
+
+The check runs on a monthly schedule and:
+
+1. Fetches the latest upstream version of each dependency.
+2. Compares each version against the last **successful** build version for each dependency.
+3. Triggers a build when a newer version is available.
+
+The workflow badges at the top of this README reflect the pass/fail status of the **most recent** run of each library build.

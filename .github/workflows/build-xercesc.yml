@@ -19,6 +19,15 @@ on:
           - "noble"
           - "resolute"
 
+  workflow_call:
+    inputs:
+      xercesc_ver:
+        type: string
+        required: true
+      ubuntu_codename:
+        type: string
+        default: "resolute"
+
 defaults:
   run:
     shell: bash --login -e -o pipefail {0} # login for environment modules
@@ -26,12 +35,12 @@ defaults:
 
 jobs:
   setup:
-    name: Build Xerces-C ${{ github.event.inputs.xercesc_ver }}
+    name: Build Xerces-C ${{ inputs.xercesc_ver || github.event.inputs.xercesc_ver }}
 
     runs-on: ubuntu-latest
 
     container:
-      image: "ubuntu:${{ github.event.inputs.ubuntu_codename }}"
+      image: "ubuntu:${{ inputs.ubuntu_codename || github.event.inputs.ubuntu_codename }}"
       env:
         RUNNER_OFF: 1
       options: --user 0
@@ -43,7 +52,7 @@ jobs:
       - name: Set env
         run: |
           echo "MODULES_DIR=$HOME/modules" >> $GITHUB_ENV
-          echo "XERCESC_VER=${{ github.event.inputs.xercesc_ver }}" >> $GITHUB_ENV
+          echo "XERCESC_VER=${{ inputs.xercesc_ver || github.event.inputs.xercesc_ver }}" >> $GITHUB_ENV
 
       - name: Setup OS
         run: |
