@@ -16,6 +16,7 @@ jobs:
   update:
     if: >
       github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == github.event.repository.default_branch &&
       (github.event.workflow_run.event == 'workflow_dispatch' ||
        github.event.workflow_run.event == 'workflow_call')
     runs-on: ubuntu-latest
@@ -37,7 +38,7 @@ jobs:
           JOB_NAME=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/jobs" --jq '.jobs[0].name')
           echo "Resolved job name: ${JOB_NAME}"
           while IFS= read -r line; do
-            echo "${line}" >> $GITHUB_OUTPUT
+            echo "${line}" >> "${GITHUB_OUTPUT}"
           done < <(bash infra/parse_build_run_name.sh "${JOB_NAME}")
 
       - name: Update manifest

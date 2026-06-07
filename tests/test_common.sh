@@ -258,6 +258,7 @@ test_normalize_petsc_tag()
     fi
   done <<EOF
 v3.19.6 3.19.6
+v3.19.6-rc.1
 v3.25.2 3.25.2
 EOF
 }
