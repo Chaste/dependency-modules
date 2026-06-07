@@ -217,6 +217,23 @@ EOF
 EOF
 }
 
+test_normalize_boost_version()
+{
+  while read -r tag expected; do
+    result="$(normalize_boost_version "${tag}" || true)"
+    if [ "${result}" != "${expected}" ]; then
+      echo "FAIL: normalize_boost_version ${tag} -> '${result}' != '${expected}'"
+      exit 1
+    fi
+  done <<EOF
+1.83.0 1.83.0
+v1.83.0 1.83.0
+boost-1.83.0 1.83.0
+boost_1_83_0
+develop
+EOF
+}
+
 test_normalize_hdf5_tag()
 {
   while read -r tag expected; do
@@ -230,21 +247,6 @@ hdf5-1.14.6 1.14.6
 hdf5_1.12.3 1.12.3
 hdf5-1.10.10 1.10.10
 vms_last_support_1_8 
-EOF
-}
-
-test_normalize_vtk_tag()
-{
-  while read -r tag expected; do
-    result="$(normalize_vtk_tag "${tag}" || true)"
-    if [ "${result}" != "${expected}" ]; then
-      echo "FAIL: normalize_vtk_tag ${tag} -> '${result}' != '${expected}'"
-      exit 1
-    fi
-  done <<EOF
-v9.3.1 9.3.1
-v9.6.2 9.6.2
-vms_last_support_trunk 
 EOF
 }
 
@@ -263,20 +265,6 @@ v3.25.2 3.25.2
 EOF
 }
 
-test_normalize_xercesc_tag()
-{
-  while read -r tag expected; do
-    result="$(normalize_xercesc_tag "${tag}" || true)"
-    if [ "${result}" != "${expected}" ]; then
-      echo "FAIL: normalize_xercesc_tag ${tag} -> '${result}' != '${expected}'"
-      exit 1
-    fi
-  done <<EOF
-v3.2.4 3.2.4
-Xerces-C_3_2_4 3.2.4
-EOF
-}
-
 test_normalize_sundials_tag()
 {
   while read -r tag expected; do
@@ -288,6 +276,35 @@ test_normalize_sundials_tag()
   done <<EOF
 v6.4.1 6.4.1
 v7.7.0 7.7.0
+EOF
+}
+
+test_normalize_vtk_tag()
+{
+  while read -r tag expected; do
+    result="$(normalize_vtk_tag "${tag}" || true)"
+    if [ "${result}" != "${expected}" ]; then
+      echo "FAIL: normalize_vtk_tag ${tag} -> '${result}' != '${expected}'"
+      exit 1
+    fi
+  done <<EOF
+v9.3.1 9.3.1
+v9.6.2 9.6.2
+vms_last_support_trunk 
+EOF
+}
+
+test_normalize_xercesc_tag()
+{
+  while read -r tag expected; do
+    result="$(normalize_xercesc_tag "${tag}" || true)"
+    if [ "${result}" != "${expected}" ]; then
+      echo "FAIL: normalize_xercesc_tag ${tag} -> '${result}' != '${expected}'"
+      exit 1
+    fi
+  done <<EOF
+v3.2.4 3.2.4
+Xerces-C_3_2_4 3.2.4
 EOF
 }
 
@@ -312,11 +329,12 @@ test_version_gt
 test_version_lt
 test_version_ge
 test_version_le
+test_normalize_boost_version
 test_normalize_hdf5_tag
-test_normalize_vtk_tag
 test_normalize_petsc_tag
-test_normalize_xercesc_tag
 test_normalize_sundials_tag
+test_normalize_vtk_tag
+test_normalize_xercesc_tag
 test_normalize_xsd_tag
 
 echo "DONE"

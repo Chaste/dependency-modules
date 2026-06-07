@@ -142,11 +142,33 @@ version_ge()
   ! version_lt $1 $2
 }
 
+# Check if a string is a semantic version of the form X[.Y[.Z]][-rc].
+#
+# Usage: is_semver <string>
+#
+# Returns: true if the string matches, false otherwise
+#
+# Examples:
+# `is_semver 1.2.3` -> true
+# `is_semver 1.2.3-rc1` -> true
+# `is_semver develop` -> false
 is_semver()
 {
   [[ "$1" =~ ^[0-9]+(\.[0-9]+){0,2}(-[A-Za-z0-9]+)?$ ]]
 }
 
+# Normalize a Boost version string to X.Y.Z.
+# Strips optional 'boost-' or 'v' prefix.
+#
+# Usage: normalize_boost_version <version>
+#
+# Returns: X.Y.Z version string, or empty if not a recognized release
+#
+# Examples:
+# `normalize_boost_version 1.83.0` -> 1.83.0
+# `normalize_boost_version v1.83.0` -> 1.83.0
+# `normalize_boost_version boost-1.83.0` -> 1.83.0
+# `normalize_boost_version boost_1_83_0` -> (empty)
 normalize_boost_version()
 {
   local version="$1"
@@ -158,6 +180,17 @@ normalize_boost_version()
   fi
 }
 
+# Normalize an HDF5 git tag to X.Y.Z.
+# Accepts tags of the form hdf5-X.Y.Z, hdf5_X.Y.Z, or plain X.Y.Z.
+#
+# Usage: normalize_hdf5_tag <tag>
+#
+# Returns: X.Y.Z version string, or empty if not a recognized release tag
+#
+# Examples:
+# `normalize_hdf5_tag hdf5-1.14.6` -> 1.14.6
+# `normalize_hdf5_tag hdf5_1.12.3` -> 1.12.3
+# `normalize_hdf5_tag vms_last_support_1_8` -> (empty)
 normalize_hdf5_tag()
 {
   local tag="$1"
@@ -184,6 +217,16 @@ normalize_hdf5_tag()
   fi
 }
 
+# Normalize a PETSc git tag to X.Y.Z.
+# Strips optional 'v' prefix. Release candidates are excluded.
+#
+# Usage: normalize_petsc_tag <tag>
+#
+# Returns: X.Y.Z version string, or empty if not a recognized release tag
+#
+# Examples:
+# `normalize_petsc_tag v3.19.6` -> 3.19.6
+# `normalize_petsc_tag v3.19.6-rc.1` -> (empty)
 normalize_petsc_tag()
 {
   local tag="$1"
@@ -195,6 +238,16 @@ normalize_petsc_tag()
   fi
 }
 
+# Normalize a SUNDIALS git tag to X.Y.Z.
+# Strips optional 'v' prefix.
+#
+# Usage: normalize_sundials_tag <tag>
+#
+# Returns: X.Y.Z version string, or empty if not a recognized release tag
+#
+# Examples:
+# `normalize_sundials_tag v6.4.1` -> 6.4.1
+# `normalize_sundials_tag v7.7.0` -> 7.7.0
 normalize_sundials_tag()
 {
   local tag="$1"
@@ -206,6 +259,16 @@ normalize_sundials_tag()
   fi
 }
 
+# Normalize a VTK git tag to X.Y.Z.
+# Strips optional 'v' prefix. Only accepts exact X.Y.Z form (no rc suffixes).
+#
+# Usage: normalize_vtk_tag <tag>
+#
+# Returns: X.Y.Z version string, or empty if not a recognized release tag
+#
+# Examples:
+# `normalize_vtk_tag v9.3.1` -> 9.3.1
+# `normalize_vtk_tag vms_last_support_trunk` -> (empty)
 normalize_vtk_tag()
 {
   local tag="$1"
@@ -216,6 +279,16 @@ normalize_vtk_tag()
   fi
 }
 
+# Normalize a Xerces-C git tag to X.Y.Z.
+# Accepts tags of the form Xerces-C_X_Y_Z, vX.Y.Z, or plain X.Y.Z.
+#
+# Usage: normalize_xercesc_tag <tag>
+#
+# Returns: X.Y.Z version string, or empty if not a recognized release tag
+#
+# Examples:
+# `normalize_xercesc_tag Xerces-C_3_2_4` -> 3.2.4
+# `normalize_xercesc_tag v3.2.4` -> 3.2.4
 normalize_xercesc_tag()
 {
   local tag="$1"
@@ -240,6 +313,16 @@ normalize_xercesc_tag()
   fi
 }
 
+# Normalize an XSD git tag to X.Y.Z.
+# Strips optional 'v' prefix.
+#
+# Usage: normalize_xsd_tag <tag>
+#
+# Returns: X.Y.Z version string, or empty if not a recognized release tag
+#
+# Examples:
+# `normalize_xsd_tag v4.0.0` -> 4.0.0
+# `normalize_xsd_tag v4.2.1` -> 4.2.1
 normalize_xsd_tag()
 {
   local tag="$1"
