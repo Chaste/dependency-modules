@@ -25,7 +25,12 @@ read_manifest_field()
 {
   local dep="$1"
   local field="$2"
-  jq -r ".${field} // empty" "${versions_dir}/${dep}.json"
+  local file="${versions_dir}/${dep}.json"
+  if [ ! -f "${file}" ]; then
+    echo ""
+    return 0
+  fi
+  jq -r ".${field} // empty" "${file}"
 }
 
 set_output()
