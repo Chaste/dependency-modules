@@ -83,6 +83,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     permissions:
       contents: write
+      pull-requests: write
     uses: ./.github/workflows/update-monitored-versions.yml
     with:
       dependency: petsc
