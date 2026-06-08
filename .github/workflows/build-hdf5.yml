@@ -65,3 +65,14 @@ jobs:
           module avail
           module load hdf5/${{ env.HDF5_VER }}
           module test hdf5/${{ env.HDF5_VER }}
+
+  record:
+    name: Record build
+    needs: setup
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    uses: ./.github/workflows/update-monitored-versions.yml
+    with:
+      dependency: hdf5
+      version: ${{ inputs.hdf5_ver }}

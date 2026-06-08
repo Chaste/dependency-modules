@@ -217,6 +217,29 @@ EOF
 EOF
 }
 
+test_max_version()
+{
+  local result
+  while IFS='|' read -r args expected; do
+    result="$(max_version ${args})"
+    if [ "${result}" != "${expected}" ]; then
+      echo "FAIL: max_version ${args} -> '${result}' != '${expected}'"
+      exit 1
+    fi
+  done <<EOF
+1.0.0|1.0.0
+1.83.0 1.84.0|1.84.0
+1.0.0 1.1.0 1.2.0|1.2.0
+9.1.0 9.3.1 9.2.0|9.3.1
+EOF
+
+  result="$(max_version)"
+  if [ -n "${result}" ]; then
+    echo "FAIL: max_version (no args) -> '${result}' != ''"
+    exit 1
+  fi
+}
+
 test_normalize_boost_version()
 {
   while read -r tag expected; do
@@ -329,6 +352,7 @@ test_version_gt
 test_version_lt
 test_version_ge
 test_version_le
+test_max_version
 test_normalize_boost_version
 test_normalize_hdf5_tag
 test_normalize_petsc_tag

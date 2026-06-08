@@ -66,3 +66,14 @@ jobs:
           module avail
           module load sundials/${{ env.SUNDIALS_VER }}
           module test sundials/${{ env.SUNDIALS_VER }}
+
+  record:
+    name: Record build
+    needs: setup
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    uses: ./.github/workflows/update-monitored-versions.yml
+    with:
+      dependency: sundials
+      version: ${{ inputs.sundials_ver }}

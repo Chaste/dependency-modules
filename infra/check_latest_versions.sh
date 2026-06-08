@@ -32,7 +32,6 @@ if [ ! -d "${versions_dir}" ]; then
   exit 1
 fi
 
-matrix_items=()
 any_build=false
 
 process_dependency()
@@ -40,9 +39,16 @@ process_dependency()
   local dep="$1"
   local latest="$2"
 
+  echo "${dep}: latest=${latest}"
+
   if check_dependency "${dep}" "${latest}"; then
     any_build=true
-    matrix_items+=("{\"dependency\":\"${dep}\",\"version\":\"${latest}\"}")
+    set_gh_output "${dep}_build" "true"
+    set_gh_output "${dep}_version" "${latest}"
+    echo "  -> build required"
+  else
+    set_gh_output "${dep}_build" "false"
+    echo "  -> up to date"
   fi
 }
 
@@ -55,12 +61,8 @@ process_dependency "xercesc" "$(fetch_latest_xercesc)"
 process_dependency "xsd" "$(fetch_latest_xsd)"
 
 if [ "${any_build}" = true ]; then
-  matrix_json="[$(IFS=,; echo "${matrix_items[*]}")]"
-  set_output "matrix" "${matrix_json}"
-  set_output "any_build" "true"
-  echo "Build matrix: ${matrix_json}"
+  set_gh_output "any_build" "true"
 else
-  set_output "matrix" "[]"
-  set_output "any_build" "false"
+  set_gh_output "any_build" "false"
   echo "All dependencies up to date."
 fi

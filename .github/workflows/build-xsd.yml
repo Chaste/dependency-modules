@@ -65,3 +65,14 @@ jobs:
           module avail
           module load xsd/${{ env.XSD_VER }}
           module test xsd/${{ env.XSD_VER }}
+
+  record:
+    name: Record build
+    needs: setup
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    uses: ./.github/workflows/update-monitored-versions.yml
+    with:
+      dependency: xsd
+      version: ${{ inputs.xsd_ver }}

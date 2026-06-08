@@ -65,3 +65,14 @@ jobs:
           module avail
           module load boost/${{ env.BOOST_VER }}
           module test boost/${{ env.BOOST_VER }}
+
+  record:
+    name: Record build
+    needs: setup
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    uses: ./.github/workflows/update-monitored-versions.yml
+    with:
+      dependency: boost
+      version: ${{ inputs.boost_ver }}

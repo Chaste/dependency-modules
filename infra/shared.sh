@@ -7,20 +7,15 @@ _infra_dir="$( dirname "$( readlink -f "${BASH_SOURCE[0]}" )" )"
 
 versions_dir="${_infra_dir}/versions"
 
-max_version()
-{
-  local max="" ver
-  for ver in "$@"; do
-    if [ -z "${ver}" ]; then
-      continue
-    fi
-    if [ -z "${max}" ] || version_gt "${ver}" "${max}"; then
-      max="${ver}"
-    fi
-  done
-  echo "${max}"
-}
-
+# Read a field from a dependency's version file.
+#
+# Usage: read_manifest_field <dependency> <field>
+#
+# Returns: the field value, or empty if the file or field does not exist
+#
+# Examples:
+# `read_manifest_field boost last_built` -> 1.83.0
+# `read_manifest_field petsc arch` -> linux-gnu
 read_manifest_field()
 {
   local dep="$1"
@@ -33,7 +28,14 @@ read_manifest_field()
   jq -r ".${field} // empty" "${file}"
 }
 
-set_output()
+# Write a key=value pair to GITHUB_OUTPUT when running in GitHub Actions.
+#
+# Usage: set_gh_output <key> <value>
+#
+# Examples:
+# `set_gh_output boost_build true`
+# `set_gh_output boost_version 1.84.0`
+set_gh_output()
 {
   local key="$1"
   local value="$2"
@@ -44,6 +46,11 @@ set_output()
   fi
 }
 
+# Fetch the latest stable Boost release version from archives.boost.io.
+#
+# Usage: fetch_latest_boost
+#
+# Returns: the latest stable version string (e.g. 1.84.0)
 fetch_latest_boost()
 {
   local html version norm versions=""
@@ -57,6 +64,11 @@ fetch_latest_boost()
   max_version ${versions}
 }
 
+# Fetch the latest stable HDF5 release version from the HDFGroup GitHub tags.
+#
+# Usage: fetch_latest_hdf5
+#
+# Returns: the latest stable version string (e.g. 1.14.6)
 fetch_latest_hdf5()
 {
   local tags norm versions="" tag
@@ -70,6 +82,11 @@ fetch_latest_hdf5()
   max_version ${versions}
 }
 
+# Fetch the latest stable PETSc release version from the GitLab tags.
+#
+# Usage: fetch_latest_petsc
+#
+# Returns: the latest stable version string (e.g. 3.21.0)
 fetch_latest_petsc()
 {
   local tags norm versions="" tag
@@ -83,6 +100,11 @@ fetch_latest_petsc()
   max_version ${versions}
 }
 
+# Fetch the latest stable SUNDIALS release version from the GitHub latest release.
+#
+# Usage: fetch_latest_sundials
+#
+# Returns: the latest stable version string (e.g. 7.1.0)
 fetch_latest_sundials()
 {
   local tag
@@ -90,6 +112,11 @@ fetch_latest_sundials()
   normalize_sundials_tag "${tag}"
 }
 
+# Fetch the latest stable VTK release version from the Kitware GitLab tags.
+#
+# Usage: fetch_latest_vtk
+#
+# Returns: the latest stable version string (e.g. 9.3.1)
 fetch_latest_vtk()
 {
   local tags norm versions="" tag
@@ -103,6 +130,11 @@ fetch_latest_vtk()
   max_version ${versions}
 }
 
+# Fetch the latest stable Xerces-C release version from the Apache GitHub tags.
+#
+# Usage: fetch_latest_xercesc
+#
+# Returns: the latest stable version string (e.g. 3.2.5)
 fetch_latest_xercesc()
 {
   local tags norm versions="" tag
@@ -116,6 +148,11 @@ fetch_latest_xercesc()
   max_version ${versions}
 }
 
+# Fetch the latest stable XSD release version from the codesynthesis GitHub tags.
+#
+# Usage: fetch_latest_xsd
+#
+# Returns: the latest stable version string (e.g. 4.2.0)
 fetch_latest_xsd()
 {
   local tags norm versions="" tag
@@ -129,13 +166,22 @@ fetch_latest_xsd()
   max_version ${versions}
 }
 
+# Check whether the latest upstream version is newer than the last built version.
+#
+# Usage: check_dependency <dependency> <latest>
+#
+# Returns:
+#  true  if latest > last_built (build required)
+#  false if latest <= last_built (up to date)
+#
+# Examples:
+# `check_dependency boost 1.84.0`  -> true (if last_built is 1.83.0)
+# `check_dependency boost 1.83.0`  -> false (if last_built is 1.83.0)
 check_dependency()
 {
   local dep="$1"
   local latest="$2"
   local last_built
-  local build_key="${dep}_build"
-  local version_key="${dep}_version"
 
   if [ -z "${latest}" ]; then
     echo "ERROR: failed to determine latest version for ${dep}" 1>&2
@@ -148,16 +194,5 @@ check_dependency()
     exit 1
   fi
 
-  echo "${dep}: latest=${latest} last_built=${last_built}"
-
-  if version_gt "${latest}" "${last_built}"; then
-    set_output "${build_key}" "true"
-    set_output "${version_key}" "${latest}"
-    echo "  -> build required"
-    return 0
-  fi
-
-  set_output "${build_key}" "false"
-  echo "  -> up to date"
-  return 1
+  version_gt "${latest}" "${last_built}"
 }

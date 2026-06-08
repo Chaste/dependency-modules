@@ -65,3 +65,14 @@ jobs:
           module avail
           module load xercesc/${{ env.XERCESC_VER }}
           module test xercesc/${{ env.XERCESC_VER }}
+
+  record:
+    name: Record build
+    needs: setup
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    uses: ./.github/workflows/update-monitored-versions.yml
+    with:
+      dependency: xercesc
+      version: ${{ inputs.xercesc_ver }}

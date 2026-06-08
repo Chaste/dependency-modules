@@ -76,3 +76,14 @@ jobs:
           module avail
           module load petsc/${{ env.PETSC_VER }}/${{ env.PETSC_ARCH }}
           module test petsc/${{ env.PETSC_VER }}/${{ env.PETSC_ARCH }}
+
+  record:
+    name: Record build
+    needs: setup
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    uses: ./.github/workflows/update-monitored-versions.yml
+    with:
+      dependency: petsc
+      version: ${{ inputs.petsc_ver }}

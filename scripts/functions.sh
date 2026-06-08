@@ -142,6 +142,29 @@ version_ge()
   ! version_lt $1 $2
 }
 
+# Return the greatest of the given version strings.
+#
+# Usage: max_version <version>...
+#
+# Returns: the highest version string, or empty if no valid versions are given
+#
+# Examples:
+# `max_version 1.0.0 1.1.0 1.2.0` -> 1.2.0
+# `max_version 1.83.0 1.84.0` -> 1.84.0
+max_version()
+{
+  local max="" ver
+  for ver in "$@"; do
+    if [ -z "${ver}" ]; then
+      continue
+    fi
+    if [ -z "${max}" ] || version_gt "${ver}" "${max}"; then
+      max="${ver}"
+    fi
+  done
+  echo "${max}"
+}
+
 # Check if a string is a semantic version of the form X[.Y[.Z]][-rc].
 #
 # Usage: is_semver <string>

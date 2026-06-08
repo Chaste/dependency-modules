@@ -66,3 +66,14 @@ jobs:
           module avail
           module load vtk/${{ env.VTK_VER }}
           module test vtk/${{ env.VTK_VER }}
+
+  record:
+    name: Record build
+    needs: setup
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    uses: ./.github/workflows/update-monitored-versions.yml
+    with:
+      dependency: vtk
+      version: ${{ inputs.vtk_ver }}
