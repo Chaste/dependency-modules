@@ -18,6 +18,7 @@ jobs:
 
     permissions:
       contents: write
+      pull-requests: write
 
     steps:
       - name: Checkout
@@ -42,13 +43,24 @@ jobs:
 
       - name: Commit manifest update
         if: steps.check.outputs.needed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
+          branch="chore/update-${{ inputs.dependency }}-${{ inputs.version }}"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "${branch}"
           git add "infra/versions/${{ inputs.dependency }}.json"
           if git diff --staged --quiet; then
             echo "No manifest changes to commit."
             exit 0
           fi
           git commit -m "chore: record successful ${{ inputs.dependency }} ${{ inputs.version }} build"
-          git push
+          git push origin "${branch}"
+          if gh pr list --head "${branch}" --json number --jq 'length' | grep -q '^0$'; then
+            gh pr create \
+              --title "chore: update ${{ inputs.dependency }} to ${{ inputs.version }}" \
+              --body "Record successful ${{ inputs.dependency }} ${{ inputs.version }} build." \
+              --base main \
+              --head "${branch}"
+          fi
