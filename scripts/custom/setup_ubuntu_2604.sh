@@ -26,6 +26,8 @@ apt-get install -y --no-install-recommends \
   doxygen \
   git \
   lcov \
+  patch \
+  pkg-config \
   python-is-python3 \
   python3 \
   python3-dev \
