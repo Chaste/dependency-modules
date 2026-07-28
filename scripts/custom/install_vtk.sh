@@ -231,8 +231,8 @@ cmake \
     -DVTK_MODULE_USE_EXTERNAL_VTK_utf8=ON \
     -DVTK_MODULE_USE_EXTERNAL_VTK_zlib=ON \
     -DHDF5_IS_PARALLEL=ON \
-    ${src_dir} && \
-make -j ${parallel} && \
+    ${src_dir}
+make -j ${parallel}
 make install
 
 # Add modulefile

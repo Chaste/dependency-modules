@@ -69,15 +69,15 @@ if [ ${major} -le 2 ]; then
     cd xerces-c-src_${ver_si_on}
     export XERCESCROOT=$(pwd)
     cd src/xercesc
-    ./runConfigure -plinux -cgcc -xg++ -P${install_dir} && \
-    make -j ${parallel} && \
+    ./runConfigure -plinux -cgcc -xg++ -P${install_dir}
+    make -j ${parallel}
     make install
 else
     wget -nc https://archive.apache.org/dist/xerces/c/${major}/sources/xerces-c-${version}.tar.gz
     tar -xzf xerces-c-${version}.tar.gz
     cd xerces-c-${version}
-    ./configure --enable-netaccessor-socket --prefix=${install_dir} && \
-    make -j ${parallel} && \
+    ./configure --enable-netaccessor-socket --prefix=${install_dir}
+    make -j ${parallel}
     make install
 fi
 
