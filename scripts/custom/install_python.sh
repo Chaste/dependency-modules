@@ -58,8 +58,8 @@ mkdir -p ${install_dir}
 cd Python-${version}
 ./configure \
      --enable-optimizations \
-     --prefix=${install_dir} && \
-make -j ${parallel} && \
+     --prefix=${install_dir}
+make -j ${parallel}
 make install
 
 # Add symbolic links

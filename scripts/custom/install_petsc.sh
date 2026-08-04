@@ -115,7 +115,7 @@ case ${arch} in
             --with-fc=0 \
             --with-shared-libraries \
             --with-ssl=false \
-            --with-x=false && \
+            --with-x=false
         make -j ${parallel} all
         ;;
 
@@ -132,7 +132,7 @@ case ${arch} in
             --with-fc=0 \
             --with-shared-libraries \
             --with-ssl=false \
-            --with-x=false && \
+            --with-x=false
         make -j ${parallel} all
         ;;
     *)

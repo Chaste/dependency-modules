@@ -100,7 +100,7 @@ install_dir=${base_dir}/opt/boost/${version}
 mkdir -p ${install_dir}
 
 cd ${src_dir}
-./bootstrap.sh --prefix=${install_dir} && \
+./bootstrap.sh --prefix=${install_dir}
 ./b2 -j ${parallel} toolset=gcc cxxflags=-w install
 
 # Add modulefile

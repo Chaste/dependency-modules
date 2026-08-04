@@ -67,8 +67,8 @@ mkdir -p ${install_dir}
 cd cmake-${version}
 ./bootstrap \
     --prefix=${install_dir} \
-    --parallel=${parallel} && \
-make -j ${parallel} && \
+    --parallel=${parallel}
+make -j ${parallel}
 make install
 
 # Add modulefile

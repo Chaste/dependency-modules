@@ -75,8 +75,8 @@ cmake \
     -DBUILD_SHARED_LIBS=ON \
     -DCMAKE_BUILD_TYPE=Release \
     -DENABLE_MPI=ON \
-    -DEXAMPLES_ENABLE=OFF .. && \
-make -j ${parallel} && \
+    -DEXAMPLES_ENABLE=OFF ..
+make -j ${parallel}
 make install
 
 # Add modulefile

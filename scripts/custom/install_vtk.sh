@@ -193,6 +193,17 @@ if version_eq "${major}.${minor}" '9.2'; then  # VTK == 9.2.x
     patch -t -p1 < ${patch_dir}/9.2/gcc-13.patch
 fi
 
+# VTK 9.4.x patches
+if version_eq "${major}.${minor}" '9.4'; then  # VTK == 9.4.x
+    # netCDF 4.9.3 replaced the _FillValue macro with NC_FillValue, which the
+    # bundled exodusII on VTK < 9.5 still uses, so do a rename if applicable.
+    netcdf_version="$(pkg-config --modversion netcdf 2>/dev/null || true)"
+    if [ -n "${netcdf_version}" ] && version_ge "${netcdf_version}" '4.9.3'; then
+        cd ${src_dir}
+        patch -t -p1 < ${patch_dir}/9.4/netcdf-fillvalue.patch
+    fi
+fi
+
 # Build and install
 install_dir=${base_dir}/opt/vtk/${version}
 mkdir -p ${install_dir}
@@ -231,8 +242,8 @@ cmake \
     -DVTK_MODULE_USE_EXTERNAL_VTK_utf8=ON \
     -DVTK_MODULE_USE_EXTERNAL_VTK_zlib=ON \
     -DHDF5_IS_PARALLEL=ON \
-    ${src_dir} && \
-make -j ${parallel} && \
+    ${src_dir}
+make -j ${parallel}
 make install
 
 # Add modulefile

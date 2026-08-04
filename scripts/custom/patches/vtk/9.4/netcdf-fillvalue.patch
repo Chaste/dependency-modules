@@ -1,0 +1,39 @@
+Subject: Use NC_FillValue instead of _FillValue in bundled exodusII
+Origin: vendor, https://github.com/Unidata/netcdf-c/blob/main/include/netcdf.h
+
+netCDF 4.9.3 removed the _FillValue macro, which used a reserved identifier,
+and replaced it with NC_FillValue. VTK's bundled exodusII still refers to
+_FillValue, so it fails to compile against netCDF >= 4.9.3 when VTK is built
+with VTK_MODULE_USE_EXTERNAL_VTK_netcdf=ON:
+
+    ex_put_prop.c:246:54: error: '_FillValue' undeclared (first use in this
+    function); did you mean 'NC_FillValue'?
+
+Both macros expand to the string "_FillValue", so the attribute name written
+to file is unchanged.
+
+This patch is only applied when building against netCDF >= 4.9.3;
+see install_vtk.sh.
+---
+--- vtk9.orig/ThirdParty/exodusII/vtkexodusII/src/ex_put_prop.c
++++ vtk9/ThirdParty/exodusII/vtkexodusII/src/ex_put_prop.c
+@@ -243,7 +243,7 @@
+     vals[0] = 0; /* fill value */
+     /*   create attribute to cause variable to fill with zeros per routine spec
+      */
+-    if ((status = nc_put_att_longlong(exoid, propid, _FillValue, int_type, 1, vals)) != NC_NOERR) {
++    if ((status = nc_put_att_longlong(exoid, propid, NC_FillValue, int_type, 1, vals)) != NC_NOERR) {
+       snprintf(errmsg, MAX_ERR_LENGTH,
+                "ERROR: failed to create property name fill attribute in file id %d", exoid);
+       ex_err_fn(exoid, __func__, errmsg, status);
+--- vtk9.orig/ThirdParty/exodusII/vtkexodusII/src/ex_put_prop_names.c
++++ vtk9/ThirdParty/exodusII/vtkexodusII/src/ex_put_prop_names.c
+@@ -172,7 +172,7 @@
+ 
+     /*   create attribute to cause variable to fill with zeros per routine spec
+      */
+-    if ((status = nc_put_att_longlong(exoid, propid, _FillValue, int_type, 1, vals)) != NC_NOERR) {
++    if ((status = nc_put_att_longlong(exoid, propid, NC_FillValue, int_type, 1, vals)) != NC_NOERR) {
+       snprintf(errmsg, MAX_ERR_LENGTH,
+                "ERROR: failed to create property name fill attribute in file id %d", exoid);
+       ex_err_fn(exoid, __func__, errmsg, status);
