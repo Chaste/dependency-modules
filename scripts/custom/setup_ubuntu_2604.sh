@@ -52,6 +52,7 @@ apt-get install -y --no-install-recommends \
   libavformat62 \
   libavutil-dev \
   libavutil60 \
+  libcpanel-json-xs-perl \
   libdouble-conversion-dev \
   libdouble-conversion3 \
   libeigen3-dev \
